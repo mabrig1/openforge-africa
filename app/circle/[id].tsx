@@ -27,6 +27,10 @@ export default function CircleDetailScreen() {
       <TouchableOpacity accessibilityRole="button" onPress={()=>router.push({pathname:"/create-task",params:{circleId:id}})}
         className="bg-slate-700 p-4 rounded-xl flex-1 ml-2 items-center"><Text className="text-white font-bold">+ Create task</Text></TouchableOpacity>
     </View>
+    <TouchableOpacity accessibilityRole="button" onPress={()=>router.push({pathname:"/transfer-pack",params:{circleId:id}})}
+      className="bg-slate-700 border border-slate-600 mt-3 p-4 rounded-xl items-center">
+      <Text className="text-white font-bold">↗ Share or import study pack</Text>
+    </TouchableOpacity>
     <Text className="text-white text-xl font-bold mt-8 mb-3">Saved sources</Text>
     {ownMaterials.length===0&&<Text className="text-slate-400 mb-4">No notes yet. Paste a section of your course handout to power source-based coaching.</Text>}
     {ownMaterials.map((m)=><View key={m.id} className="bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-3">

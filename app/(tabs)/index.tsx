@@ -16,6 +16,10 @@ export default function CirclesScreen() {
           <View><Text className="text-white text-2xl font-bold">{materials.length}</Text><Text className="text-slate-400 text-xs">Saved notes</Text></View>
         </View>
       </View>
+      <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
+        className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
+        <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>
+      </TouchableOpacity>
       <View className="flex-row justify-between items-center mb-4">
         <Text className="text-white text-xl font-bold">Your study circles</Text>
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Create study circle"

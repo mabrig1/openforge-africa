@@ -13,10 +13,11 @@ A working React Native/Expo **on-device learning workspace** that supports:
 - Create study tasks: discussion, peer explanation, peer review and three-choice micro-quizzes.
 - Submit an attempt and see deterministic grading; progress and task completion are persisted.
 - Ask the **Study Coach** questions. It finds passages from saved notes using keyword overlap and clearly credits the source.
+- Manually share a source-labelled study pack using Android Share, or import a pasted pack after preview and confirmation (strict size/shape validation, duplicate import detection).
 - Remove notes and delete a circle together with its local content.
 - Low-data and privacy-friendly design; no authentication or remote service required.
 
-**Important:** Study Coach is a keyword-matching tool, **not** a local generative AI model and not semantic RAG. There is **no** multi-user synchronization, live chat, automatic invitation, Moodle connection or tutor reporting yet. One learner can plan activities for peers, but peers are not connected by this version. Do not evaluate v0.2 as though it offers live collaborative group work.
+**Important:** Study pack exchange is **user-initiated**, unencrypted, unauthenticated and not real-time synchronization. The chosen sharing app may send content over the internet. Shared answer keys are not safe for examinations. Study Coach is a keyword-matching tool, **not** a local generative AI model and not semantic RAG. There is **no** multi-user synchronization, live chat, automatic invitation, Moodle connection or tutor reporting yet. One learner can plan activities for peers, but peers are not connected by this version. Do not evaluate v0.2 as though it offers live collaborative group work.
 
 ## Why OpenForge
 
@@ -48,7 +49,7 @@ Use a **compatible Expo development build / Expo Go version for SDK 52**. Curren
 
 ## Privacy and trust
 
-This release stores content in AsyncStorage on the device. It does not transmit data, log analytics, collect identities, or upload material to a model. **AsyncStorage is not encrypted**, so do not store student records, passwords, confidential documents or other sensitive data. It also has device-dependent size limits: course notes are deliberately small. Deleting the app may destroy all data. There is no cloud backup.
+This release stores content in AsyncStorage on the device. It does not automatically transmit data, log analytics, collect identities, or upload material to a model. **Export through the native Share sheet is an intentional transfer to an app of your choosing**, not an encrypted channel controlled by OpenForge. **AsyncStorage is not encrypted**, so do not store student records, passwords, confidential documents or other sensitive data. It also has device-dependent size limits: course notes are deliberately small. Deleting the app may destroy all data. There is no cloud backup. Study pack transfer is **not a full personal-data backup** and exported content is not verified/signed.
 
 This is **not** an official NOUN or other institution service. Course materials must be shared within copyright and institutional rules. No certificate or credential is issued. Study Coach matching is intended for study prompts, not verified academic answers.
 
