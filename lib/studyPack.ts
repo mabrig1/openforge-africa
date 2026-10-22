@@ -1,6 +1,6 @@
 /** Explicit, manually shared text study packs. No implicit sync or trust. */
-import { LIMITS, validateCircle, validateMaterial, validateTask,
-  type CourseMaterial, type StudyCircle, type StudyTask, type TaskType } from "./study";
+import { validateCircle, validateMaterial, validateTask,
+  type CourseMaterial, type StudyCircle, type StudyTask, type TaskType } from "./study.ts";
 
 const KINDS: TaskType[] = ["discussion","explanation","peer-review","micro-quiz"];
 const MAX_PACK_CHARS = 30000;

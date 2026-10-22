@@ -16,4 +16,8 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm test
+      - name: Diagnose Metro versions
+        run: |
+          node -e "for(const p of ['metro','expo','nativewind','@expo/metro-config']) {try {let m=require(p+'/package.json');console.log(p,m.version)}catch(e){console.log(p,e.message)}}"
+          npm ls metro --depth=1 || true
       - run: npx expo export --platform android --output-dir dist
