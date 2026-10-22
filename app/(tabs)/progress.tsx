@@ -15,7 +15,7 @@ export default function ProgressScreen() {
          {text:"Cancel",style:"cancel"},
          {text:"Send via another app",onPress:async()=>{try{await Share.share({title:"OpenForge optional learning digest",message:digest});}
            catch{Alert.alert("Could not share","No sharing option is available.");}}
-       ])}]);
+       }])}]);
   };
   const progress = getProgress(tasks);
   return <ScrollView className="flex-1 bg-slate-900" contentContainerStyle={{padding:18,paddingBottom:36}}>
