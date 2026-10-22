@@ -2,75 +2,35 @@ import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
 import { router } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
+import { newId, validateCircle, LIMITS } from "../lib/study";
 
 export default function CreateCircleScreen() {
-  const { addCircle } = useCircleStore();
-  const [name, setName] = useState("");
-  const [courseCode, setCourseCode] = useState("");
-  const [courseTitle, setCourseTitle] = useState("");
-
-  const handleCreate = () => {
-    if (!name.trim() || !courseCode.trim()) {
-      Alert.alert("Missing information", "Please provide a circle name and course code.");
-      return;
-    }
-
-    addCircle({
-      id: `circle_${Date.now()}`,
-      name: name.trim(),
-      courseCode: courseCode.trim().toUpperCase(),
-      courseTitle: courseTitle.trim() || "Course",
-      memberCount: 1,
-      taskCount: 0,
-      lastActivity: "Just now",
-      createdAt: Date.now(),
-    });
-
-    Alert.alert("Circle created", "Your Study Circle is ready. Invite members offline or when you have connectivity.", [
-      { text: "OK", onPress: () => router.back() },
-    ]);
+  const addCircle = useCircleStore((s)=>s.addCircle);
+  const [name,setName]=useState("");
+  const [courseCode,setCode]=useState("");
+  const [courseTitle,setTitle]=useState("");
+  const create=()=>{
+    const issue=validateCircle(name,courseCode,courseTitle);
+    if(issue){Alert.alert("Check details",issue);return;}
+    const id=newId("circle");
+    addCircle({id,name:name.trim(),courseCode:courseCode.trim().toUpperCase(),courseTitle:courseTitle.trim()||"Course",
+      memberCount:1,taskCount:0,lastActivity:"Just now",createdAt:Date.now()});
+    router.replace({pathname:"/circle/[id]",params:{id}});
   };
-
-  return (
-    <ScrollView className="flex-1 bg-slate-900" contentContainerStyle={{ padding: 16 }}>
-      <Text className="text-slate-400 mb-6">
-        Create a small Study Circle (ideal size 3–8 students). You can invite members later.
-      </Text>
-
-      <Text className="text-slate-300 mb-1.5">Circle Name</Text>
-      <TextInput
-        className="bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 border border-slate-700"
-        placeholder="e.g. CIT 101 Morning Group"
-        placeholderTextColor="#64748B"
-        value={name}
-        onChangeText={setName}
-      />
-
-      <Text className="text-slate-300 mb-1.5">Course Code</Text>
-      <TextInput
-        className="bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 border border-slate-700"
-        placeholder="e.g. CIT 101"
-        placeholderTextColor="#64748B"
-        value={courseCode}
-        onChangeText={setCourseCode}
-        autoCapitalize="characters"
-      />
-
-      <Text className="text-slate-300 mb-1.5">Course Title (optional)</Text>
-      <TextInput
-        className="bg-slate-800 text-white rounded-xl px-4 py-3 mb-8 border border-slate-700"
-        placeholder="e.g. Introduction to Computers"
-        placeholderTextColor="#64748B"
-        value={courseTitle}
-        onChangeText={setCourseTitle}
-      />
-
-      <TouchableOpacity
-        onPress={handleCreate}
-        className="bg-green-600 py-4 rounded-xl items-center"
-      >
-        <Text className="text-white font-bold text-lg">Create Study Circle</Text>
-      </TouchableOpacity>
-    </ScrollView>
-  );
+  return <ScrollView className="flex-1 bg-slate-900" contentContainerStyle={{padding:20}}>
+    <Text className="text-white text-2xl font-bold">Start a circle</Text>
+    <Text className="text-slate-300 mt-2 mb-7 leading-6">Organise a course and study together. Groups of 3–8 are recommended; inviting members will require a future sharing release.</Text>
+    <Text className="text-slate-300 mb-2">Circle name</Text>
+    <TextInput accessibilityLabel="Circle name" className="bg-slate-800 border border-slate-600 p-4 text-white rounded-xl mb-5"
+      placeholder="PAD 101 Study Crew" placeholderTextColor="#94A3B8" value={name} onChangeText={setName} maxLength={LIMITS.circleName}/>
+    <Text className="text-slate-300 mb-2">Course code</Text>
+    <TextInput accessibilityLabel="Course code" className="bg-slate-800 border border-slate-600 p-4 text-white rounded-xl mb-5"
+      placeholder="PAD 101" placeholderTextColor="#94A3B8" value={courseCode} onChangeText={setCode} autoCapitalize="characters" maxLength={LIMITS.courseCode}/>
+    <Text className="text-slate-300 mb-2">Course title</Text>
+    <TextInput accessibilityLabel="Course title" className="bg-slate-800 border border-slate-600 p-4 text-white rounded-xl mb-7"
+      placeholder="Introduction to Public Administration" placeholderTextColor="#94A3B8" value={courseTitle} onChangeText={setTitle} maxLength={LIMITS.courseTitle}/>
+    <TouchableOpacity accessibilityRole="button" className="bg-green-600 p-4 rounded-xl items-center" onPress={create}>
+      <Text className="text-white font-bold text-lg">Create local workspace</Text>
+    </TouchableOpacity>
+  </ScrollView>;
 }
