@@ -1,126 +1,55 @@
-import { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { useCircleStore } from "../../stores/circleStore";
+import { groundedReply } from "../../lib/study";
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-}
-
-export default function AIFacilitatorScreen() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "I am your AI Facilitator.\n\nI help Study Circles stay productive offline. I can:\n• Suggest discussion questions grounded in your course materials\n• Check understanding\n• Help structure peer explanations\n• Guide micro-assessments\n\nAsk me how to run a better study session or generate questions for your circle.",
-    },
-  ]);
+interface Message { id: number; role: "student" | "coach"; text: string; }
+export default function CoachScreen() {
+  const { circles, materials } = useCircleStore();
+  const [circleId, setCircleId] = useState<string | null>(null);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const listRef = useRef<FlatList>(null);
-
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const selected = circleId && circles.some((c) => c.id === circleId) ? circleId : circles[0]?.id;
+  const sources = materials.filter((m) => m.circleId === selected);
+  const send = () => {
+    if (!input.trim() || !selected) return;
+    const reply = groundedReply(input.trim(), sources);
+    setMessages((previous) => [...previous,
+      {id: Date.now(),role:"student",text:input.trim()},
+      {id: Date.now()+1,role:"coach",text:reply.content}]);
     setInput("");
-    setLoading(true);
-
-    await new Promise((r) => setTimeout(r, 800));
-
-    // Simple facilitator responses (will later use real RAG)
-    const lower = userMsg.content.toLowerCase();
-    let reply =
-      "I can help your Study Circle go deeper. Try asking me to generate 3 discussion questions on a specific topic from your course, or ask how to structure a peer teaching session.";
-
-    if (lower.includes("question") || lower.includes("discuss")) {
-      reply =
-        "Here are three strong discussion questions you can use in your Study Circle (grounded in typical open university materials):\n\n1. What is the most important practical implication of this concept for a Nigerian student?\n2. Where do you see this idea working differently in our local context compared to the textbook example?\n3. How would you explain this concept to a classmate who missed the last session?\n\nAssign one question to each member and reconvene offline.";
-    } else if (lower.includes("peer") || lower.includes("teach") || lower.includes("explain")) {
-      reply =
-        "Peer teaching works best when structured:\n\n1. One student prepares a 5-minute explanation.\n2. Others ask clarifying questions only.\n3. The explainer then answers.\n4. Group votes on clarity (1–5).\n5. Record one key insight for the circle log.\n\nThis creates accountability without needing internet.";
-    }
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: reply,
-      },
-    ]);
-    setLoading(false);
   };
-
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-slate-900"
-    >
-      <View className="px-4 py-2 bg-slate-800 border-b border-slate-700">
-        <Text className="text-xs text-slate-400">AI Facilitator • Works fully offline</Text>
-      </View>
-
-      <FlatList
-        ref={listRef}
-        data={messages}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
-        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
-        renderItem={({ item }) => (
-          <View
-            className={`mb-4 max-w-[88%] ${
-              item.role === "user" ? "self-end" : "self-start"
-            }`}
-          >
-            <View
-              className={`rounded-2xl px-4 py-3 ${
-                item.role === "user"
-                  ? "bg-green-600"
-                  : "bg-slate-800 border border-slate-700"
-              }`}
-            >
-              <Text className="text-white leading-5">{item.content}</Text>
-            </View>
-          </View>
-        )}
-      />
-
-      <View className="flex-row items-center p-3 border-t border-slate-800 bg-slate-900">
-        <TextInput
-          className="flex-1 bg-slate-800 text-white rounded-full px-4 py-3 mr-2"
-          placeholder="Ask the Facilitator..."
-          placeholderTextColor="#64748B"
-          value={input}
-          onChangeText={setInput}
-          onSubmitEditing={handleSend}
-          editable={!loading}
-        />
-        <TouchableOpacity
-          onPress={handleSend}
-          disabled={loading || !input.trim()}
-          className={`w-12 h-12 rounded-full items-center justify-center ${
-            loading || !input.trim() ? "bg-slate-700" : "bg-green-600"
-          }`}
-        >
-          <Text className="text-white text-lg font-bold">{loading ? "…" : "↑"}</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
-  );
+  return <KeyboardAvoidingView className="flex-1 bg-slate-900" behavior={Platform.OS==="ios"?"padding":undefined}>
+    <View className="p-4 border-b border-slate-700">
+      <Text className="text-white text-2xl font-bold">Study Coach</Text>
+      <Text className="text-slate-300 text-sm mt-2 leading-5">Private keyword-based retrieval from saved course notes. No cloud AI, fabricated citations or hidden uploads.</Text>
+      <Text className="text-slate-400 mt-3 mb-2">Choose a course</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {circles.map((c) => <TouchableOpacity key={c.id} accessibilityRole="button" onPress={() => {setCircleId(c.id);setMessages([]);}}
+          className={selected===c.id?"bg-green-700 px-4 py-3 rounded-full mr-2":"bg-slate-700 px-4 py-3 rounded-full mr-2"}>
+          <Text className="text-white font-semibold">{c.courseCode}</Text>
+        </TouchableOpacity>)}
+      </ScrollView>
+      <Text className="text-green-400 text-xs mt-3">{sources.length} local note{sources.length===1?"":"s"} available • No network needed</Text>
+    </View>
+    <ScrollView className="flex-1 px-4" contentContainerStyle={{paddingVertical:20}}>
+      {messages.length===0 && <View className="bg-slate-800 border border-slate-700 p-5 rounded-2xl">
+        <Text className="text-white text-lg font-semibold">Ask a question from your notes</Text>
+        <Text className="text-slate-300 leading-6 mt-2">For example: “What does public accountability mean?” I will show the closest matching passage and three ways to discuss it with classmates.</Text>
+        {!selected && <Text className="text-amber-400 mt-3">Create a study circle first to begin.</Text>}
+        {selected && !sources.length && <Text className="text-amber-400 mt-3">Open your circle and save course notes first.</Text>}
+      </View>}
+      {messages.map((m) => <View key={m.id} className={m.role==="student"?"bg-green-800 rounded-2xl p-4 mb-3 ml-8":"bg-slate-800 rounded-2xl border border-slate-700 p-4 mb-3 mr-4"}>
+        <Text className="text-green-300 text-xs mb-2">{m.role==="student"?"YOU":"OFFLINE STUDY COACH"}</Text>
+        <Text className="text-white leading-6">{m.text}</Text>
+      </View>)}
+    </ScrollView>
+    <View className="flex-row p-3 border-t border-slate-700 items-center">
+      <TextInput accessibilityLabel="Question for Study Coach" className="bg-slate-800 text-white rounded-2xl flex-1 px-4 py-3"
+        placeholder="Ask about a saved topic..." placeholderTextColor="#94A3B8" value={input} onChangeText={setInput}
+        maxLength={300} multiline />
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Ask Study Coach" disabled={!selected||!input.trim()} onPress={send}
+        className="bg-green-600 p-3 rounded-xl ml-2"><Text className="text-white font-bold">Ask</Text></TouchableOpacity>
+    </View>
+  </KeyboardAvoidingView>;
 }
