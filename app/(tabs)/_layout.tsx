@@ -36,9 +36,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ai"
         options={{
-          title: "AI Facilitator",
+          title: "Coach",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="robot-happy-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="sessions"
+        options={{
+          title: "Focus",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="timer-outline" size={size} color={color} />
           ),
         }}
       />

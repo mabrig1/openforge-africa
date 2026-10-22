@@ -4,7 +4,7 @@
 
 > Study together. Even when mobile data runs out.
 
-## Version 0.2 — what's real today
+## Version 0.3 — what's real today
 
 A working React Native/Expo **on-device learning workspace** that supports:
 
@@ -12,6 +12,8 @@ A working React Native/Expo **on-device learning workspace** that supports:
 - Save source-labelled course notes (up to 12,000 characters each) without cloud upload.
 - Create study tasks: discussion, peer explanation, peer review and three-choice micro-quizzes.
 - Submit an attempt and see deterministic grading; progress and task completion are persisted.
+- Start a device-local focus sprint with a persistent start timestamp, stop or discard it, and optionally record a short reflection. Focus durations are wall-time estimates, not independently verified study/attendance.
+- Preview and voluntarily share a **counts-only** learning digest (task completion, practice quiz results and focus time). Sharing never happens automatically; the digest includes no circle names, student identities, source text or reflection notes.
 - Ask the **Study Coach** questions. It finds passages from saved notes using keyword overlap and clearly credits the source.
 - Manually share a source-labelled study pack using Android Share, or import a pasted pack after preview and confirmation (strict size/shape validation, duplicate import detection).
 - Remove notes and delete a circle together with its local content.
@@ -53,6 +55,14 @@ This release stores content in AsyncStorage on the device. It does not automatic
 
 This is **not** an official NOUN or other institution service. Course materials must be shared within copyright and institutional rules. No certificate or credential is issued. Study Coach matching is intended for study prompts, not verified academic answers.
 
+## Local focus + consented reporting
+
+- Focus sessions record a start and end timestamp, elapsed wall seconds (capped at four hours), and an optional private reflection (240 characters maximum). One active session per device; active state resumes on relaunch if local storage persists.
+- A session shorter than 10 seconds is not saved. Device clock manipulation or background time can make measurements inaccurate.
+- The voluntary digest includes **only aggregate numbers**, not individual academic records; small cohorts can still be reidentified in context. Never treat it as official assessment or evidence of supervised study.
+- Sharing invokes the operating-system Share sheet **only after preview and two explicit user actions**. You remain responsible for choosing a trustworthy recipient.
+- AsyncStorage is not encrypted and is inappropriate for sensitive learner records or confidential reflections.
+
 ## Project structure
 
 ```text
@@ -60,7 +70,7 @@ app/               Expo Router screens (circles, notes, tasks, Study Coach, prog
 lib/study.ts       Offline learning rules, validation, retrieval and scoring
 lib/db.ts          Future SQLite schema (not wired to v0.2 user flows)
 stores/            Versioned Zustand + AsyncStorage local persistence
-tests/             Deterministic domain tests (Node built-in runner)
+tests/             Deterministic domain tests and privacy regressions (Node built-in runner)
 .github/workflows/ Automated tests and TypeScript checks on PRs
 docs/              Architecture, accessibility, grant metrics and next phases
 ```
@@ -71,9 +81,9 @@ docs/              Architecture, accessibility, grant metrics and next phases
 
 ## Roadmap
 
-- **v0.3:** Explicit, encrypted peer-to-peer exchange or institution-hosted sync with per-circle identity, permissions, duplicate-safe imports and conflict resolution.
-- **v0.4:** Proper retrieval engine over imported content, optional on-device ML only where device capabilities permit, tested quality benchmarks and tutor consent workflows.
-- **v0.5:** Moodle/LTI adapter, institutional enrolment controls, privacy-impact assessment, accessible multilingual learning prompts, longitudinal pilot.
+- **v0.4:** Explicit, encrypted peer-to-peer exchange or institution-hosted sync with per-circle identity, permissions, duplicate-safe imports and conflict resolution.
+- **v0.5:** Proper retrieval engine over imported content, optional on-device ML only where device capabilities permit, tested quality benchmarks and tutor consent workflows.
+- **v0.6:** Moodle/LTI adapter, institutional enrolment controls, privacy-impact assessment, accessible multilingual learning prompts, longitudinal pilot.
 - **Security:** Signed releases, restricted telemetry by opt-in, durable key management, deletion/export controls, dependency review and adversarial sync tests.
 - **Platform:** Stepwise upgrade from Expo SDK 52 to a supported SDK with native-build checks before shipping.
 

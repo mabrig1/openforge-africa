@@ -2,7 +2,7 @@
   "expo": {
     "name": "OpenForge Africa",
     "slug": "openforge-africa",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0F172A",

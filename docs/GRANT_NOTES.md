@@ -1,12 +1,12 @@
 # Grant-ready research proposal notes — not a claim of achieved impact
 
-**Project:** OpenForge Africa, on-device ODL learning workspace (v0.2).
+**Project:** OpenForge Africa, on-device ODL learning workspace (v0.3).
 
 **Target learners:** Nigerian and African open/distance learners, initially possible pilot partners at NOUN or comparable institutions. No university endorsement or deployment is implied.
 
 ## Theory of change
 
-Low-connectivity, low-cost study routines may make it easier to complete self-study tasks and organise peer sessions. The product now enables offline notes, task creation, quizzes and learner self-monitoring; planned consented group exchange and tutor oversight will later test whether peer accountability adds value.
+Low-connectivity, low-cost study routines may make it easier to complete self-study tasks and organise peer sessions. The product now enables offline notes, task creation, quizzes, persistent local focus timers and learner-initiated aggregate reports; planned consented group exchange and tutor oversight will later test whether peer accountability adds value.
 
 ## Proposed 12-week pilot (requires consent / institutional approvals)
 
@@ -20,11 +20,15 @@ Low-connectivity, low-cost study routines may make it easier to complete self-st
 
 | Indicator | Collection | Protection |
 |---|---|---|
-| On-device tasks created/completed | Already local, optional aggregated export later | No identities or grades by default |
+| On-device tasks created/completed | Already local; learner can voluntarily share aggregate counts | No identities, course names or notes in digest |
 | Quiz attempts/correctness | Already local | Not an invigilated examination |
-| Peer sessions / shared materials | **Not implemented** | Needs opt-in exchange and privacy review |
+| Peer sessions / shared materials | Study packs can be exchanged manually; synchronous multi-user sessions are **not implemented** | Needs opt-in, authenticated exchange, identity and privacy review |
 | Learning efficacy / dropout | **Not measured** | Requires separate study design and approvals |
-| Tutor time saved | **Not measured** | Requires actual tutor workflow integration |
+| Tutor time saved | **Not measured**; voluntary counts-only digest is not a connected dashboard | Requires actual tutor workflow integration |
+
+## Focus timer measurement limitations
+
+Focus events are device-clock wall-time estimates, capped at four hours; backgrounding and clock changes can misstate time. Learners can stop/discard sessions. This does not measure attention, in-person peers or instructional outcomes. A pilot must triangulate with ethically collected baseline and follow-up measures.
 
 ## Budget/use-of-funds priority
 

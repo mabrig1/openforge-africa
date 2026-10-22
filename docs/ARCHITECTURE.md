@@ -1,4 +1,4 @@
-# OpenForge Africa v0.2: Architecture and honest capability boundary
+# OpenForge Africa v0.3: Architecture and honest capability boundary
 
 ## Current implementation
 
@@ -7,26 +7,32 @@ Expo Router React Native UI
   ↳ Zustand state & AsyncStorage persistence (version 1 / legacy migration)
       ↳ local study circles
       ↳ source-labelled snippets of course material
-      ↳ tasks / deterministic micro-quizzes
+      ↳ tasks / deterministic micro-quizzes\n      ↳ active focus timer + completed session history
       ↳ processed import-pack fingerprints for duplicate suppression
-  ↳ pure offline lib/study.ts
+  ↳ pure offline lib/study.ts + lib/focus.ts
       ↳ validation, scoring, local progress metrics
       ↳ lexical paragraph retrieval; source attribution
+      ↳ bounded focus-time calculations + anonymous aggregate learning summary
+  ↳ optional OS Share sheet for learner-initiated counts-only digest
 ```
 
 The older `lib/db.ts` schema provides a **future** SQLite design, not the source of truth in v0.2. No operation in the current UI calls it. The text-only sharing adapter (lib/studyPack.ts + native Share sheet) is a user-initiated import/export option, **not** live sync. Do not describe this release as using SQLite, vector search, embeddings, cryptography, LLMs, cross-device sync, tutoring integrations, or push notifications.
 
 ## Invariants
 
-- Creating and completing tasks never requires internet.
+- Creating/completing tasks and recording a focus sprint never requires internet.
 - The Study Coach never makes network requests and cannot invent missing sources.
 - Local study packs contain only notes and task definitions; personal completion scores are excluded. User must explicitly initiate export or confirm import. Packs are unverified plaintext and do not confer identity or authenticity.
 - Quiz answers are stored within the task on this device. This **is not suitable for high-stakes assessment** or anti-cheating use.
-- Progress counts only local events, not retention or learning efficacy.
+- Progress counts only local events, not retention or learning efficacy. Focus sessions reflect elapsed wall time (maximum 4h), not verified attention, attendance or group participation.
 - Circle membership is a future concept: `memberCount` is legacy scaffolding, not verified identities.
-- Deleting a local circle also removes its associated tasks and notes.
+- Deleting a local circle also removes its associated tasks, notes and focus sessions. A separate, confirmed action clears all local OpenForge workspace data (not forensic erasure of a device).
 - A student entering confidential data into local notes may expose it if the device is compromised; AsyncStorage is not encrypted.
 - App uninstall or storage reset may erase data permanently; study-pack export is not a complete, secure backup.
+
+## Volunteer tutor/mentor reports
+
+Only aggregate task, practice quiz and focus counts are included. No titles, course codes, student identifiers, reflections, notes or timestamps. An independent user-controlled Share action follows a confirmation and preview. There is **no** server-controlled institution dashboard, student monitoring or telemetry. Very small aggregates may still reveal information to a recipient; disclose this before sharing.
 
 ## Threat model & safeguarding
 
@@ -34,7 +40,7 @@ The older `lib/db.ts` schema provides a **future** SQLite design, not the source
 |---|---|---|
 | Unsupported study claim | Explicit local-source citation and no-match response | Human-reviewed evaluation set, hallucination/sourcing tests |
 | Imported malicious content | Strict manual JSON schema, limits and duplicate detection; content rendered as plain text | Provenance/signatures and institutional moderation before partner launch |
-| Leaked personal data | No cloud transfer or analytics | Encrypted storage, privacy notices, consent, access controls |
+| Leaked personal data | No automatic cloud transfer; export requires preview/consent; counts-only digest | Encrypted storage, privacy notices, reidentification review, access controls |
 | Quiz cheating | Answer reveal after completion | Server-issued or secured question sets for formal assessment |
 | Offline desynchronisation | No cross-device sync claimed | Stable identities, idempotent signed mutations, audit log |
 | Stolen/misplaced shared device | No account yet | Device PIN guidance, optional encrypted profiles and session control |
