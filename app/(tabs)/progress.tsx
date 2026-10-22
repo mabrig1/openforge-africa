@@ -12,7 +12,7 @@ export default function ProgressScreen() {
       <Text className="text-green-400 text-sm font-semibold">TASK COMPLETION</Text>
       <Text className="text-white text-5xl font-extrabold mt-2">{progress.percent}%</Text>
       <View className="bg-slate-700 rounded-full h-3 mt-4 overflow-hidden">
-        <View className="bg-green-500 h-3 rounded-full" style={{width:progress.percent+"%"}} />
+        <View className="bg-green-500 h-3 rounded-full" style={{width: `${progress.percent}%` as `${number}%`}} />
       </View>
       <Text className="text-slate-300 mt-3">{progress.completed} of {progress.total} learning tasks completed</Text>
     </View>
