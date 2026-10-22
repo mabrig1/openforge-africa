@@ -3,6 +3,8 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { newId, type StudyCircle, type StudyTask, type CourseMaterial } from "../lib/study";
 import type { ImportedPack } from "../lib/studyPack";
+import { elapsedFocusSeconds, sessionReflectionIssue,
+  type ActiveFocus, type FocusSession } from "../lib/focus";
 
 // Keep legacy named imports compatible with existing screens.
 export type { StudyCircle, CourseMaterial };
@@ -13,6 +15,11 @@ interface CircleState {
   tasks: StudyTask[];
   materials: CourseMaterial[];
   imports: string[];
+  sessions: FocusSession[];
+  activeFocus: ActiveFocus | null;
+  startFocus: (circleId: string) => boolean;
+  finishFocus: (reflection?: string) => FocusSession | null;
+  discardFocus: () => void;
   importPack: (pack: ImportedPack) => string | null;
   addCircle: (circle: StudyCircle) => void;
   removeCircle: (id: string) => void;
@@ -28,6 +35,34 @@ export const useCircleStore = create<CircleState>()(
       tasks: [],
       materials: [],
       imports: [],
+      sessions: [],
+      activeFocus: null,
+      startFocus: (circleId) => {
+        let started = false;
+        set((state) => {
+          if(state.activeFocus || !state.circles.some(c => c.id === circleId)) return state;
+          started = true;
+          return {...state, activeFocus:{circleId,startedAt:Date.now()}};
+        });
+        return started;
+      },
+      finishFocus: (reflection = "") => {
+        let record:FocusSession|null = null;
+        set((state) => {
+          const active = state.activeFocus;
+          if(!active || sessionReflectionIssue(reflection) ||
+             !state.circles.some((c) => c.id === active.circleId)) return state;
+          const now=Date.now();
+          const seconds=elapsedFocusSeconds(active.startedAt,now);
+          if(seconds<10) return state;
+          record={id:newId("focus"),circleId:active.circleId,
+            startedAt:active.startedAt,endedAt:now,seconds,
+            ...(reflection.trim()?{reflection:reflection.trim()}:{})};
+          return {...state,activeFocus:null,sessions:[record,...state.sessions]};
+        });
+        return record;
+      },
+      discardFocus: () => set((state) => ({...state,activeFocus:null})),
       importPack: (pack) => {
         let createdId: string | null = null;
         set((s) => {
@@ -59,6 +94,8 @@ export const useCircleStore = create<CircleState>()(
         circles: s.circles.filter((c) => c.id !== id),
         tasks: s.tasks.filter((t) => t.circleId !== id),
         materials: s.materials.filter((m) => m.circleId !== id),
+        sessions: s.sessions.filter((item) => item.circleId !== id),
+        activeFocus: s.activeFocus?.circleId === id ? null : s.activeFocus,
       })),
       addTask: (task) => set((s) => ({ tasks: [task, ...s.tasks] })),
       completeTask: (id, selectedIndex) => set((s) => ({
@@ -75,7 +112,7 @@ export const useCircleStore = create<CircleState>()(
     }),
     {
       name: "openforge-storage",
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       // Merge defaults with historical v0.1 state so older circles/tasks survive.
       migrate: (persisted: any) => ({
@@ -84,6 +121,8 @@ export const useCircleStore = create<CircleState>()(
         tasks: Array.isArray(persisted?.tasks) ? persisted.tasks : [],
         materials: Array.isArray(persisted?.materials) ? persisted.materials : [],
         imports: Array.isArray(persisted?.imports) ? persisted.imports : [],
+        sessions: Array.isArray(persisted?.sessions) ? persisted.sessions : [],
+        activeFocus: persisted?.activeFocus ?? null,
       }),
     }
   )

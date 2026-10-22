@@ -16,6 +16,10 @@ export default function CirclesScreen() {
           <View><Text className="text-white text-2xl font-bold">{materials.length}</Text><Text className="text-slate-400 text-xs">Saved notes</Text></View>
         </View>
       </View>
+      <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
+        className="bg-slate-700 border border-slate-600 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-semibold">⏱ Start an offline focus session</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
         className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
         <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>

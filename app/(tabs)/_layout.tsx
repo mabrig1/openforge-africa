@@ -43,6 +43,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="sessions"
+        options={{
+          title: "Focus",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="timer-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="progress"
         options={{
           title: "Progress",

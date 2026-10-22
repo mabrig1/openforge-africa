@@ -27,6 +27,10 @@ export default function CircleDetailScreen() {
       <TouchableOpacity accessibilityRole="button" onPress={()=>router.push({pathname:"/create-task",params:{circleId:id}})}
         className="bg-slate-700 p-4 rounded-xl flex-1 ml-2 items-center"><Text className="text-white font-bold">+ Create task</Text></TouchableOpacity>
     </View>
+    <TouchableOpacity accessibilityRole="button" onPress={()=>router.push("/(tabs)/sessions")}
+      className="bg-green-950 border border-green-800 mt-3 p-4 rounded-xl items-center">
+      <Text className="text-green-300 font-bold">⏱ Run an offline focus session</Text>
+    </TouchableOpacity>
     <TouchableOpacity accessibilityRole="button" onPress={()=>router.push({pathname:"/transfer-pack",params:{circleId:id}})}
       className="bg-slate-700 border border-slate-600 mt-3 p-4 rounded-xl items-center">
       <Text className="text-white font-bold">↗ Share or import study pack</Text>
