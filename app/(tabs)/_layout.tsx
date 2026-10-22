@@ -36,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ai"
         options={{
-          title: "AI Facilitator",
+          title: "Coach",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="robot-happy-outline" size={size} color={color} />
           ),

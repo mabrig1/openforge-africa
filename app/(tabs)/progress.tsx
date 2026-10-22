@@ -4,7 +4,13 @@ import { useCircleStore } from "../../stores/circleStore";
 import { getProgress } from "../../lib/study";
 
 export default function ProgressScreen() {
-  const { circles, tasks, materials, sessions } = useCircleStore();
+  const { circles, tasks, materials, sessions, resetLocalData } = useCircleStore();
+  const eraseData=()=>Alert.alert(
+    "Remove all local learning data?",
+    "All saved circles, course notes, tasks, quiz scores, focus sessions and imported-pack history will be removed from this app on this device. This cannot be undone. This is not a forensic secure erase.",
+    [{text:"Cancel",style:"cancel"},
+     {text:"Remove everything",style:"destructive",onPress:resetLocalData}]
+  );
   const localSummary=learningSummary(tasks,sessions);
   const shareDigest=()=>{
     const digest=voluntaryLearningDigest(tasks,sessions);
@@ -58,5 +64,10 @@ export default function ProgressScreen() {
       <Text className="text-green-300 font-bold">Your privacy matters</Text>
       <Text className="text-slate-200 mt-2 leading-6">Nothing is automatically sent to tutors, institutions, or analytics servers. Only explicit use of the share feature sends a selected aggregate report through another app. Formal institutional reporting and sync are not yet enabled.</Text>
     </View>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Remove all locally saved learning data"
+      onPress={eraseData} className="border border-rose-700 rounded-xl p-4 items-center mt-6">
+      <Text className="text-rose-300 font-bold">Remove all local learning data</Text>
+    </TouchableOpacity>
+    <Text className="text-slate-500 text-xs mt-2 leading-5">This clears this app's saved workspace. It is not a guaranteed forensic erase or a deletion of copies you previously shared.</Text>
   </ScrollView>;
 }

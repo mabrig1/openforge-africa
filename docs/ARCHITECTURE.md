@@ -26,7 +26,7 @@ The older `lib/db.ts` schema provides a **future** SQLite design, not the source
 - Quiz answers are stored within the task on this device. This **is not suitable for high-stakes assessment** or anti-cheating use.
 - Progress counts only local events, not retention or learning efficacy. Focus sessions reflect elapsed wall time (maximum 4h), not verified attention, attendance or group participation.
 - Circle membership is a future concept: `memberCount` is legacy scaffolding, not verified identities.
-- Deleting a local circle also removes its associated tasks and notes.
+- Deleting a local circle also removes its associated tasks, notes and focus sessions. A separate, confirmed action clears all local OpenForge workspace data (not forensic erasure of a device).
 - A student entering confidential data into local notes may expose it if the device is compromised; AsyncStorage is not encrypted.
 - App uninstall or storage reset may erase data permanently; study-pack export is not a complete, secure backup.
 

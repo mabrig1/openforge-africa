@@ -20,6 +20,7 @@ interface CircleState {
   startFocus: (circleId: string) => boolean;
   finishFocus: (reflection?: string) => FocusSession | null;
   discardFocus: () => void;
+  resetLocalData: () => void;
   importPack: (pack: ImportedPack) => string | null;
   addCircle: (circle: StudyCircle) => void;
   removeCircle: (id: string) => void;
@@ -63,6 +64,9 @@ export const useCircleStore = create<CircleState>()(
         return record;
       },
       discardFocus: () => set((state) => ({...state,activeFocus:null})),
+      resetLocalData: () => set(() => ({
+        circles: [], tasks: [], materials: [], imports: [], sessions: [], activeFocus: null,
+      })),
       importPack: (pack) => {
         let createdId: string | null = null;
         set((s) => {
