@@ -47,12 +47,13 @@ export const useCircleStore = create<CircleState>()(
       name: "openforge-storage",
       version: 1,
       storage: createJSONStorage(() => AsyncStorage),
+      // Merge defaults with historical v0.1 state so older circles/tasks survive.
       migrate: (persisted: any) => ({
+        ...persisted,
         circles: Array.isArray(persisted?.circles) ? persisted.circles : [],
         tasks: Array.isArray(persisted?.tasks) ? persisted.tasks : [],
         materials: Array.isArray(persisted?.materials) ? persisted.materials : [],
       }),
-      partialize: (s) => ({ circles: s.circles, tasks: s.tasks, materials: s.materials }),
     }
   )
 );
