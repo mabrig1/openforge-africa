@@ -31,3 +31,14 @@ jobs:
         run: npm run check:worker-local
       - name: Validate matching configuration for existing Worker (dry run only)
         run: npm run cf:dry-run:live
+      - name: Install Playwright Chromium for browser runtime smoke test
+        run: npx playwright install --with-deps chromium
+      - name: Verify real mobile browser rendering and local persistence
+        run: npm run check:browser
+      - name: Attach browser failure screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openforge-browser-failure
+          path: test-results/*.png
+          if-no-files-found: ignore
