@@ -1,5 +1,6 @@
+import { Alert } from "../../lib/platformDialogs";
 import { useState } from "react";
-import { ScrollView, Text, View, TouchableOpacity, Alert } from "react-native";
+import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useCircleStore } from "../../stores/circleStore";
 import { gradeQuiz } from "../../lib/study";
