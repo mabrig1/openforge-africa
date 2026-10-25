@@ -2,6 +2,18 @@
 
 **Status:** review-only draft. This branch does **not** deploy anything, bind a domain, create D1/R2 resources, enable public access, or change a Cloudflare account. The original Android application remains in the repository.
 
+## Latest CI / Cloudflare Builds alignment (October 25, 2026)
+
+The default `wrangler.jsonc` now uses **`name: "openforge-africa"`**, matching the Cloudflare-connected Worker. This was changed after repeated Cloudflare bot Build: Failed reports on the draft branch; the exact failure is **still unconfirmed** because Cloudflare's authenticated log was unavailable.
+
+- `wrangler.jsonc` is the connected **production-name** configuration. Running `wrangler deploy` without `--dry-run` against it may change the current production Worker. **Do not do so until expressly approving promotion and recording rollback information.**
+- `wrangler.staging.jsonc` retains the separate, isolated `openforge-africa-web-staging` identity; use `npm run cf:dry-run` for safe staged compilation.
+- `wrangler.live.jsonc` is an explicit same-name alias of the default configuration; `npm run cf:dry-run:live` checks the default production-name configuration without deployment.
+- The app is not served by `openforge.mabrigkorie.org` merely because a draft PR passes GitHub CI.
+- GitHub's browser test uses local Wrangler + headless Chromium to detect blank runtime pages and confirm fake-circle browser storage. It creates no cloud data.
+
+**Required Cloudflare Workers Builds settings:** connected Worker = `openforge-africa`; source repo = `mabrig1/openforge-africa`; branch must have this web implementation, Node 22; **Build command = `npm run build`**; Preview command = `npx wrangler preview` only if previews are enabled and the account has the appropriate safe preview setup; Deploy command = `npx wrangler deploy` only when approving production. Cloudflare Workers Builds **does not currently honor Wrangler custom build scripts**, so GitHub CI success does not establish what build command is configured in the Cloudflare dashboard. Check the build logs first.
+
 ## 25 October 2026 — Verified live Hello world and deployment mismatch
 
 A read-only fetch of `https://openforge.mabrigkorie.org/` confirmed that the public hostname currently returns **plain text `Hello world`**. This is a placeholder response, not an Expo front end or an empty React component. Changing a GitHub branch, passing the web bundle, or running `wrangler deploy --dry-run` cannot change the live response.
@@ -34,7 +46,7 @@ Both configs have **no** D1, R2, runtime code, API secrets or external resource 
 
 An **Expo Router client-rendered SPA** based on the same local learning screens (circles, notes, tasks, Study Coach, Focus, Progress and seven-day pilot). Web data is stored in the browser via Zustand + AsyncStorage's web storage implementation; it is local to the browser and **not** synchronized with Android. No student sign-in, remote API, AI inference, tutor dashboard, institutional authorization, encrypted storage or automatic peer sync is implemented.
 
-This is a *separate* Cloudflare static-assets Worker. `wrangler.jsonc` names it `openforge-africa-web-staging`, turns **workers_dev off**, defines no routes, domains or database bindings and serves `dist/index.html` for SPA navigation. Configuring a custom route or Cloudflare Access, merging PRs or publishing requires explicit owner authorization. Do not connect it to any existing Worker used by another app.
+This is a Cloudflare static-assets Worker with **two explicit configurations**: `wrangler.jsonc` targets the already-connected `openforge-africa` service by name; `wrangler.staging.jsonc` defines an isolated staging candidate. Both turn **workers_dev off**, define no routes, domains or database bindings, and serve `dist/index.html` for SPA navigation. Configuring a custom route or Cloudflare Access, merging PRs or publishing requires explicit owner authorization. Do not connect it to any existing Worker used by another app.
 
 ## Verify before approving any deployment
 
@@ -82,10 +94,10 @@ For a *new, isolated* Workers Builds application, not an existing live Worker:
 | Install | `npm install --no-audit --no-fund` (Node 22) |
 | Build command | `npm run build` |
 | Deploy command | `npx wrangler deploy` |
-| Config path | `./wrangler.jsonc` |
+| Config path | `./wrangler.jsonc` targets existing service; staging uses `./wrangler.staging.jsonc` explicitly |
 | Asset directory | `./dist` |
 | SPA fallback | `single-page-application` |
-| Worker | `openforge-africa-web-staging` |
+| Worker | `openforge-africa` for existing connected Worker; `openforge-africa-web-staging` only when expressly using staging config |
 | Workers.dev URL | deliberately disabled in draft |
 | D1, R2, API | **not configured / not needed** |
 
