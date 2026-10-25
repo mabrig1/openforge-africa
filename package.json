@@ -15,7 +15,7 @@
     "check:worker-local": "node scripts/smoke-local-worker.mjs",
     "cf:dry-run:live": "wrangler deploy --dry-run",
     "check:live": "node scripts/verify-live-site.mjs https://openforge.mabrigkorie.org/",
-    "cf:preview": "wrangler preview",
+    "cf:preview": "npm run build && npm run check:web && wrangler preview",
     "check:browser": "node scripts/browser-smoke.mjs"
   },
   "dependencies": {
