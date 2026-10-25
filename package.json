@@ -48,5 +48,9 @@
     "metro": "0.81.5",
     "wrangler": "^4.151.0"
   },
-  "private": true
+  "private": true,
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22 <23"
+  }
 }
