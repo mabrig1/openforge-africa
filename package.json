@@ -12,7 +12,9 @@
     "build": "expo export --platform web --output-dir dist",
     "check:web": "node scripts/check-web-output.mjs",
     "cf:dry-run": "wrangler deploy --dry-run",
-    "check:worker-local": "node scripts/smoke-local-worker.mjs"
+    "check:worker-local": "node scripts/smoke-local-worker.mjs",
+    "cf:dry-run:live": "wrangler deploy --config wrangler.live.jsonc --dry-run",
+    "check:live": "node scripts/verify-live-site.mjs https://openforge.mabrigkorie.org/"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
