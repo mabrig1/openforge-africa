@@ -4,6 +4,10 @@
 
 > Study together. Even when mobile data runs out.
 
+## Draft pilot-first upgrade (not released)
+
+A new opt-in **seven-day study journal** is under review on a stacked feature branch. From the Circles screen, a learner can start a local pilot and self-report daily study mode, biggest obstacle and usefulness (1–5); optional aggregate-only report sharing remains voluntary. This is local **self-report**, not attendance validation, real peer sync, demonstrated retention impact, or institution-grade analytics. It does not connect to a backend or upload data. See [Pilot upgrade and Cloudflare-only architecture](docs/PILOT_CLOUDFLARE_ONLY.md) for real boundaries and Android release gates.
+
 ## Version 0.3 — what's real today
 
 A working React Native/Expo **on-device learning workspace** that supports:
