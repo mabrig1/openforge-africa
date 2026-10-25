@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "openforge-africa-web-staging",
+  "name": "openforge-africa",
   "compatibility_date": "2026-10-25",
   "workers_dev": false,
   "assets": {
