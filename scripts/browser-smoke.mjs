@@ -37,12 +37,12 @@ try {
   await page.getByRole("textbox",{name:"Course code"}).fill("QA 101");
   await page.getByRole("textbox",{name:"Course title"}).fill("Synthetic test subject");
   await page.getByRole("button",{name:"Create local workspace"}).click();
-  await page.getByText("Fictional QA Circle").first().waitFor({timeout:12000});
+  await page.getByText("Fictional QA Circle").last().waitFor({timeout:12000});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("Fictional QA Circle").first().waitFor({state:"visible",timeout:15000});
+  await page.getByText("Fictional QA Circle").last().waitFor({state:"visible",timeout:15000});
   console.log("PASS: browser-local study circle persists on reload");
   await page.goto(address+"/pilot",{waitUntil:"domcontentloaded"});
-  await page.getByText("Seven-day study pilot").waitFor({state:"visible",timeout:15000});
+  await page.getByText("Seven-day study pilot").last().waitFor({state:"visible",timeout:15000});
   console.log("PASS: direct SPA navigation to /pilot");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
