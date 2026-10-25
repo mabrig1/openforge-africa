@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { Alert } from "../../lib/platformDialogs";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useCircleStore } from "../../stores/circleStore";
 import { getProgress } from "../../lib/study";
