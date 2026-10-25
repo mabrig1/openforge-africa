@@ -11,7 +11,8 @@
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "build": "expo export --platform web --output-dir dist",
     "check:web": "node scripts/check-web-output.mjs",
-    "cf:dry-run": "wrangler deploy --dry-run"
+    "cf:dry-run": "wrangler deploy --dry-run",
+    "check:worker-local": "node scripts/smoke-local-worker.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
