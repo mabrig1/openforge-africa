@@ -2,6 +2,34 @@
 
 **Status:** review-only draft. This branch does **not** deploy anything, bind a domain, create D1/R2 resources, enable public access, or change a Cloudflare account. The original Android application remains in the repository.
 
+## 25 October 2026 — Verified live Hello world and deployment mismatch
+
+A read-only fetch of `https://openforge.mabrigkorie.org/` confirmed that the public hostname currently returns **plain text `Hello world`**. This is a placeholder response, not an Expo front end or an empty React component. Changing a GitHub branch, passing the web bundle, or running `wrangler deploy --dry-run` cannot change the live response.
+
+GitHub PR #4's Cloudflare bot independently reports **Cloudflare Build: Failed** on commits including `eaa1255` and `dfbfe79` for the dashboard Worker service `openforge-africa`. The actual Cloudflare build logs are behind account authentication and have **not** been inspected, so their exact error is unconfirmed.
+
+One concrete, high-risk mismatch exists: the **already-connected Cloudflare Worker** is named `openforge-africa`, while this branch's default `wrangler.jsonc` is intentionally named `openforge-africa-web-staging`. Cloudflare's own Workers Builds documentation states that a mismatched Worker name can cause a deployment build to fail. This is a credible explanation, **not** a confirmed log diagnosis.
+
+### Two isolated configurations now provided
+
+- `wrangler.jsonc`: **isolated staging** candidate named `openforge-africa-web-staging` with `workers_dev: false`. Never point the existing Worker `openforge-africa` at this config.
+- `wrangler.live.jsonc`: **future production candidate** named `openforge-africa`, the exact connected service name, with SPA static assets from `dist`. This file does **not** deploy or bind any routes by itself.
+
+Both configs have **no** D1, R2, runtime code, API secrets or external resource provisioning. Both retain `workers_dev: false`. GitHub Actions runs **both dry-runs** and a local Worker routing smoke test. It does not publish either configuration.
+
+### Safest completion sequence
+
+1. Preserve or export the current `openforge-africa` Worker version and bindings from Cloudflare before replacement; list all attached domains/routes. **Do not delete the existing Worker.**
+2. In Cloudflare **Workers & Pages → openforge-africa → Deployments → View Build History**, read the latest failed build logs to confirm the error (configuration name, npm build script, permissions, wrong branch or deploy command).
+3. In **Settings → Builds**, ensure the GitHub repository is `mabrig1/openforge-africa`, root is repository root, install uses Node 22, and build command is `npm run build`. The connected branch must contain the web code (PR #4 is **stacked and unmerged**, so `main` does not contain it).
+4. **Do not apply step 5 automatically.** Review the current Worker and any Cloudflare Access requirements. Approve an isolated staging verification before exposing the app to real visitors.
+5. For an **approved production promotion only**, the deploy command is `npx wrangler deploy --config wrangler.live.jsonc` (not the default `wrangler.jsonc`). This targets the existing service name `openforge-africa`; wrong target selection can replace the live Worker.
+6. Confirm the intended `openforge.mabrigkorie.org` route is mapped to `openforge-africa` and that no competing Worker/DNS route intercepts requests. This must be confirmed in the Cloudflare dashboard, not guessed from repo code.
+7. After the approved switch, use `npm run check:live`: it performs a **read-only** HTTP check and fails if the URL still returns `Hello world` or an invalid HTML shell. Then do real-browser smoke tests to rule out JavaScript runtime errors.
+8. If health checks fail, roll back **only** the targeted Worker to its previously captured last-good version. Do not touch other services.
+
+**Important:** A static Expo SPA responds with HTML + JavaScript. It is not deployed merely by creating a domain or checking GitHub CI; the Cloudflare Worker must actually receive the built assets, and the correct service must be bound to the domain.
+
 ## What this builds
 
 An **Expo Router client-rendered SPA** based on the same local learning screens (circles, notes, tasks, Study Coach, Focus, Progress and seven-day pilot). Web data is stored in the browser via Zustand + AsyncStorage's web storage implementation; it is local to the browser and **not** synchronized with Android. No student sign-in, remote API, AI inference, tutor dashboard, institutional authorization, encrypted storage or automatic peer sync is implemented.
