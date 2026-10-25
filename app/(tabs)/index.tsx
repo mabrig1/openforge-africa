@@ -1,64 +1,60 @@
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import { useCircleStore } from "../../stores/circleStore";
 
 export default function CirclesScreen() {
-  const { circles } = useCircleStore();
-
+  const { circles, tasks, materials } = useCircleStore();
   return (
-    <View className="flex-1 bg-slate-900 p-4">
-      <View className="flex-row justify-between items-center mb-5">
-        <View>
-          <Text className="text-2xl font-bold text-white">Study Circles</Text>
-          <Text className="text-slate-400 text-sm mt-0.5">
-            Learn together, even offline
-          </Text>
+    <View className="flex-1 bg-slate-900 px-4 pt-5">
+      <View className="bg-slate-800 rounded-3xl p-5 mb-5 border border-slate-700">
+        <Text className="text-green-400 font-bold text-xs tracking-widest">OPENFORGE AFRICA • OFFLINE FIRST</Text>
+        <Text className="text-white text-3xl font-extrabold mt-2">Learn stronger, together.</Text>
+        <Text className="text-slate-300 mt-2 leading-5">Turn course notes into study sessions, challenges and measurable progress — even without data.</Text>
+        <View className="flex-row mt-5">
+          <View className="mr-8"><Text className="text-white text-2xl font-bold">{circles.length}</Text><Text className="text-slate-400 text-xs">Circles</Text></View>
+          <View className="mr-8"><Text className="text-white text-2xl font-bold">{tasks.length}</Text><Text className="text-slate-400 text-xs">Tasks</Text></View>
+          <View><Text className="text-white text-2xl font-bold">{materials.length}</Text><Text className="text-slate-400 text-xs">Saved notes</Text></View>
         </View>
-        <TouchableOpacity
-          onPress={() => router.push("/create-circle")}
-          className="bg-green-600 px-4 py-2 rounded-full"
-        >
-          <Text className="text-white font-semibold">+ New</Text>
+      </View>
+      <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
+        className="bg-slate-700 border border-slate-600 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-semibold">⏱ Start an offline focus session</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open optional seven-day study pilot" onPress={() => router.push("/pilot")}
+        className="bg-green-800 border border-green-600 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-semibold">Start or review a seven-day study pilot</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
+        className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
+        <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>
+      </TouchableOpacity>
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className="text-white text-xl font-bold">Your study circles</Text>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Create study circle"
+          onPress={() => router.push("/create-circle")} className="bg-green-600 py-3 px-5 rounded-full">
+          <Text className="text-white font-bold">+ Create</Text>
         </TouchableOpacity>
       </View>
-
-      {circles.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-6xl mb-4">👥</Text>
-          <Text className="text-white text-xl font-semibold text-center mb-2">
-            No Study Circles yet
-          </Text>
-          <Text className="text-slate-400 text-center leading-5">
-            Create a small group (3–8 students) around a course. Collaborate offline. The AI Facilitator will guide your discussions using only your downloaded materials.
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={circles}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <Link href={`/circle/${item.id}`} asChild>
-              <TouchableOpacity className="bg-slate-800 rounded-2xl p-4 mb-3 border border-slate-700">
-                <View className="flex-row justify-between items-start">
-                  <View className="flex-1">
-                    <Text className="text-white font-bold text-lg">{item.name}</Text>
-                    <Text className="text-slate-300 mt-1">{item.courseCode} • {item.courseTitle}</Text>
-                  </View>
-                  <View className="bg-green-900/40 px-2.5 py-1 rounded-full">
-                    <Text className="text-green-400 text-xs font-medium">
-                      {item.memberCount} members
-                    </Text>
-                  </View>
-                </View>
-                <Text className="text-slate-500 text-xs mt-3">
-                  {item.taskCount} active tasks • Last activity {item.lastActivity}
-                </Text>
-              </TouchableOpacity>
-            </Link>
-          )}
-        />
-      )}
+      <FlatList data={circles} keyExtractor={(item) => item.id} showsVerticalScrollIndicator={false}
+        ListEmptyComponent={<View className="bg-slate-800 rounded-3xl p-7 mt-4 border border-slate-700">
+          <Text className="text-white text-xl font-bold mb-3">Your first circle starts here</Text>
+          <Text className="text-slate-300 leading-6">Create a circle for a course, paste the relevant notes, then build offline discussion tasks or a three-answer quiz. Work is saved locally on this device.</Text>
+        </View>}
+        renderItem={({item}) => {
+          const ownTasks = tasks.filter((task) => task.circleId === item.id);
+          const completed = ownTasks.filter((task) => task.status === "completed").length;
+          return <TouchableOpacity accessibilityRole="button" onPress={() => router.push({pathname:"/circle/[id]",params:{id:item.id}})}
+            className="bg-slate-800 border border-slate-700 rounded-2xl p-5 mb-3">
+            <Text className="text-green-400 text-xs font-semibold">{item.courseCode}</Text>
+            <Text className="text-white text-xl font-bold mt-1">{item.name}</Text>
+            <Text className="text-slate-300 mt-1">{item.courseTitle}</Text>
+            <View className="flex-row justify-between mt-4">
+              <Text className="text-slate-400 text-xs">{materials.filter((m) => m.circleId === item.id).length} saved sources</Text>
+              <Text className="text-slate-400 text-xs">{completed}/{ownTasks.length} tasks completed →</Text>
+            </View>
+          </TouchableOpacity>;
+        }}
+      />
     </View>
   );
 }

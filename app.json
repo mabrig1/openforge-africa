@@ -1,29 +1,32 @@
 {
   "expo": {
-    "name": "OpenForge",
+    "name": "OpenForge Africa",
     "slug": "openforge-africa",
-    "version": "0.1.0",
+    "version": "0.3.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0F172A"
-    },
-    "assetBundlePatterns": ["**/*"],
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0F172A",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "africa.openforge.app"
     },
     "android": {
+      "package": "africa.openforge.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
-      },
-      "package": "africa.openforge.app"
+      }
     },
-    "plugins": ["expo-router", "expo-sqlite"],
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ],
     "scheme": "openforge",
     "experiments": {
       "typedRoutes": true

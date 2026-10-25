@@ -1,0 +1,44 @@
+name: Verify offline learning
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      - name: Diagnose Metro versions
+        run: |
+          node -e "for(const p of ['metro','expo','nativewind','@expo/metro-config']) {try {let m=require(p+'/package.json');console.log(p,m.version)}catch(e){console.log(p,e.message)}}"
+          npm ls metro --depth=1 || true
+      - run: npx expo export --platform android --output-dir dist
+      - name: Export production website
+        run: npm run build
+      - name: Validate web output
+        run: npm run check:web
+      - name: Verify Wrangler config without deployment
+        run: npm run cf:dry-run
+      - name: Test SPA routes and assets with local Wrangler
+        run: npm run check:worker-local
+      - name: Validate matching configuration for existing Worker (dry run only)
+        run: npm run cf:dry-run:live
+      - name: Install Playwright Chromium for browser runtime smoke test
+        run: npx playwright install --with-deps chromium
+      - name: Verify real mobile browser rendering and local persistence
+        run: npm run check:browser
+      - name: Attach browser failure screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openforge-browser-failure
+          path: test-results/*.png
+          if-no-files-found: ignore
