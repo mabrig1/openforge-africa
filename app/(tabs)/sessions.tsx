@@ -1,5 +1,6 @@
+import { Alert } from "../../lib/platformDialogs";
 import { useEffect, useState } from "react";
-import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { ScrollView, View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useCircleStore } from "../../stores/circleStore";
 import { elapsedFocusSeconds, learningSummary, MAX_REFLECTION } from "../../lib/focus";
 

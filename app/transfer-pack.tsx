@@ -1,5 +1,6 @@
+import { Share, Alert } from "../lib/platformDialogs";
 import { useState } from "react";
-import { ScrollView, View, Text, TextInput, TouchableOpacity, Share, Alert } from "react-native";
+import { ScrollView, View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
 import { buildStudyPack, parseStudyPack } from "../lib/studyPack";

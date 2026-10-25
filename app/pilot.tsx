@@ -1,5 +1,6 @@
+import { Alert, Share } from "../lib/platformDialogs";
 import { useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View, Share } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { router } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
 import { localDay, optionalPilotDigest, pilotDay, pilotSummary,

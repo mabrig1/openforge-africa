@@ -1,4 +1,5 @@
-import { ScrollView, Text, View, Share, Alert, TouchableOpacity } from "react-native";
+import { Share, Alert } from "../../lib/platformDialogs";
+import { ScrollView, Text, View, TouchableOpacity } from "react-native";
 import { learningSummary, voluntaryLearningDigest } from "../../lib/focus";
 import { useCircleStore } from "../../stores/circleStore";
 import { getProgress } from "../../lib/study";

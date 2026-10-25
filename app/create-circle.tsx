@@ -1,5 +1,6 @@
+import { Alert } from "../lib/platformDialogs";
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import { router } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
 import { newId, validateCircle, LIMITS } from "../lib/study";

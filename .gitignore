@@ -15,3 +15,8 @@ web-build/
 .env.local
 .idea/
 .vscode/
+
+# Cloudflare local state and private development variables
+.wrangler/
+.dev.vars*
+!.dev.vars.example

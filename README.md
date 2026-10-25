@@ -8,6 +8,10 @@
 
 A new opt-in **seven-day study journal** is under review on a stacked feature branch. From the Circles screen, a learner can start a local pilot and self-report daily study mode, biggest obstacle and usefulness (1–5); optional aggregate-only report sharing remains voluntary. This is local **self-report**, not attendance validation, real peer sync, demonstrated retention impact, or institution-grade analytics. It does not connect to a backend or upload data. See [Pilot upgrade and Cloudflare-only architecture](docs/PILOT_CLOUDFLARE_ONLY.md) for real boundaries and Android release gates.
 
+## Web deployment preparation (draft)
+
+The web-compatible Expo Router build and **Cloudflare Workers static-assets staging** configuration are in a separate unmerged branch. `npm run build` exports an SPA to `dist/`; `npm run check:web` checks the output and `npm run cf:dry-run` validates Wrangler without uploading anything. Read [Cloudflare web deployment instructions](docs/CLOUDFLARE_WEB_DEPLOYMENT.md) **before** any domain change or deployment. Browser data remains local, unencrypted and is not synced with Android. No Cloudflare API, D1/R2 integration, institutional login, or public deployment has been made.
+
 ## Version 0.3 — what's real today
 
 A working React Native/Expo **on-device learning workspace** that supports:
