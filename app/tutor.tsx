@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
 import { groundedReply } from "../lib/study";
 import { setStudioDraft } from "../lib/studioDraft";
@@ -14,7 +14,8 @@ interface TutorResult {
 export default function TutorScreen() {
   const circles = useCircleStore(s=>s.circles);
   const materials = useCircleStore(s=>s.materials);
-  const [circleId,setCircleId]=useState("");
+  const params=useLocalSearchParams<{circleId?:string}>();
+  const [circleId,setCircleId]=useState(params.circleId??"");
   const current=circleId||circles[0]?.id||"";
   const notes=materials.filter(s=>s.circleId===current);
   const [noteIds,setNoteIds]=useState<string[]>([]);
