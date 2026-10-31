@@ -2,6 +2,7 @@
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
+import { readFile, stat } from "node:fs/promises";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const address="http://127.0.0.1:8792";
@@ -78,22 +79,55 @@ try {
   await page.getByRole("textbox",{name:"Explainer source text"}).fill("Students can learn without internet. Offline notes support practice tasks. Small quizzes show local progress.");
   await page.getByRole("button",{name:"Generate storyboard and infographic"}).click();
   await page.getByText("Actual SVG infographic preview").waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Choose timeline infographic layout"}).click();
   const svgDownload=page.waitForEvent("download",{timeout:15000});
   await page.getByRole("button",{name:"Download SVG infographic"}).click();
   const saved=await svgDownload;
   if(saved.suggestedFilename()!=="openforge-infographic.svg")throw Error("SVG download failed");
-  console.log("PASS: real downloadable SVG infographic created");
+  const actualSvg=await readFile(await saved.path(),"utf8");
+  if(!actualSvg.includes('<line x1="109"')||!actualSvg.includes("OPENFORGE AFRICA"))
+    throw Error("Selected timeline diagram was not exported");
+  console.log("PASS: timeline infographic SVG generated and downloaded");
+  await page.getByRole("button",{name:"Slide duration 5 seconds"}).click();
+  const subtitleDownload=page.waitForEvent("download",{timeout:15000});
+  await page.getByRole("button",{name:"Download SRT slide subtitles"}).click();
+  const subtitle=await subtitleDownload;
+  if(subtitle.suggestedFilename()!=="openforge-explainer.srt")throw Error("SRT filename invalid");
+  const srt=await readFile(await subtitle.path(),"utf8");
+  if(!srt.includes("00:00:00,000 --> 00:00:05,000")||!srt.includes("00:00:05,000 --> 00:00:10,000"))
+    throw Error("SRT cues do not match 5 second scene timing");
+  console.log("PASS: SRT subtitle export with exact per-slide timings");
+  await page.getByRole("button",{name:"Slide duration 3 seconds"}).click();
+  await page.getByRole("checkbox",{name:"Record my own microphone narration locally"}).click();
+  await page.getByText("Requires microphone permission upon Render.",{exact:false}).waitFor({state:"visible"});
+  await page.getByRole("checkbox",{name:"Record my own microphone narration locally"}).click();
+  console.log("PASS: optional microphone opt-in can be enabled and disabled");
   const canRecord=await page.evaluate(()=>
     typeof MediaRecorder!=="undefined" && !!HTMLCanvasElement.prototype.captureStream &&
     ["video/webm;codecs=vp8","video/webm"].some(m=>MediaRecorder.isTypeSupported(m)));
   if(canRecord){
-    await page.getByRole("button",{name:"Render silent WebM explainer video"}).click();
-    await page.getByRole("button",{name:"Download rendered WebM video"}).waitFor({state:"visible",timeout:35000});
+    await page.getByRole("button",{name:"Render explainer video"}).click();
+    await page.getByRole("button",{name:"Download rendered explainer video"}).waitFor({state:"visible",timeout:35000});
+    await page.getByLabel("Local recorded explainer preview").waitFor({state:"visible",timeout:12000});
+    await page.waitForFunction(() => {
+      const v=document.querySelector('video[aria-label="Local recorded explainer preview"]');
+      return v instanceof HTMLVideoElement && v.readyState>=1 && v.videoWidth>0;
+    },null,{timeout:12000});
+    console.log("PASS: actual browser video metadata plays in local preview");
     const videoDownload=page.waitForEvent("download",{timeout:15000});
-    await page.getByRole("button",{name:"Download rendered WebM video"}).click();
+    await page.getByRole("button",{name:"Download rendered explainer video"}).click();
     const video=await videoDownload;
-    if(video.suggestedFilename()!=="openforge-explainer.webm")throw Error("WebM download failed");
-    console.log("PASS: actual WebM video export produced by canvas recorder");
+    const name=video.suggestedFilename();
+    if(!["openforge-explainer.webm","openforge-explainer.mp4"].includes(name))
+      throw Error("Invalid real video filename: "+name);
+    const output=await video.path();
+    if((await stat(output)).size<2000)throw Error("Encoded video file is too small");
+    const bytes=await readFile(output);
+    if(name.endsWith(".webm") && bytes.subarray(0,4).toString("hex")!=="1a45dfa3")
+      throw Error("WebM signature missing");
+    if(name.endsWith(".mp4") && !bytes.subarray(0,20).toString("latin1").includes("ftyp"))
+      throw Error("MP4 container signature missing");
+    console.log("PASS: real playable-format "+name+" video exported with valid container header");
   } else console.log("SKIP: headless browser does not support WebM capture");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
