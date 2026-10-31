@@ -44,6 +44,16 @@ try {
   await page.goto(address+"/pilot",{waitUntil:"domcontentloaded"});
   await page.getByText("Seven-day study pilot").last().waitFor({state:"visible",timeout:15000});
   console.log("PASS: direct SPA navigation to /pilot");
+  await page.goto(address+"/challenge",{waitUntil:"domcontentloaded"});
+  await page.getByText("Build better. Prove it.").waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Run six local integrity checks"}).click();
+  await page.getByText("6 of 6 local checks passed").waitFor({state:"visible",timeout:15000});
+  console.log("PASS: challenge page runs real local integrity checks");
+  await page.getByRole("button",{name:"Load synthetic demonstration study circle"}).click();
+  await page.getByText("OpenForge Judge Demo (synthetic)").last().waitFor({state:"visible",timeout:15000});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("OpenForge Judge Demo (synthetic)").last().waitFor({state:"visible",timeout:15000});
+  console.log("PASS: synthetic judge course imports and survives reload");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
