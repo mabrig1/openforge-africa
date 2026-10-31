@@ -16,7 +16,7 @@ test("chapter 23 requirements, word count and 100-point human rubric",()=>{
 test("draft readiness checks length but never invents academic grades",()=>{
  const draft={...EMPTY_CAPSTONE,question:"Is online tutoring equitable?",
    abstract:Array(160).fill("abstract").join(" "),
-   reconstruction:Array(2900).fill("premise").join(" "),
+   reconstruction:Array(3100).fill("premise").join(" "),
    references:"Author, year, document",
    aiDisclosure:"No AI assistance was used."};
  const result=checkCapstone(draft);
