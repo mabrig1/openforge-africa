@@ -185,6 +185,28 @@ try {
   if(!exportedDraft.includes("unequal device access")||!exportedDraft.includes("No AI services"))
     throw Error("Capstone export lost data or disclosure");
   console.log("PASS: capstone saves privately across reload, retains disclosure and exports readable TXT");
+  await page.goto(address+"/psy210",{waitUntil:"domcontentloaded"});
+  await page.getByText("Psychology in the Age of AI").last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("0 / 6 modules reviewed").waitFor({state:"visible",timeout:12000});
+  await page.getByRole("button",{name:"Open PSY 210 module 6: Applied Capstone Project"}).waitFor({state:"visible"});
+  await page.getByRole("radio",{name:"Choice 1: Cognitive"}).click();
+  await page.getByRole("button",{name:"Check PSY 210 practice answer"}).click();
+  await page.getByText("Correct",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Advance PSY 210 companion quiz"}).click();
+  await page.getByRole("radio",{name:"Choice 2: Anthropomorphism"}).click();
+  await page.getByRole("button",{name:"Check PSY 210 practice answer"}).click();
+  await page.getByRole("button",{name:"Advance PSY 210 companion quiz"}).click();
+  await page.getByText("Practice review completed").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Mark PSY 210 module reviewed"}).click();
+  await page.getByText("1 / 6 modules reviewed").waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 6 modules reviewed").waitFor({state:"visible",timeout:12000});
+  await page.getByRole("button",{name:"Create PSY 210 infographic or lesson video"}).click();
+  await page.getByRole("textbox",{name:"Explainer source text"}).waitFor({state:"visible",timeout:15000});
+  const psyDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!psyDraft.includes("Psychology studies mind and behavior"))
+    throw Error("Psychology module was not transferred to visual studio");
+  console.log("PASS: PSY 210 navigation, source-aligned quiz, persistent module progress and creative studio handoff");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();

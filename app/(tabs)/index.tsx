@@ -34,6 +34,12 @@ export default function CirclesScreen() {
           <Text className="text-white text-center font-bold">Capstone Studio</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open PSY 210 Psychology in the Age of AI course"
+        onPress={()=>router.push("/psy210")}
+        className="bg-indigo-900 border border-indigo-500 rounded-xl p-4 mb-3">
+        <Text className="text-white text-center font-bold">🧠 Psychology in the Age of AI — PSY 210</Text>
+        <Text className="text-indigo-200 text-center text-xs mt-1">6 interactive modules • 14-week independent study</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Logic and Critical Thinking course"
         onPress={() => router.push("/course")}
         className="bg-green-900 border border-green-500 rounded-xl p-4 mb-3">
