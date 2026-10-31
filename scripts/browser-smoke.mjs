@@ -161,7 +161,7 @@ try {
   await page.getByRole("button",{name:"Check my logic prediction"}).click();
   await page.getByText("Correct. Compare your reasoning",{exact:false}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Load Modus ponens (valid) example"}).click();
-  await page.getByText("VALID ARGUMENT").waitFor({state:"visible"});
+  await page.getByText("VALID ARGUMENT",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Load De Morgan equivalence (tautology) example"}).click();
   await page.getByText("tautology",{exact:false}).last().waitFor({state:"visible"});
   console.log("PASS: real truth-table calculations distinguish counterexample, valid inference and tautology");
