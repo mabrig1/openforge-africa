@@ -24,6 +24,10 @@ export default function CirclesScreen() {
         className="bg-green-800 border border-green-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">Start or review a seven-day study pilot</Text>
       </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Innovation Challenge Lab" onPress={() => router.push("/challenge")}
+        className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-semibold">⚡ Innovation Challenge Lab • Demo and proof</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
         className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
         <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>
