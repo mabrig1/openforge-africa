@@ -86,6 +86,18 @@ export default function LogicCourseScreen() {
         <Text className="text-white mt-2">You marked all 23 lessons as read and passed all practice checks. This is not a university award or proof of identity.</Text>
       </View>}
     </View>
+    <View className="bg-slate-800 border border-indigo-700 rounded-2xl p-4 mt-5">
+      <Text className="text-white font-bold text-xl">Hands-on learning laboratories</Text>
+      <Text className="text-slate-300 mt-2">Apply your reasoning skills, not just answer multiple-choice questions.</Text>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open interactive Formal Logic Lab"
+        onPress={()=>router.push("/logic-lab")} className="bg-indigo-700 rounded-xl p-4 mt-4">
+        <Text className="text-white text-center font-bold">∴ Truth tables & counterexamples →</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Capstone Research Studio"
+        onPress={()=>router.push("/capstone")} className="bg-green-800 rounded-xl p-4 mt-3">
+        <Text className="text-white text-center font-bold">✎ Capstone writing & evidence studio →</Text>
+      </TouchableOpacity>
+    </View>
     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show 8 course modules and 12-week formal logic syllabus"
       onPress={()=>setShowSyllabus(v=>!v)}
       className="bg-slate-700 border border-slate-500 rounded-xl p-4 mt-5">
