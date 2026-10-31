@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCircleStore } from "../stores/circleStore";
 import { groundedReply } from "../lib/study";
 import { setStudioDraft } from "../lib/studioDraft";
