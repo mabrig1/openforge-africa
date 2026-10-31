@@ -22,6 +22,9 @@ export default function RootLayout() {
         <Stack.Screen name="transfer-pack" options={{ title: "Study pack exchange", presentation: "modal" }} />
         <Stack.Screen name="pilot" options={{ title: "Seven-day study pilot" }} />
         <Stack.Screen name="challenge" options={{ title: "Innovation Challenge Lab" }} />
+        <Stack.Screen name="tutor" options={{ title: "AI Study Tutor" }} />
+        <Stack.Screen name="reader" options={{ title: "Text Reader" }} />
+        <Stack.Screen name="explainer" options={{ title: "Visual Learning Studio" }} />
       </Stack>
     </PaperProvider>
   );
