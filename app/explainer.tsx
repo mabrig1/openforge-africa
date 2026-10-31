@@ -83,9 +83,16 @@ export default function ExplainerScreen() {
     <Text className="text-slate-400 mt-2">Preview: {slides.length} panels • Edit input, then regenerate to update panels.</Text>
     {slides.map((slide,index)=><View key={index}
       className="bg-slate-800 rounded-2xl border border-slate-700 p-5 mt-3">
-      <Text className="text-green-300 font-bold">STEP {index+1}</Text>
-      <Text className="text-white text-xl font-bold mt-2">{slide.heading}</Text>
-      <Text className="text-slate-300 leading-6 mt-2">{slide.body}</Text>
+      <Text className="text-green-300 font-bold">STEP {index+1} • Editable</Text>
+      <TextInput accessibilityLabel={"Edit slide "+(index+1)+" heading"}
+        maxLength={90} value={slide.heading} placeholderTextColor="#94a3b8"
+        onChangeText={value=>{setVideo(null);setSlides(prev=>prev.map((s,i)=>i===index?{...s,heading:value}:s));}}
+        className="bg-slate-900 text-white text-lg font-bold rounded-xl p-3 mt-3"/>
+      <TextInput accessibilityLabel={"Edit slide "+(index+1)+" explanation"}
+        multiline textAlignVertical="top" maxLength={240} value={slide.body}
+        onChangeText={value=>{setVideo(null);setSlides(prev=>prev.map((s,i)=>i===index?{...s,body:value}:s));}}
+        className="bg-slate-900 text-slate-200 rounded-xl p-3 mt-2"
+        style={{minHeight:80}}/>
     </View>)}
     {Platform.OS==="web" && <View className="bg-slate-800 rounded-2xl mt-4 border border-slate-700 p-3">
       <Text className="text-white font-bold m-2">Actual SVG infographic preview</Text>
