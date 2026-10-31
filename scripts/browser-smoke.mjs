@@ -108,6 +108,12 @@ try {
   if(canRecord){
     await page.getByRole("button",{name:"Render explainer video"}).click();
     await page.getByRole("button",{name:"Download rendered explainer video"}).waitFor({state:"visible",timeout:35000});
+    await page.getByLabel("Local recorded explainer preview").waitFor({state:"visible",timeout:12000});
+    await page.waitForFunction(() => {
+      const v=document.querySelector('video[aria-label="Local recorded explainer preview"]');
+      return v instanceof HTMLVideoElement && v.readyState>=1 && v.videoWidth>0;
+    },null,{timeout:12000});
+    console.log("PASS: actual browser video metadata plays in local preview");
     const videoDownload=page.waitForEvent("download",{timeout:15000});
     await page.getByRole("button",{name:"Download rendered explainer video"}).click();
     const video=await videoDownload;
