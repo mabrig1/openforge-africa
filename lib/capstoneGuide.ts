@@ -35,7 +35,7 @@ export function countWords(text:string):number{
 }
 export function checkCapstone(draft:CapstoneDraft) {
   const writtenSections:CapstoneKey[]=[
-    "abstract","question","definitions","searchMethod","reconstruction",
+    "question","definitions","searchMethod","reconstruction",
     "alternatives","objections","recommendation","references","formalization",
   ];
   const writtenWords=writtenSections.reduce((n,key)=>n+countWords(draft[key]??""),0);
