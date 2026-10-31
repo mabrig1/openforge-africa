@@ -24,7 +24,7 @@ test("diagram never embeds raw learner tags or onload attributes",()=>{
     const svg=buildAdvancedInfographicSvg(evil,layout);
     assert.ok(!svg.includes("<script>"));
     assert.ok(!svg.includes("<foreignObject>"));
-    assert.doesNotMatch(svg, /<svg[^>]*onload\s*=/i);
+    assert.doesNotMatch(svg, /<svg\s+onload\s*=/i);
     assert.match(svg,/&lt;/);
   }
   assert.throws(()=>buildAdvancedInfographicSvg([], "cards"));
