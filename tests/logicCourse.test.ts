@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { getLogicCreditProposals, LOGIC_PROGRAM_MODULES, LCT_201_WEEKS } from "../lib/logicSyllabus.ts";
 import {
   LOGIC_LESSONS,LOGIC_COURSE_PARTS,getLogicLesson,
   logicCourseCompletion,validateLogicCourse,
@@ -35,4 +36,14 @@ test("completion cannot be inflated by duplicates, invalid chapters, or only rea
   const all=LOGIC_LESSONS.map(c=>c.id);
   assert.equal(logicCourseCompletion(all,all).eligible,true);
   assert.equal(logicCourseCompletion(all.slice(0,-1),all).eligible,false);
+});
+
+test("suggested programme has 18 core and 6 elective credits, with 12-week formal-logic plan",()=>{
+ const credits=getLogicCreditProposals();
+ assert.deepEqual(credits,{core:18,optional:6,appliedGradeWeight:100});
+ assert.equal(LOGIC_PROGRAM_MODULES.length,8);
+ assert.equal(LCT_201_WEEKS.length,12);
+ assert.deepEqual(LCT_201_WEEKS.map(w=>w.week),Array.from({length:12},(_,i)=>i+1));
+ assert.match(LCT_201_WEEKS[7].assessment,/25%/);
+ assert.match(LCT_201_WEEKS[11].assessment,/45%/);
 });
