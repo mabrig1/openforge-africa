@@ -54,6 +54,47 @@ try {
   await page.reload({waitUntil:"domcontentloaded"});
   await page.getByText("OpenForge Judge Demo (synthetic)").last().waitFor({state:"visible",timeout:15000});
   console.log("PASS: synthetic judge course imports and survives reload");
+  const api=await page.request.get(address+"/api/tutor");
+  if(api.status()!==200 || (await api.json()).available!==false)
+    throw Error("Unconfigured tutor API did not clearly report disabled state");
+  const disabled=await page.request.post(address+"/api/tutor",{
+    data:{question:"test",sources:[{id:"s1",title:"Test",excerpt:"synthetic"}]}
+  });
+  if(disabled.status()!==503)throw Error("Disabled private tutor unexpectedly accepted inference");
+  console.log("PASS: tutor route responds safely without credentials or inference");
+  await page.goto(address+"/tutor",{waitUntil:"domcontentloaded"});
+  await page.getByText("Ask your AI Tutor").waitFor({state:"visible",timeout:15000});
+  await page.getByRole("checkbox",{name:"Share preview of Fictional Learning Notes"}).check();
+  await page.getByRole("textbox",{name:"Tutor question"}).fill("What is offline study?");
+  await page.getByRole("button",{name:"Ask offline note coach"}).click();
+  await page.getByText("OFFLINE NOTE LOOKUP").waitFor({state:"visible",timeout:15000});
+  console.log("PASS: offline tutor with explicit selected notes");
+  await page.goto(address+"/reader",{waitUntil:"domcontentloaded"});
+  await page.getByText("Text Reader").last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("textbox",{name:"Text for speech reader"}).fill("Public accountability means explaining decisions.");
+  await page.getByRole("button",{name:"Speed 1.2 times"}).click();
+  console.log("PASS: text reader accepts content and speed controls");
+  await page.goto(address+"/explainer",{waitUntil:"domcontentloaded"});
+  await page.getByRole("textbox",{name:"Explainer source text"}).fill("Students can learn without internet. Offline notes support practice tasks. Small quizzes show local progress.");
+  await page.getByRole("button",{name:"Generate storyboard and infographic"}).click();
+  await page.getByText("Actual SVG infographic preview").waitFor({state:"visible",timeout:15000});
+  const svgDownload=page.waitForEvent("download",{timeout:15000});
+  await page.getByRole("button",{name:"Download SVG infographic"}).click();
+  const saved=await svgDownload;
+  if(saved.suggestedFilename()!=="openforge-infographic.svg")throw Error("SVG download failed");
+  console.log("PASS: real downloadable SVG infographic created");
+  const canRecord=await page.evaluate(()=>
+    typeof MediaRecorder!=="undefined" && !!HTMLCanvasElement.prototype.captureStream &&
+    ["video/webm;codecs=vp8","video/webm"].some(m=>MediaRecorder.isTypeSupported(m)));
+  if(canRecord){
+    await page.getByRole("button",{name:"Render silent WebM explainer video"}).click();
+    await page.getByRole("button",{name:"Download rendered WebM video"}).waitFor({state:"visible",timeout:35000});
+    const videoDownload=page.waitForEvent("download",{timeout:15000});
+    await page.getByRole("button",{name:"Download rendered WebM video"}).click();
+    const video=await videoDownload;
+    if(video.suggestedFilename()!=="openforge-explainer.webm")throw Error("WebM download failed");
+    console.log("PASS: actual WebM video export produced by canvas recorder");
+  } else console.log("SKIP: headless browser does not support WebM capture");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
