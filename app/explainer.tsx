@@ -4,6 +4,7 @@ import { createStoryboard } from "../lib/explainVisual";
 import { buildAdvancedInfographicSvg, DIAGRAM_LAYOUTS, type DiagramLayout } from "../lib/advancedDiagram";
 import { createSrt, createVtt, SLIDE_MS_OPTIONS, DEFAULT_SLIDE_MS } from "../lib/mediaCaptions";
 import { downloadCaptionFile } from "../lib/captionExport";
+import LocalVideoPreview from "../components/LocalVideoPreview";
 import { getStudioDraft } from "../lib/studioDraft";
 import { exportInfographic } from "../lib/infographicExport";
 import { renderExplainerVideo, downloadExplainerVideo } from "../lib/video";
@@ -162,6 +163,7 @@ export default function ExplainerScreen() {
           <Text className="text-white text-center">Cancel rendering</Text>
         </TouchableOpacity>
       </>}
+      {!!video && <View className="mt-4"><Text className="text-white font-bold mb-2">Play and review your recorded video</Text><LocalVideoPreview blob={video}/></View>}
       {!!video && <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download rendered explainer video"
         onPress={()=>downloadExplainerVideo(video)}
         className="bg-indigo-700 p-4 rounded-xl mt-4">
