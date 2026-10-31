@@ -1,0 +1,10 @@
+/** Local subtitle downloads, not speech-recognition transcripts. */
+export function downloadCaptionFile(content: string, format: "srt"|"vtt"): void {
+  const mime = format === "srt" ? "application/x-subrip" : "text/vtt";
+  const blob = new Blob([content], {type: mime+";charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download="openforge-explainer."+format;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
