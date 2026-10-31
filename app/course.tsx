@@ -79,7 +79,7 @@ export default function LogicCourseScreen() {
       <Text className="text-white text-3xl font-extrabold mt-2">{stats.completed} / 23 complete</Text>
       <Text className="text-slate-300 mt-2">{read.length} marked as read • {passed.length} practice checks passed • {stats.percent}% completed</Text>
       <View className="bg-slate-700 rounded-full overflow-hidden mt-4" style={{height:12}}>
-        <View className="bg-green-500 h-3" style={{width:stats.percent+"%" as `${number}%`}}/>
+        <View className="bg-green-500 h-3" style={{width:(stats.percent+"%") as `${number}%`}}/>
       </View>
       {stats.eligible&&<View className="bg-green-950 border border-green-600 rounded-xl p-4 mt-4">
         <Text className="text-green-300 font-bold">Self-study milestone achieved!</Text>
