@@ -135,15 +135,15 @@ export default function ExplainerScreen() {
       </TouchableOpacity>}
       <Text className="text-slate-300 mt-3 text-xs">Subtitles below represent slide text, not recognized or synchronized spoken words.</Text>
       <View className="flex-row justify-between mt-4">
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download SRT slide subtitles"
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={Platform.OS==="web"?"Download SRT slide subtitles":"Share SRT slide subtitle text"}
           onPress={()=>downloadCaptionFile(createSrt(slides,slideMs),"srt")}
           className="bg-indigo-800 p-3 rounded-xl" style={{width:"48%"}}>
-          <Text className="text-white text-center">↓ SRT subtitles</Text>
+          <Text className="text-white text-center">{Platform.OS==="web"?"↓ SRT subtitles":"Share SRT"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Download VTT slide subtitles"
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel={Platform.OS==="web"?"Download VTT slide subtitles":"Share VTT slide subtitle text"}
           onPress={()=>downloadCaptionFile(createVtt(slides,slideMs),"vtt")}
           className="bg-indigo-800 p-3 rounded-xl" style={{width:"48%"}}>
-          <Text className="text-white text-center">↓ VTT subtitles</Text>
+          <Text className="text-white text-center">{Platform.OS==="web"?"↓ VTT subtitles":"Share VTT"}</Text>
         </TouchableOpacity>
       </View>
       {Platform.OS==="web"?<TouchableOpacity accessibilityRole="button" accessibilityLabel="Render explainer video"
