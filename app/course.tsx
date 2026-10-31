@@ -7,6 +7,7 @@ import {
   LOGIC_LESSONS, getLogicLesson, logicCourseCompletion,
 } from "../lib/logicCourse";
 import { useLogicCourseProgress } from "../stores/logicCourseStore";
+import { LOGIC_PROGRAM_MODULES, LCT_201_WEEKS, getLogicCreditProposals } from "../lib/logicSyllabus";
 import { useCircleStore } from "../stores/circleStore";
 import { setStudioDraft } from "../lib/studioDraft";
 import { speakText, stopSpeech } from "../lib/speech";
@@ -23,6 +24,8 @@ export default function LogicCourseScreen() {
   const [choice,setChoice]=useState<number|null>(null);
   const [feedback,setFeedback]=useState("");
   const [showIndex,setShowIndex]=useState(false);
+  const [showSyllabus,setShowSyllabus]=useState(false);
+  const credits=getLogicCreditProposals();
   const lesson=getLogicLesson(selected)??LOGIC_LESSONS[0];
   const stats=logicCourseCompletion(read,passed);
   const chooseLesson=(id:number)=>{
@@ -83,6 +86,26 @@ export default function LogicCourseScreen() {
         <Text className="text-white mt-2">You marked all 23 lessons as read and passed all practice checks. This is not a university award or proof of identity.</Text>
       </View>}
     </View>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show 8 course modules and 12-week formal logic syllabus"
+      onPress={()=>setShowSyllabus(v=>!v)}
+      className="bg-slate-700 border border-slate-500 rounded-xl p-4 mt-5">
+      <Text className="text-white font-semibold text-center">{showSyllabus?"Hide programme and syllabus":"View 8-module programme + 12-week Formal Logic I syllabus"}</Text>
+    </TouchableOpacity>
+    {showSyllabus&&<View className="bg-slate-800 border border-slate-700 rounded-xl p-4 mt-3">
+      <Text className="text-white text-xl font-bold">Proposed programme map</Text>
+      <Text className="text-slate-300 mt-2">Suggested {credits.core} core credits + {credits.optional} elective credits. Institutional approval has not been granted or implied.</Text>
+      {LOGIC_PROGRAM_MODULES.map(m=><View key={m.code} className="border-t border-slate-600 mt-3 pt-3">
+        <Text className="text-green-300 font-bold">{m.code} • {m.name}</Text>
+        <Text className="text-slate-300 mt-1">{m.tier} • {m.credits} suggested credits • Chapters {m.chapters}</Text>
+      </View>)}
+      <Text className="text-white text-xl font-bold mt-7">LCT 201: Formal Logic I — 12 weeks</Text>
+      <Text className="text-slate-300 mt-2">Assessment framework in the manuscript: three assignments of 10% each, mid-module exam 25%, final exam 45% (total {credits.appliedGradeWeight}%). The app does not administer these graded assessments.</Text>
+      {LCT_201_WEEKS.map(w=><View key={w.week} className="bg-slate-700 rounded-xl p-3 mt-3">
+        <Text className="text-white font-bold">Week {w.week}: {w.focus}</Text>
+        <Text className="text-slate-200 mt-2">{w.task}</Text>
+        <Text className="text-green-300 mt-2">{w.assessment}</Text>
+      </View>)}
+    </View>}
     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show all 23 lesson titles"
       onPress={()=>setShowIndex(v=>!v)} className="bg-indigo-800 rounded-xl p-4 mt-5">
       <Text className="text-white text-center font-bold">{showIndex?"Hide course contents":"☰ Browse all 23 lessons"}</Text>
