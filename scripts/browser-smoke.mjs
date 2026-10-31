@@ -153,6 +153,38 @@ try {
   const savedCourse=await page.getByText("Chapter 1: What Does It Mean to Think Critically?");
   await savedCourse.waitFor({state:"visible",timeout:15000});
   console.log("PASS: course notes join offline study circle and appear in AI Tutor without cloud calls");
+  await page.goto(address+"/logic-lab",{waitUntil:"domcontentloaded"});
+  await page.getByText("Formal Logic Lab").last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("INVALID ARGUMENT").waitFor({state:"visible",timeout:12000});
+  await page.getByText("P=F, Q=T").waitFor({state:"visible",timeout:12000});
+  await page.getByRole("radio",{name:"Predict invalid"}).click();
+  await page.getByRole("button",{name:"Check my logic prediction"}).click();
+  await page.getByText("Correct. Compare your reasoning",{exact:false}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Load Modus ponens (valid) example"}).click();
+  await page.getByText("VALID ARGUMENT").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Load De Morgan equivalence (tautology) example"}).click();
+  await page.getByText("tautology",{exact:false}).last().waitFor({state:"visible"});
+  console.log("PASS: real truth-table calculations distinguish counterexample, valid inference and tautology");
+  await page.goto(address+"/capstone",{waitUntil:"domcontentloaded"});
+  await page.getByText("Capstone Research Studio").last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("textbox",{name:"Capstone question writing area"}).fill(
+    "Should a university require a mobile learning application despite unequal device access?");
+  await page.getByRole("button",{name:"Edit capstone section 13: AI assistance and integrity disclosure"}).click();
+  await page.getByRole("textbox",{name:"Capstone aiDisclosure writing area"}).fill(
+    "No AI services have been used to create this fictional test case.");
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByRole("button",{name:"Edit capstone section 3: Exact research question and scope"}).click();
+  const savedQuestion=await page.getByRole("textbox",{name:"Capstone question writing area"}).inputValue();
+  if(!savedQuestion.includes("unequal device access"))throw Error("Private capstone draft was not persisted");
+  const capstoneFile=page.waitForEvent("download",{timeout:15000});
+  await page.getByRole("button",{name:"Download or share capstone text draft"}).click();
+  const capstoneDownload=await capstoneFile;
+  if(capstoneDownload.suggestedFilename()!=="openforge-capstone-draft.txt")
+    throw Error("Capstone TXT export missing");
+  const exportedDraft=await readFile(await capstoneDownload.path(),"utf8");
+  if(!exportedDraft.includes("unequal device access")||!exportedDraft.includes("No AI services"))
+    throw Error("Capstone export lost data or disclosure");
+  console.log("PASS: capstone saves privately across reload, retains disclosure and exports readable TXT");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
