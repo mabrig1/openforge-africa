@@ -64,7 +64,7 @@ try {
   console.log("PASS: tutor route responds safely without credentials or inference");
   await page.goto(address+"/tutor",{waitUntil:"domcontentloaded"});
   await page.getByText("Ask your AI Tutor").waitFor({state:"visible",timeout:15000});
-  await page.getByRole("checkbox",{name:"Share preview of Fictional Learning Notes"}).check();
+  await page.getByRole("checkbox",{name:/Share preview of Offline Study/}).click();
   await page.getByRole("textbox",{name:"Tutor question"}).fill("What is offline study?");
   await page.getByRole("button",{name:"Ask offline note coach"}).click();
   await page.getByText("OFFLINE NOTE LOOKUP").waitFor({state:"visible",timeout:15000});
