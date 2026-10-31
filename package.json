@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "benchmark:offline": "node --experimental-strip-types scripts/offline-benchmark.mjs",
     "build": "expo export --platform web --output-dir dist",
     "check:web": "node scripts/check-web-output.mjs",
     "cf:dry-run": "wrangler deploy --config wrangler.staging.jsonc --dry-run",
