@@ -14,7 +14,8 @@ interface TutorResult {
 export default function TutorScreen() {
   const circles = useCircleStore(s=>s.circles);
   const materials = useCircleStore(s=>s.materials);
-  const [circleId,setCircleId]=useState("");
+  const params=useLocalSearchParams<{circleId?:string}>();
+  const [circleId,setCircleId]=useState(params.circleId??"");
   const current=circleId||circles[0]?.id||"";
   const notes=materials.filter(s=>s.circleId===current);
   const [noteIds,setNoteIds]=useState<string[]>([]);
