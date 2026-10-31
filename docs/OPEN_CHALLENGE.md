@@ -84,6 +84,10 @@ The defensible claim to build toward is: **a reproducibly tested, accessible Afr
 
 **Not yet decided:** dates, venue/platform, fees (ideally free), prizes, winner title, judges, publication approval, licensing and sponsorship. Do not present these as announced. For an app-building contest a hackathon format is more appropriate than a predictive ML leaderboard; a Kaggle prediction contest instead needs a clearly specified dataset, target, evaluation metric and private solutions.
 
+## Public, reproducible synthetic developer regression
+
+Run `npm run benchmark:offline` with Node 22. The committed `benchmarks/offline-grounding-v1.json` contains eight fictional positive/no-evidence questions. The script produces JSON showing each expected source, predicted source and pass/fail; a mismatch exits nonzero, and CI executes the same script. This public development set helps detect regressions, but it is deliberately **small, visible and not held out**. A successful score is not independent accuracy validation, offline Android performance evidence, a competition result or proof of "AI" inference. Organizers must separately curate licensed held-out tasks before any competition begins.
+
 ## Evidence ledger template
 
 Record for each claim: feature; source commit; scripted test; actual device/OS/browser; offline/network conditions; outcome; failure screenshots or logs; date; independent reviewer; limitations. Show **NOT VERIFIED** until independently checked. Never turn six local self-checks into a claim that the app has defeated competitors.
