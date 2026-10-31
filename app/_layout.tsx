@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="add-material" options={{ title: "Save course notes", presentation: "modal" }} />
         <Stack.Screen name="transfer-pack" options={{ title: "Study pack exchange", presentation: "modal" }} />
         <Stack.Screen name="pilot" options={{ title: "Seven-day study pilot" }} />
+        <Stack.Screen name="challenge" options={{ title: "Innovation Challenge Lab" }} />
       </Stack>
     </PaperProvider>
   );
