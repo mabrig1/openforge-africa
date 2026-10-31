@@ -24,6 +24,16 @@ export default function CirclesScreen() {
         className="bg-green-800 border border-green-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">Start or review a seven-day study pilot</Text>
       </TouchableOpacity>
+      <View className="flex-row justify-between mb-3">
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Formal Logic Lab from home"
+          onPress={()=>router.push("/logic-lab")} className="bg-slate-800 border border-green-700 rounded-xl p-3" style={{width:"48%"}}>
+          <Text className="text-white text-center font-bold">Truth Table Lab</Text>
+        </TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Capstone Research Studio from home"
+          onPress={()=>router.push("/capstone")} className="bg-slate-800 border border-indigo-700 rounded-xl p-3" style={{width:"48%"}}>
+          <Text className="text-white text-center font-bold">Capstone Studio</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Logic and Critical Thinking course"
         onPress={() => router.push("/course")}
         className="bg-green-900 border border-green-500 rounded-xl p-4 mb-3">
