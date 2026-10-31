@@ -28,6 +28,23 @@ export default function CirclesScreen() {
         className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">⚡ Innovation Challenge Lab • Demo and proof</Text>
       </TouchableOpacity>
+      <View className="bg-slate-800 border border-slate-600 rounded-xl p-3 mb-3">
+        <Text className="text-green-300 font-bold text-base mb-2">✨ AI & Creative Learning Studio</Text>
+        <View className="flex-row flex-wrap justify-between">
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open AI Study Tutor"
+            onPress={() => router.push("/tutor")} className="bg-indigo-800 rounded-xl p-3 mb-2" style={{width:"48%"}}>
+            <Text className="text-white text-center font-semibold">AI Tutor</Text>
+          </TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Text Reader"
+            onPress={() => router.push("/reader")} className="bg-green-800 rounded-xl p-3 mb-2" style={{width:"48%"}}>
+            <Text className="text-white text-center font-semibold">Text Reader</Text>
+          </TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Infographic and Video Studio"
+            onPress={() => router.push("/explainer")} className="bg-slate-700 rounded-xl p-3" style={{width:"100%"}}>
+            <Text className="text-white text-center font-semibold">Infographics & Text-to-Video →</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
         className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
         <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>
