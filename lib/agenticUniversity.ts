@@ -54,7 +54,8 @@ function create(id:AgentId,headline:string,steps:string[],
   ...(opts.draft?{draft:opts.draft}:{}),...(opts.delegates?{delegates:opts.delegates}:{})};
 }
 function lookup(c:Context){
- const answer=groundedReply(c.question||c.course.next.title||c.course.title,c.notes);
+ const answer=groundedReply(c.question||c.course.next.title||c.course.title,
+  c.notes.map(n=>({...n,circleId:"agent-local",createdAt:0})));
  return {answer,evidence:answer.matched&&answer.sourceId&&answer.sourceTitle?
    [{id:answer.sourceId,title:answer.sourceTitle}]:[]};
 }
