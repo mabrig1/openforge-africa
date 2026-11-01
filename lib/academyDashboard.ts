@@ -2,8 +2,8 @@
  * Deterministic, offline-only Academy dashboard shared by two courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
-import { LOGIC_LESSONS } from "./logicCourse";
-import { PSY210_MODULES } from "./psy210Course";
+import { LOGIC_LESSONS } from "./logicCourse.ts";
+import { PSY210_MODULES } from "./psy210Course.ts";
 
 export type AcademyCourseId = "logic"|"psy210";
 export interface AcademySnapshotInput {
