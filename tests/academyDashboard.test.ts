@@ -72,7 +72,7 @@ test("both courses complete only with all respective course milestones",()=>{
   logicPassed:Array.from({length:23},(_,i)=>i+1),
   psyRead:[1,2,3,4,5,6],psyScores:{"1":2,"2":3,"3":2,"4":2,"5":2,"6":2},
  });
- assert.deepEqual([data.completed,data.total,data.percent],[29,158,22]);
+ assert.deepEqual([data.completed,data.total,data.percent],[29,158,18]);
  assert.equal(data.courses[0].next.number,0);
  assert.equal(data.courses[1].next.action,"Explore independently");
 });
