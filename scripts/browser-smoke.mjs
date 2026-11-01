@@ -33,6 +33,17 @@ try {
   if((await page.locator("body").innerText()).trim().toLowerCase()==="hello world")
     throw new Error("Page still displays the placeholder Worker");
   console.log("PASS: full Expo application rendered at 375px mobile viewport");
+  // The first screen must actually expose the Academy and fifteen-agent classroom.
+  await page.getByRole("button",{name:"Explore all ten Academy courses"}).click();
+  await page.getByText("My Learning Dashboard",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Open free 15-agent interactive classroom"}).waitFor({state:"visible"});
+  await page.goto(address,{waitUntil:"domcontentloaded"});
+  await page.getByRole("button",{name:"Launch free fifteen agent classroom from home"}).click();
+  await page.getByText("15-agent classroom",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.goto(address,{waitUntil:"domcontentloaded"});
+  await page.getByRole("button",{name:"Create study circle"}).waitFor({state:"visible",timeout:15000});
+  console.log("PASS: discoverable new Academy and 15-agent links navigate from homepage at 375px");
+
   await page.getByRole("button",{name:"Create study circle"}).click();
   await page.getByRole("textbox",{name:"Circle name"}).fill("Fictional QA Circle");
   await page.getByRole("textbox",{name:"Course code"}).fill("QA 101");
