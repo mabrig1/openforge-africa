@@ -17,7 +17,7 @@ export default function ClassroomScreen(){
  const [courseId,setCourseId]=useState<AcademyCourseId>(
    academyCourseExists(params.course??"")?params.course as AcademyCourseId:"logic");
  const [unitId,setUnitId]=useState<number|null>(null);
- const [includeAcademyReview,setIncludeAcademyReview]=useState(false);
+ const [includeAcademyReview,setIncludeAcademyReview]=useState(true);
  const [today]=useState(localDayKey());
  const trialStartedOn=useClassroomStore(s=>s.trialStartedOn);
  const dailyUsage=useClassroomStore(s=>s.dailyUsage);
@@ -28,6 +28,7 @@ export default function ClassroomScreen(){
  const [mode,setMode]=useState<ClassroomMode>("qa");
  const [topic,setTopic]=useState("");
  const [initiator,setInitiator]=useState<ClassroomAgentId>("of-physics-questioner");
+ const [showRolePicker,setShowRolePicker]=useState(false);
  const [chosenNotes,setChosenNotes]=useState<string[]>([]);
  const [result,setResult]=useState<ClassroomRun|null>(null);
  const [error,setError]=useState("");
@@ -72,15 +73,17 @@ export default function ClassroomScreen(){
    prev.length<(includeAcademyReview?2:3)?[...prev,id]:prev);
   setResult(null);
  };
- const run=()=>{
+ const run=(suggested?:string,suggestedMode?:ClassroomMode)=>{
   setError("");
-  if(!topic.trim()){setError("Enter a question or discussion topic.");return;}
+  const prompt=typeof suggested==="string"&&suggested.trim()?suggested.trim():topic.trim();
+  if(!prompt){setError("Enter a question or discussion topic.");return;}
+  if(suggested){setTopic(prompt);setMode(suggestedMode??"qa");}
   if(!access.remaining){setError("Today's local preview allowance is exhausted. Basic access renews tomorrow.");return;}
   try{
    const approvedSources=[...(includeAcademyReview?[review.source]:[]),...selection]
      .slice(0,3);
    const transcript=runClassroom({
-    mode,topic,selectedAgentId:initiator,maxSpeakers:access.maxSpeakers,
+    mode:suggestedMode??mode,topic:prompt,selectedAgentId:initiator,maxSpeakers:access.maxSpeakers,
     // Last 50 metadata-only traces, oldest first for least-recent rotation.
     recentAgentIds:logs.slice().reverse().flatMap(l=>l.agents).slice(-60),
    },approvedSources);
@@ -95,8 +98,7 @@ export default function ClassroomScreen(){
   <Text className="text-green-400 text-xs font-bold">OPENFORGE AFRICA • OPENMAIC-INSPIRED PREVIEW</Text>
   <Text className="text-white text-3xl font-extrabold mt-2">15-agent classroom</Text>
   <Text className="text-slate-300 leading-6 mt-3">
-   The Director routes real on-device learning prompts to 15 distinct educational roles.
-   Teacher-first question answering and rotating roundtables are testable without any provider charges.
+   Choose a course, practise with a source-based teacher response and hear distinct perspectives from selectable educational roles. No subscription is needed.
   </Text>
   <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
    <Text className="text-amber-100 leading-5">
@@ -118,6 +120,47 @@ export default function ClassroomScreen(){
      <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
     </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
   </View>
+  <View className="bg-emerald-950 border border-emerald-700 rounded-2xl p-5 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">START HERE · GUIDED STUDY</Text>
+   <Text className="text-white text-xl font-bold mt-2">{review.unitTitle}</Text>
+   <Text className="text-slate-200 mt-2 leading-5">
+    {course.code}: a public lesson review is already selected. Try a source-grounded explanation or a classroom discussion; you can change the lesson below.
+   </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Explain this course lesson now"
+    disabled={!access.remaining}
+    onPress={()=>run("Explain "+review.unitTitle+" using the selected lesson review","qa")}
+    className="bg-emerald-500 rounded-xl p-4 mt-4">
+    <Text className="text-slate-950 text-center font-extrabold">TEACH ME THIS LESSON →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run a guided class discussion now"
+    disabled={!access.remaining}
+    onPress={()=>run("Discuss "+review.unitTitle+" and test its main assumptions","discussion")}
+    className="bg-indigo-700 rounded-xl p-4 mt-3">
+    <Text className="text-white text-center font-bold">HEAR THE CLASS DISCUSS IT →</Text>
+   </TouchableOpacity>
+   {!access.remaining&&<Text className="text-amber-200 mt-3">Today's free run allowance is used. You can still read Academy lessons and practise in the offline labs.</Text>}
+  </View>
+  {result&&<View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-6">
+   <Text className="text-green-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
+   {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 mt-2">
+    Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
+   </Text>)}
+   {result.questionUnanswered&&<Text className="text-amber-200 mt-3">
+    Source gap: a learner question remains unverified. The classroom was not automatically closed.
+   </Text>}
+   <Text className="text-white text-xl font-bold mt-5">Classroom transcript</Text>
+   {result.turns.map(t=><View key={t.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
+    <Text className="text-green-300 font-bold">{t.name.toUpperCase()}</Text>
+    <Text selectable className="text-slate-100 leading-6 mt-2">{t.message}</Text>
+    {!!t.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
+     Local source: {t.evidence.map(e=>e.title).join("; ")}
+    </Text>}
+   </View>)}
+   <Text className="text-slate-400 text-xs mt-4">
+    These turns are role-specific offline learning scaffolds, not generative responses.
+    No transcript was uploaded or published.
+   </Text>
+  </View>}
   <Text className="text-white text-lg font-bold mt-7">1. Choose an Academy course</Text>
   <Text className="text-slate-300 mt-2 mb-3">
    The classroom reads the same ten course progress stores as Academy. Choose a short original public review to study.
@@ -126,7 +169,7 @@ export default function ClassroomScreen(){
   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
    {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
     accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
-    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
+    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(true);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
     className={course.id===c.id?"bg-green-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
     <Text className="text-white font-bold">{c.code}</Text>
    </TouchableOpacity>)}
@@ -188,24 +231,28 @@ export default function ClassroomScreen(){
    style={{minHeight:90,textAlignVertical:"top"}}/>
   <Text className="text-white text-lg font-bold mt-7">4. Choose a classmate</Text>
   <Text className="text-slate-300 mt-2 leading-5">
-   In discussions the chosen classmate can initiate when there is no unanswered direct question.
-   A question always goes to the Teacher first. All 13 classmates are selectable.
+   The selected classmate contributes to your next discussion. Teacher-first responses are preserved for direct questions. All 13 classmates can be selected.
   </Text>
-  <View className="flex-row flex-wrap justify-between mt-3">
+  <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showRolePicker}}
+   accessibilityLabel="Choose a different classroom role"
+   onPress={()=>setShowRolePicker(value=>!value)} className="bg-slate-700 p-4 rounded-xl mt-3">
+   <Text className="text-white font-bold">Selected: {CLASSROOM_AGENTS.find(a=>a.id===initiator)?.name} · {showRolePicker?"Hide roles ↑":"Change role ↓"}</Text>
+  </TouchableOpacity>
+  {showRolePicker&&<View className="flex-row flex-wrap justify-between mt-3">
    {CLASSROOM_AGENTS.filter(a=>a.role==="student").map(a=><TouchableOpacity key={a.id}
     accessibilityRole="button" accessibilityState={{selected:initiator===a.id}}
     accessibilityLabel={"Choose "+a.name} onPress={()=>{setInitiator(a.id);setResult(null);}}
     style={{width:"48%"}}
     className={initiator===a.id?"bg-green-900 border border-green-500 p-3 rounded-xl mb-3":"bg-slate-800 border border-slate-700 p-3 rounded-xl mb-3"}>
     <Text className="text-white font-bold">{a.name}</Text>
-    <Text className="text-slate-400 text-xs">Priority {a.priority}</Text>
+    <Text className="text-slate-400 text-xs">{a.persona}</Text>
    </TouchableOpacity>)}
-  </View>
+  </View>}
   <Text className="text-white text-lg font-bold mt-6">5. Additional personal notes (optional)</Text>
   <Text className="text-slate-300 mt-2 mb-3">
    You may select up to three sources in total, including the public review above. Personal saved notes are used only after you explicitly select them; no network requests occur.
   </Text>
-  {!notes.length&&<Text className="text-amber-200 mb-3">No saved study-circle notes yet. You can still test the speaking schedule.</Text>}
+  {!notes.length&&<Text className="text-amber-200 mb-3">No saved personal notes yet. The selected public Academy review is sufficient to start learning.</Text>}
   {notes.map(n=><TouchableOpacity key={n.id} accessibilityRole="checkbox"
    accessibilityState={{checked:chosenNotes.includes(n.id)}} accessibilityLabel={"Choose saved note "+n.title}
    onPress={()=>toggleNote(n.id)} className={chosenNotes.includes(n.id)?"bg-green-900 rounded-xl p-3 mb-2":"bg-slate-800 rounded-xl p-3 mb-2"}>
@@ -213,34 +260,13 @@ export default function ClassroomScreen(){
    {chosenNotes.includes(n.id)&&<Text selectable className="text-slate-300 text-xs mt-2">{n.content.slice(0,350)}{n.content.length>350?"…":""}</Text>}
   </TouchableOpacity>)}
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run free local classroom"
-   disabled={!topic.trim()||!access.remaining} onPress={run}
+   disabled={!topic.trim()||!access.remaining} onPress={()=>run()}
    className="bg-green-700 rounded-xl p-4 mt-5">
    <Text className="text-white text-center font-bold">
     {!access.remaining?"Today's free limit reached":"Run free local classroom →"}
    </Text>
   </TouchableOpacity>
   {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
-  {result&&<View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-6">
-   <Text className="text-green-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
-   {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 mt-2">
-    Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
-   </Text>)}
-   {result.questionUnanswered&&<Text className="text-amber-200 mt-3">
-    Source gap: a learner question remains unverified. The classroom was not automatically closed.
-   </Text>}
-   <Text className="text-white text-xl font-bold mt-5">Classroom transcript</Text>
-   {result.turns.map(t=><View key={t.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
-    <Text className="text-green-300 font-bold">{t.name.toUpperCase()}</Text>
-    <Text selectable className="text-slate-100 leading-6 mt-2">{t.message}</Text>
-    {!!t.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
-     Local source: {t.evidence.map(e=>e.title).join("; ")}
-    </Text>}
-   </View>)}
-   <Text className="text-slate-400 text-xs mt-4">
-    These turns are role-specific offline learning scaffolds, not generative responses.
-    No transcript was uploaded or published.
-   </Text>
-  </View>}
   <View className="bg-slate-800 p-4 rounded-xl mt-6">
    <Text className="text-white font-bold">Recent local dispatch history ({logs.length})</Text>
    {logs.slice(0,3).map(l=><Text key={l.id} selectable className="text-slate-300 text-xs mt-2">
