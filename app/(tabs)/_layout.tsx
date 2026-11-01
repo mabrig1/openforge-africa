@@ -9,13 +9,13 @@ export default function TabLayout(){
  const sidebar=Platform.OS==="web"&&width>=1024;
  const compact=width<370||height<620;
  return <Tabs screenOptions={{
-  tabBarPosition:sidebar?"left":"bottom",
+  tabBarPosition:sidebar?"top":"bottom",
   tabBarLabelPosition:"below-icon",
   tabBarActiveTintColor:"#087F74",tabBarInactiveTintColor:"#64748B",
   tabBarLabelStyle:{fontSize:sidebar?12:compact?9:11,fontWeight:"800"},
   tabBarStyle:{backgroundColor:"#FFFFFF",borderTopColor:"#E2E8F0",
    borderRightColor:"#E2E8F0",borderRightWidth:sidebar?1:0,
-   width:sidebar?105:undefined,height:sidebar?undefined:56+Math.max(inset.bottom,6),
+   width:undefined,height:sidebar?62:56+Math.max(inset.bottom,6),
    paddingBottom:sidebar?0:Math.max(inset.bottom,6)},
   headerStyle:{backgroundColor:"#F6F7FB"},headerTintColor:"#162036",
  }}>
