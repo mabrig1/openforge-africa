@@ -78,3 +78,19 @@ test("invalid inputs fail cleanly without hidden actions",()=>{
  assert.throws(()=>scheduleClassroom({topic:"",mode:"qa",maxSpeakers:3}),/topic/);
  assert.throws(()=>scheduleClassroom({topic:"test",mode:"qa",maxSpeakers:99}),/Speaker limit/);
 });
+
+test("all fifteen configured roles actually execute a distinct user-visible local turn",()=>{
+ const messages=new Map<string,string>();
+ for(const agent of CLASSROOM_AGENTS){
+  const mode=agent.role==="student"?"discussion":"qa";
+  const r=runClassroom({topic:"Reasoning and evidence",mode,
+   selectedAgentId:agent.id,maxSpeakers:5},[]);
+  const turn=r.turns.find(t=>t.agentId===agent.id);
+  assert.ok(turn,"Missing dispatched role: "+agent.id);
+  assert.ok(turn!.message.length>=20);
+  messages.set(agent.id,turn!.message);
+ }
+ assert.equal(messages.size,15);
+ // The teacher / assistant source-gap statements and each classmate's activity differ.
+ assert.equal(new Set(messages.values()).size,15);
+});
