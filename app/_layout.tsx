@@ -34,6 +34,9 @@ export default function RootLayout() {
         <Stack.Screen name="decision-science" options={{ title: "Human Intelligence, Logic and AI Decision Science" }} />
         <Stack.Screen name="decision-lab" options={{ title: "Probability and Decision Lab" }} />
         <Stack.Screen name="forge-studies" options={{ title: "FS 101: Introduction to Forge Studies" }} />
+        <Stack.Screen name="forge-portfolio" options={{ title: "FS 101 Evidence Portfolio Studio" }} />
+        <Stack.Screen name="statistics-lab" options={{ title: "Descriptive Statistics Laboratory" }} />
+        <Stack.Screen name="causal-lab" options={{ title: "Causal Inference and Simpson's Paradox" }} />
       </Stack>
     </PaperProvider>
   );
