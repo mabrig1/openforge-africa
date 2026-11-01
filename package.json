@@ -22,7 +22,8 @@
     "test:visual": "node --experimental-strip-types --test tests/explainVisual.test.ts",
     "postinstall": "node scripts/prepare-cloudflare-build.mjs",
     "cf:build": "npm run build && npm run check:web",
-    "cf:build:verify": "npm run cf:build && npm run cf:dry-run:live"
+    "cf:build:verify": "npm run cf:build && npm run cf:dry-run:live",
+    "check:release:live": "node scripts/verify-live-academy.mjs https://openforge.mabrigkorie.org"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
