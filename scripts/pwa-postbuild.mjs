@@ -105,6 +105,6 @@ const sourceSW=join(out,"sw.js");
 if(!existsSync(sourceSW))throw Error("public/sw.js was not copied by Expo export");
 const sw=readFileSync(sourceSW,"utf8")
  .replaceAll("__BUILD_VERSION__",buildId)
- .replace("__SHELL_URLS__",JSON.stringify(shell));
+ .replaceAll("__SHELL_URLS__",JSON.stringify(shell));
 writeFileSync(sourceSW,sw);
 console.log("[OpenForge] PWA packaged: manifest, install icons, service worker and "+shell.length+" offline shell files.");
