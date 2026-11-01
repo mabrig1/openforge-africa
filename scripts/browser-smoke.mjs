@@ -412,7 +412,7 @@ try {
   console.log("PASS: Clear Sight course, Brier synthetic calculation, quiz retry, persistence, explainer and nine-course dashboard");
   // Speaker: eight source weeks; independent review, consent-aware practice and offline media transfer.
   await page.goto(address+"/multi-channel-speaker",{waitUntil:"domcontentloaded"});
-  await page.getByText("The Multi-Channel Speaker",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByText("The Multi-Channel Speaker",{exact:true}).last().waitFor({state:"visible",timeout:15000});
   await page.getByText("0 / 24",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"View Multi-Channel Speaker course showcase and synthetic case"}).click();
   await page.getByText(/Descriptive return rate: 40%/).waitFor({state:"visible"});
