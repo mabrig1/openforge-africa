@@ -509,6 +509,20 @@ try {
   await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
   await page.getByText(/6 \/ 8 classroom runs left today/).waitFor({state:"visible"});
   console.log("PASS: 15-agent local classroom, teacher-first, rotated debate, persisted free trial counters");
+  // Connected Academy course review, explicit local-source opt-in and audit dashboard.
+  await page.goto(address+"/classroom?course=psy210",{waitUntil:"domcontentloaded"});
+  await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByText("Foundations of Mind & AI",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What does psychology study?");
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
+  await page.getByText(/Local source: PSY 210/).first().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open classroom verification dashboard"}).click();
+  await page.getByText("Classroom Verification",{exact:true}).waitFor({state:"visible"});
+  await page.getByText("SYNTHETIC CHECKS PASS",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/15 local roles · 10 linked courses · 158 short study reviews/).waitFor({state:"visible"});
+  console.log("PASS: PSY 210 Academy course/short review consent, local source evidence and transparent verification dashboard");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
