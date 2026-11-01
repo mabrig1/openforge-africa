@@ -28,6 +28,8 @@ function CourseCompanion({course}:{course:ExpansionCourse}){
  const [evidenceNote,setEvidenceNote]=useState(drafts[String(item.id)]?.note??"");
  useEffect(()=>()=>stopSpeech(),[]);
  const completion=expandedSummary(course,read,passed);
+ const practiceChoices=[item.distractors[0],item.distractors[1]];
+ practiceChoices.splice(item.id%3,0,item.correct);
  const navigate=(n:number)=>{
   if(n<1||n>items.length)return;
   stopSpeech();select(course,n);
