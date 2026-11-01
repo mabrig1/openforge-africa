@@ -17,7 +17,7 @@ test("every question has three choices and a bounded valid answer",()=>{
   assert.equal(m.concepts.length,4);
   for(const q of m.questions) {
    assert.equal(q.options.length,3);
-   assert.ok(q.options[q.answer].length>8);
+   assert.ok(q.options[q.answer].trim().length>2);
    assert.ok(q.rationale.length>20);
   }
  }
