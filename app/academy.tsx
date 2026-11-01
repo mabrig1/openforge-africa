@@ -1,0 +1,197 @@
+import {ScrollView,Text,TouchableOpacity,View} from "react-native";
+import {router} from "expo-router";
+import {Alert} from "../lib/platformDialogs";
+import {useLogicCourseProgress} from "../stores/logicCourseStore";
+import {usePsy210Progress} from "../stores/psy210Store";
+import {useAcademyStudyStore} from "../stores/academyStudyStore";
+import {
+ getAcademyDashboard,academyWeeklySessions,localCalendarDay,
+ type AcademyCourseId,
+} from "../lib/academyDashboard";
+
+export default function AcademyDashboardScreen(){
+ const logicRead=useLogicCourseProgress(s=>s.read);
+ const logicPassed=useLogicCourseProgress(s=>s.passed);
+ const logicSelected=useLogicCourseProgress(s=>s.selected);
+ const psyRead=usePsy210Progress(s=>s.read);
+ const psyScores=usePsy210Progress(s=>s.scores);
+ const psySelected=usePsy210Progress(s=>s.selected);
+ const following=useAcademyStudyStore(s=>s.following);
+ const weeklyTarget=useAcademyStudyStore(s=>s.weeklyTarget);
+ const sessions=useAcademyStudyStore(s=>s.sessions);
+ const toggleCourse=useAcademyStudyStore(s=>s.toggleCourse);
+ const setTarget=useAcademyStudyStore(s=>s.setTarget);
+ const markSession=useAcademyStudyStore(s=>s.markSession);
+ const resetPlan=useAcademyStudyStore(s=>s.resetPlan);
+ const dashboard=getAcademyDashboard({
+  logicRead,logicPassed,logicSelected,psyRead,psyScores,psySelected,
+ });
+ const today=localCalendarDay();
+ const weekly=academyWeeklySessions(sessions,today);
+ const followed=dashboard.courses.filter(c=>following.includes(c.id));
+ const nextSteps=followed.filter(c=>c.next.number>0).sort((a,b)=>a.percent-b.percent);
+ const todayMarked=(id:AcademyCourseId)=>sessions.some(s=>s.day===today&&s.course===id);
+ return <ScrollView className="flex-1 bg-slate-900" keyboardShouldPersistTaps="handled"
+  contentContainerStyle={{padding:18,paddingBottom:90}}>
+   <Text className="text-green-400 text-xs font-bold tracking-widest">OPENFORGE AFRICA • ACADEMY</Text>
+   <Text className="text-white text-3xl font-extrabold mt-2">My Learning Dashboard</Text>
+   <Text className="text-slate-300 leading-6 mt-3">
+     Continue your two independent subjects in one place. Your learning checks,
+     study preferences and manually recorded study sessions stay on this device.
+   </Text>
+   <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
+     <Text className="text-amber-100 leading-5">
+       Personal self-study record only. This is not institution-approved enrollment,
+       a degree, an accredited certificate, verified attendance or a clinical qualification.
+       Different courses have different practice rules; the numbers below track review milestones only.
+     </Text>
+   </View>
+   <View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-5">
+     <Text className="text-green-300 font-bold">TWO-COURSE OVERVIEW</Text>
+     <Text className="text-white text-3xl font-extrabold mt-2">
+       {dashboard.completed} / {dashboard.total} milestones
+     </Text>
+     <Text className="text-slate-300 mt-2">
+       {dashboard.percent}% of the two native review tracks · {following.length} followed subject(s)
+     </Text>
+     <View className="bg-slate-700 rounded-full mt-4 overflow-hidden" style={{height:12}}>
+       <View className="bg-green-500 h-3"
+         style={{width:(dashboard.percent+"%") as `${number}%`}}/>
+     </View>
+     <Text className="text-slate-400 text-xs mt-3">
+       23 logic chapters plus six psychology modules. This is not a cross-subject exam score.
+     </Text>
+   </View>
+   <Text className="text-white text-xl font-bold mt-7 mb-3">Course catalogue</Text>
+   {dashboard.courses.map(course=>{
+     const isFollowing=following.includes(course.id);
+     const isLogic=course.id==="logic";
+     return <View key={course.id}
+       className={isLogic?
+         "bg-slate-800 border border-green-800 rounded-2xl p-5 mb-4":
+         "bg-slate-800 border border-teal-700 rounded-2xl p-5 mb-4"}>
+       <Text className="text-slate-400 font-bold text-xs">{course.code} • SELF-STUDY COURSE</Text>
+       <Text className="text-white text-2xl font-bold mt-2">{course.title}</Text>
+       <Text className="text-slate-300 mt-2">{course.completed}/{course.total} milestones complete • {course.percent}%</Text>
+       <View className="bg-slate-700 rounded-full overflow-hidden mt-3" style={{height:10}}>
+         <View className={isLogic?"bg-green-400 h-3":"bg-teal-400 h-3"}
+           style={{width:(course.percent+"%") as `${number}%`}}/>
+       </View>
+       <Text className="text-slate-300 mt-3">{course.read} reading checks • {course.practised} practice achievements</Text>
+       <Text className="text-slate-400 text-sm leading-5 mt-3">{course.notice}</Text>
+       <View className="bg-slate-900 border-l-4 border-indigo-500 rounded-xl p-4 mt-4">
+         <Text className="text-indigo-300 font-bold">YOUR NEXT LEARNING STEP</Text>
+         <Text className="text-white mt-2 font-bold">{course.next.number?
+           (isLogic?"Chapter ":"Module ")+course.next.number+": "+course.next.title:
+           "All review milestones recorded"}</Text>
+         <Text className="text-slate-300 mt-2">{course.next.action} — {course.next.detail}</Text>
+       </View>
+       <TouchableOpacity accessibilityRole="button"
+         accessibilityLabel={"Resume "+course.title}
+         onPress={()=>router.push(course.route)}
+         className={isLogic?"bg-green-700 rounded-xl p-4 mt-4":"bg-teal-700 rounded-xl p-4 mt-4"}>
+         <Text className="text-white text-center font-bold">
+           {course.completed===course.total?"Revisit subject →":"Resume subject →"}
+         </Text>
+       </TouchableOpacity>
+       <TouchableOpacity accessibilityRole="button"
+         accessibilityLabel={(isFollowing?"Stop following ":"Follow ")+course.title+" in weekly plan"}
+         onPress={()=>toggleCourse(course.id)}
+         className="bg-slate-700 border border-slate-600 rounded-xl p-3 mt-3">
+         <Text className="text-white text-center">
+           {isFollowing?"✓ Following · remove from weekly plan":"Add this subject to weekly plan"}
+         </Text>
+       </TouchableOpacity>
+     </View>;
+   })}
+   <View className="bg-slate-800 border border-indigo-700 rounded-2xl p-5 mt-3">
+     <Text className="text-white text-xl font-bold">Personal weekly study rhythm</Text>
+     <Text className="text-slate-300 leading-6 mt-2">
+       Set a small goal, choose one next action and mark a session only after
+       you actually study. These entries are self-reported, not automatically verified.
+     </Text>
+     <Text className="text-green-300 font-bold mt-4">
+       {weekly.count} / {weeklyTarget} sessions recorded this device-calendar week
+     </Text>
+     <Text className="text-slate-300 mt-2">
+       {weekly.activeDays} active study day(s) · Logic {weekly.byCourse.logic} · Psychology {weekly.byCourse.psy210}
+     </Text>
+     <View className="bg-slate-700 rounded-full overflow-hidden mt-3" style={{height:10}}>
+       <View className="bg-indigo-400 h-3"
+         style={{width:(Math.min(100,Math.round(weekly.count/weeklyTarget*100))+"%") as `${number}%`}}/>
+     </View>
+     <Text className="text-white font-bold mt-5">Sessions per week (goal)</Text>
+     <View className="flex-row flex-wrap mt-3">
+       {[2,3,4,5,7].map(n=><TouchableOpacity key={n}
+         accessibilityRole="button" accessibilityLabel={"Set weekly study goal to "+n+" sessions"}
+         accessibilityState={{selected:weeklyTarget===n}}
+         onPress={()=>setTarget(n)} style={{minWidth:48}}
+         className={weeklyTarget===n?"bg-green-700 rounded-xl p-3 mr-2 mb-2":"bg-slate-700 rounded-xl p-3 mr-2 mb-2"}>
+         <Text className="text-white text-center">{n}</Text>
+       </TouchableOpacity>)}
+     </View>
+     {nextSteps.length===0?
+       <Text className="text-slate-300 mt-4">
+         {followed.length===0?"Follow at least one subject above to build your study plan.":
+         "All followed subjects have completed their local review milestones. Consider instructor-reviewed assignments."}
+       </Text>:
+       nextSteps.map(course=><View key={course.id} className="bg-slate-900 rounded-xl p-4 mt-4">
+         <Text className="text-indigo-300 font-bold">{course.code} • {course.next.action}</Text>
+         <Text className="text-white mt-2">{course.next.title}</Text>
+         <View className="flex-row justify-between mt-3">
+           <TouchableOpacity accessibilityRole="button"
+             accessibilityLabel={"Study next section in "+course.title}
+             onPress={()=>router.push(course.route)}
+             className="bg-indigo-700 rounded-xl p-3" style={{width:"48%"}}>
+             <Text className="text-white text-center font-bold">Study now →</Text>
+           </TouchableOpacity>
+           <TouchableOpacity accessibilityRole="button"
+             accessibilityLabel={"Record today's study session for "+course.title}
+             disabled={todayMarked(course.id)} onPress={()=>markSession(course.id)}
+             className={todayMarked(course.id)?
+               "bg-slate-700 border border-slate-600 rounded-xl p-3":
+               "bg-green-700 rounded-xl p-3"} style={{width:"48%"}}>
+             <Text className="text-white text-center">
+               {todayMarked(course.id)?"✓ Recorded today":"Mark session done"}
+             </Text>
+           </TouchableOpacity>
+         </View>
+       </View>)}
+     <Text className="text-slate-400 text-xs mt-4">
+       One optional self-reported study session per subject per device-local day; cannot replace reading checks, quizzes or formal instructor assessments.
+     </Text>
+   </View>
+   <Text className="text-white text-xl font-bold mt-7 mb-3">Learning tools</Text>
+   <View className="flex-row justify-between">
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open offline Tutor from Academy"
+       onPress={()=>router.push("/tutor")} className="bg-indigo-800 rounded-xl p-4"
+       style={{width:"48%"}}>
+       <Text className="text-white font-bold text-center">Ask the Tutor →</Text>
+     </TouchableOpacity>
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Text Reader from Academy"
+       onPress={()=>router.push("/reader")} className="bg-slate-700 rounded-xl p-4"
+       style={{width:"48%"}}>
+       <Text className="text-white font-bold text-center">Text Reader →</Text>
+     </TouchableOpacity>
+   </View>
+   <View className="flex-row justify-between mt-3">
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open multimedia explainer from Academy"
+       onPress={()=>router.push("/explainer")} className="bg-slate-700 rounded-xl p-4"
+       style={{width:"48%"}}>
+       <Text className="text-white font-bold text-center">Explainer Studio →</Text>
+     </TouchableOpacity>
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open fictional psychology interview simulator"
+       onPress={()=>router.push("/psychology-interview")} className="bg-slate-700 rounded-xl p-4"
+       style={{width:"48%"}}>
+       <Text className="text-white font-bold text-center">Interview Lab →</Text>
+     </TouchableOpacity>
+   </View>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Reset weekly study plan only"
+     onPress={()=>Alert.alert("Reset study plan?",
+       "This clears your followed subjects, weekly goal and self-reported study sessions. It does not erase either course's reading or quiz record.",
+       [{text:"Keep plan",style:"cancel"},{text:"Reset plan",style:"destructive",onPress:resetPlan}])}
+     className="p-4 mt-5">
+     <Text className="text-slate-400 text-center">Reset weekly study plan (confirmation required)</Text>
+   </TouchableOpacity>
+  </ScrollView>;
+}

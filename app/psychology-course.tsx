@@ -84,6 +84,11 @@ export default function PsychologyCourseScreen(){
      <Text className="text-slate-400 text-xs mt-3">Each self-study milestone requires a marked reading and at least two of three formative questions correct. This does not evaluate applied competence.</Text>
      {stat.eligible&&<Text className="text-teal-300 mt-3 font-bold">✓ All native review milestones completed — not an academic award.</Text>}
    </View>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Return to unified Academy dashboard from Psychology course"
+     onPress={()=>router.push("/academy")}
+     className="bg-indigo-800 border border-indigo-600 rounded-xl p-4 mt-4">
+     <Text className="text-white text-center font-bold">← My Academy • both subjects</Text>
+   </TouchableOpacity>
    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open advanced scripted psychology interview simulator"
      onPress={()=>router.push("/psychology-interview")}
      className="bg-indigo-700 p-4 rounded-xl mt-5">

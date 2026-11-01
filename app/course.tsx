@@ -98,6 +98,10 @@ export default function LogicCourseScreen() {
         <Text className="text-white text-center font-bold">✎ Capstone writing & evidence studio →</Text>
       </TouchableOpacity>
     </View>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Return to unified Academy dashboard from Logic course"
+      onPress={()=>router.push("/academy")} className="bg-indigo-800 border border-indigo-600 rounded-xl p-4 mt-4">
+      <Text className="text-white text-center font-bold">← My Academy • both subjects</Text>
+    </TouchableOpacity>
     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show 8 course modules and 12-week formal logic syllabus"
       onPress={()=>setShowSyllabus(v=>!v)}
       className="bg-slate-700 border border-slate-500 rounded-xl p-4 mt-5">

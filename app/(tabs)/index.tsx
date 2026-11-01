@@ -16,6 +16,12 @@ export default function CirclesScreen() {
           <View><Text className="text-white text-2xl font-bold">{materials.length}</Text><Text className="text-slate-400 text-xs">Saved notes</Text></View>
         </View>
       </View>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
+        onPress={()=>router.push("/academy")}
+        className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Two-course dashboard →</Text>
+        <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
         className="bg-slate-700 border border-slate-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">⏱ Start an offline focus session</Text>

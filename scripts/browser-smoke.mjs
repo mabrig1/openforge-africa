@@ -226,6 +226,25 @@ try {
   if(!transcript.includes("Fictional practice case: Academic stress"))
     throw Error("Synthetic psychology dialogue was not transferred to Reader");
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 29 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
+  await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
+  await page.getByRole("button",{
+    name:"Record today's study session for Logic and Critical Thinking"}).click();
+  await page.getByRole("button",{
+    name:"Record today's study session for Psychology in the Age of AI"}).click();
+  await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("2 / 29 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
+  await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Return to unified Academy dashboard from Psychology course"}).click();
+  await page.getByText("My Learning Dashboard").last().waitFor({state:"visible"});
+  console.log("PASS: unified Academy tracks both native courses, plans real local study records and resumes study");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
