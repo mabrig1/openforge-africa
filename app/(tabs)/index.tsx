@@ -64,6 +64,11 @@ export default function CirclesScreen() {
         <Text className="text-white font-bold text-center">🎓 FS 101 • Introduction to Forge Studies</Text>
         <Text className="text-teal-200 text-xs mt-1 text-center">10-week Forge Cycle • public-proof preparation notebook</Text>
       </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 private evidence portfolio studio from home"
+        onPress={()=>router.push("/forge-portfolio")} className="bg-slate-800 border border-teal-700 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-bold">📁 FS 101 • Evidence Portfolio Studio</Text>
+        <Text className="text-slate-300 text-center text-xs mt-1">Prepare human-review dossier • private • no automatic credential</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Innovation Challenge Lab" onPress={() => router.push("/challenge")}
         className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">⚡ Innovation Challenge Lab • Demo and proof</Text>
