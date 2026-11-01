@@ -204,7 +204,7 @@ export const getNewCourseUnit=(course:NewCourseId,id:number)=>
 export const newCourseCorrectIndex=(course:NewCourseId,id:number)=>
  getNewCourseUnit(course,id)?(id*5+(course==="rlx101"?1:2))%3:-1;
 export const checkNewCourseAnswer=(course:NewCourseId,id:number,index:number)=>
- Number.isInteger(index)&&newCourseCorrectIndex(course,id)===index;
+ !!getNewCourseUnit(course,id)&&Number.isInteger(index)&&index>=0&&index<3&&newCourseCorrectIndex(course,id)===index;
 export const newCourseCompletion=(course:NewCourseId,read:number[],passed:number[])=>{
  const valid=(xs:number[])=>new Set(xs.filter(id=>!!getNewCourseUnit(course,id)));
  const r=valid(read),p=valid(passed);
