@@ -100,26 +100,6 @@ export default function ClassroomScreen(){
   <Text className="text-slate-300 leading-6 mt-3">
    Choose a course, practise with a source-based teacher response and hear distinct perspectives from selectable educational roles. No subscription is needed.
   </Text>
-  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
-   <Text className="text-amber-100 leading-5">
-    This free version is a deterministic offline classroom, NOT 15 cloud-powered generative agents,
-    an OpenMAIC deployment or an accredited university. Only selected local notes are inspected.
-    The preview counter lives on this device and is not a secure public-account quota.
-   </Text>
-  </View>
-  <View className="bg-slate-800 border border-green-700 p-5 rounded-2xl mt-5">
-   <Text className="text-green-300 font-bold">FREE {access.plan==="explorer"?"EXPLORER TRIAL":"BASIC"}</Text>
-   <Text className="text-white text-2xl font-bold mt-2">{access.remaining} / {access.maxRuns} classroom runs left today</Text>
-   <Text className="text-slate-300 mt-2">
-    {access.maxSpeakers} speaking agents per run · All {roster.total} roles registered · No payment or card needed
-   </Text>
-   {access.plan==="explorer"?<Text className="text-green-200 mt-2">Your 7-day Explorer preview ends on {access.expiresOn}.</Text>:
-    access.canStartTrial?<TouchableOpacity accessibilityRole="button"
-     accessibilityLabel="Start free seven day Explorer preview" onPress={()=>beginExplorer(today)}
-     className="bg-indigo-700 p-4 rounded-xl mt-4">
-     <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
-    </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
-  </View>
   <View className="bg-emerald-950 border border-emerald-700 rounded-2xl p-5 mt-5">
    <Text className="text-emerald-300 text-xs font-bold">START HERE · GUIDED STUDY</Text>
    <Text className="text-white text-xl font-bold mt-2">{review.unitTitle}</Text>
@@ -162,6 +142,26 @@ export default function ClassroomScreen(){
     No transcript was uploaded or published.
    </Text>
   </View>}
+  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
+   <Text className="text-amber-100 leading-5">
+    This free version is a deterministic offline classroom, NOT 15 cloud-powered generative agents,
+    an OpenMAIC deployment or an accredited university. Only selected local notes are inspected.
+    The preview counter lives on this device and is not a secure public-account quota.
+   </Text>
+  </View>
+  <View className="bg-slate-800 border border-green-700 p-5 rounded-2xl mt-5">
+   <Text className="text-green-300 font-bold">FREE {access.plan==="explorer"?"EXPLORER TRIAL":"BASIC"}</Text>
+   <Text className="text-white text-2xl font-bold mt-2">{access.remaining} / {access.maxRuns} classroom runs left today</Text>
+   <Text className="text-slate-300 mt-2">
+    {access.maxSpeakers} speaking agents per run · All {roster.total} roles registered · No payment or card needed
+   </Text>
+   {access.plan==="explorer"?<Text className="text-green-200 mt-2">Your 7-day Explorer preview ends on {access.expiresOn}.</Text>:
+    access.canStartTrial?<TouchableOpacity accessibilityRole="button"
+     accessibilityLabel="Start free seven day Explorer preview" onPress={()=>beginExplorer(today)}
+     className="bg-indigo-700 p-4 rounded-xl mt-4">
+     <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
+    </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
+  </View>
   <Text className="text-white text-lg font-bold mt-7">1. Choose an Academy course</Text>
   <Text className="text-slate-300 mt-2 mb-3">
    The classroom reads the same ten course progress stores as Academy. Choose a short original public review to study.
