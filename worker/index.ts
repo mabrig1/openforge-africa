@@ -1,3 +1,4 @@
+import {handleClassroomAI} from "./classroomInference.ts";
 /** Cloudflare Worker: private, opt-in, source-grounded tutor. No secret is shipped in Expo assets. */
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
@@ -106,6 +107,7 @@ export default {
   async fetch(request: Request, env: Env) {
     const path = new URL(request.url).pathname;
     if (path === "/api/tutor") return handleTutorRequest(request, env);
+    if (path === "/api/classroom-ai") return handleClassroomAI(request, env);
     if (path.startsWith("/api/")) return json({ error: "Unknown API route" }, 404);
     return env.ASSETS.fetch(request);
   },
