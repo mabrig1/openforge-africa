@@ -14,6 +14,7 @@ import {useAcademyStudyStore} from "../stores/academyStudyStore";
 import {getAcademyDashboard,academyWeeklySessions,localCalendarDay,
  type AcademyCourseId} from "../lib/academyDashboard";
 import {AGENTS,runAgent,type AgentId,type AgentResult} from "../lib/agenticUniversity";
+import {academyCourseReview} from "../lib/classroomAcademyBridge";
 import {setStudioDraft} from "../lib/studioDraft";
 
 export default function AgentDesk(){
@@ -24,7 +25,7 @@ export default function AgentDesk(){
  const sessions=useAcademyStudyStore(s=>s.sessions);
  const savedNotes=useCircleStore(s=>s.materials);
  const [courseId,setCourseId]=useState<AcademyCourseId>("logic");
- const [agent,setAgent]=useState<AgentId>("coordinator");
+ const [agent,setAgent]=useState<AgentId>("tutor");
  const [question,setQuestion]=useState("");
  const [selectedNotes,setSelectedNotes]=useState<string[]>([]);
  const [result,setResult]=useState<AgentResult|null>(null);
@@ -42,7 +43,9 @@ export default function AgentDesk(){
   speakerRead:sp.read,speakerPassed:sp.passed,speakerSelected:sp.selected,
  });
  const course=dashboard.courses.find(c=>c.id===courseId)??dashboard.courses[0];
- const notes=savedNotes.filter(note=>selectedNotes.includes(note.id)).slice(0,3);
+ // Public, short course reviews ship in the app. Private personal notes are opt-in.
+ const review=academyCourseReview(course);
+ const notes=[review.source,...savedNotes.filter(note=>selectedNotes.includes(note.id)).slice(0,2)];
  const run=()=>{
   setError("");
   try{
@@ -57,7 +60,7 @@ export default function AgentDesk(){
  };
  const chooseNote=(id:string)=>{
   setSelectedNotes(previous=>previous.includes(id)?previous.filter(x=>x!==id):
-   previous.length<3?[...previous,id]:previous);
+   previous.length<2?[...previous,id]:previous);
   setResult(null);
  };
  return <ScrollView className="flex-1 bg-slate-900"
@@ -65,8 +68,7 @@ export default function AgentDesk(){
   <Text className="text-green-400 text-xs font-bold">OPENFORGE AFRICA • AGENT DESK V0.1</Text>
   <Text className="text-white text-3xl font-extrabold mt-2">12-agent learning studio</Text>
   <Text className="text-slate-300 leading-6 mt-3">
-   Select an Academy course and a specialist. These are transparent rule-based role workflows,
-   not twelve autonomous AI models. The Coordinator can delegate to three local specialists.
+   Select a course and a specialist, then press Run. Your selected course's public review is already available to the agent. These are transparent offline study workflows, not twelve cloud AI models.
   </Text>
   <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
    <Text className="text-amber-100 leading-5">
@@ -107,10 +109,10 @@ export default function AgentDesk(){
     <Text className="text-slate-300 text-xs mt-2">{def.purpose}</Text>
    </TouchableOpacity>)}
   </View>
-  <Text className="text-white font-bold text-lg mt-5 mb-3">3. Choose local notes (optional, max 3)</Text>
-  <Text className="text-slate-300 mb-3">Only your selected note excerpts (up to 1,500 characters each) can be searched locally. Nothing is uploaded.</Text>
+  <Text className="text-white font-bold text-lg mt-5 mb-3">3. Additional personal notes (optional, max 2)</Text>
+  <Text className="text-slate-300 mb-3">The public review for {course.code{"}"} — {review.unitTitle{"}"} is included automatically. You can optionally choose up to two private device notes; nothing is uploaded.</Text>
   {savedNotes.length===0?<Text className="text-amber-300">
-   No saved study-circle notes yet. The Tutor, Library and source-grounded Assessment require local notes.
+   No personal notes saved yet. The Tutor, Library and Assessment can still use this course's public review.
   </Text>:savedNotes.map(note=><TouchableOpacity key={note.id} accessibilityRole="checkbox"
    accessibilityState={{checked:selectedNotes.includes(note.id)}}
    accessibilityLabel={"Select saved note "+note.title} onPress={()=>chooseNote(note.id)}
@@ -135,8 +137,8 @@ export default function AgentDesk(){
    {!!result.delegates&&<Text className="text-indigo-200 mt-3">Local delegation: {result.delegates.map(id=>AGENTS.find(a=>a.id===id)?.name).join(" → ")}</Text>}
    {result.steps.map((step,index)=><Text key={index} selectable className="text-slate-100 leading-6 mt-4">{index+1}. {step}</Text>)}
    {!!result.evidence.length&&<View className="bg-slate-900 p-3 rounded-xl mt-4">
-    <Text className="text-green-300 font-bold">Matched local source(s)</Text>
-    {result.evidence.map(item=><Text key={item.id} className="text-slate-200 mt-2">{item.title} — saved note</Text>)}
+    <Text className="text-green-300 font-bold">Sources actually used</Text>
+    {result.evidence.map(item=><Text key={item.id} className="text-slate-200 mt-2">{item.title} — selected study source</Text>)}
    </View>}
    <Text className="text-amber-200 mt-5 text-sm">{result.notice}</Text>
    {!!result.draft&&<TouchableOpacity accessibilityRole="button" onPress={openDraft}
