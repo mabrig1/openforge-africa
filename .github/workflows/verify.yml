@@ -14,6 +14,8 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-audit --no-fund
+      - name: Syntax-check read-only production acceptance script
+        run: node --check scripts/verify-live-academy.mjs
       - run: npm run typecheck
       - run: npm test
       - name: Simulate Cloudflare Workers Builds install lifecycle (no deployment)
