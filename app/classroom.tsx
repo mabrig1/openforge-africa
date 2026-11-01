@@ -197,28 +197,61 @@ export default function ClassroomScreen(){
    {!access.remaining&&<Text className="text-amber-200 mt-3">Today's free run allowance is used. You can still read Academy lessons and practise in the offline labs.</Text>}
   </View>
   {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
-  {result&&<View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-6">
-   <Text className="text-green-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
-   {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 mt-2">
-    Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
-   </Text>)}
-   {result.questionUnanswered&&<Text className="text-amber-200 mt-3">
-    Source gap: a learner question remains unverified. The classroom was not automatically closed.
-   </Text>}
-   <Text className="text-white text-xl font-bold mt-5">Classroom transcript</Text>
-   {result.turns.map(t=><View key={t.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
-    <Text className="text-green-300 font-bold">{t.name.toUpperCase()}</Text>
-    <Text selectable className="text-slate-100 leading-6 mt-2">{t.message}</Text>
-    {!!t.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
-     Local source: {t.evidence.map(e=>e.title).join("; ")}
+  {result&&<View className="bg-slate-800 border border-emerald-600 rounded-2xl p-4 mt-5"
+    accessibilityLabel="Local classroom discussion results">
+   <Text className="text-emerald-300 text-xs font-bold">YOUR LEARNING CONVERSATION</Text>
+   <Text className="text-white text-xl font-bold mt-2">{result.turns.length} roles contributed</Text>
+   {result.questionUnanswered&&<View className="bg-amber-950 p-3 rounded-xl mt-3">
+    <Text className="text-amber-100">No matching source was found for this question. Check the lesson selection or provide a relevant note.</Text>
+    {!includeAcademyReview&&<TouchableOpacity accessibilityRole="button"
+     accessibilityLabel="Use the selected public lesson as evidence"
+     onPress={()=>{setIncludeAcademyReview(true);setResult(null);}} className="bg-emerald-700 rounded-lg p-3 mt-2">
+     <Text className="text-white font-bold">Use selected lesson source →</Text>
+    </TouchableOpacity>}
+   </View>}
+   {result.turns.map((turn,i)=><View key={turn.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
+    <Text className="text-emerald-300 font-bold">{i+1}. {turn.name}</Text>
+    <Text selectable className="text-slate-100 leading-6 mt-2">{turn.message}</Text>
+    {!!turn.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
+     Based on: {turn.evidence.map(e=>e.title).join("; ")}
     </Text>}
    </View>)}
+   <View className="flex-row flex-wrap mt-3" style={{gap:9}}>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Read classroom conversation aloud"
+     onPress={playTranscript} className="bg-indigo-700 rounded-xl p-3" style={{flexGrow:1,minHeight:48}}>
+     <Text className="text-white text-center font-bold">▶ Listen to conversation</Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Stop reading conversation"
+     onPress={()=>stopSpeech()} className="bg-slate-700 rounded-xl p-3" style={{minHeight:48}}>
+     <Text className="text-white font-bold">■ Stop</Text>
+    </TouchableOpacity>
+   </View>
+   {!!speechError&&<Text className="text-amber-200 mt-2">{speechError}</Text>}
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show agent dispatch details"
+    accessibilityState={{expanded:showTrace}} onPress={()=>setShowTrace(v=>!v)}
+    className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white text-center font-bold">{showTrace?"Hide agent details ↑":"Show agent details ↓"}</Text>
+   </TouchableOpacity>
+   {showTrace&&<View className="bg-slate-950 p-3 rounded-xl mt-3">
+    <Text className="text-emerald-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
+    {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 text-xs mt-2">
+     Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
+    </Text>)}
+   </View>}
    <Text className="text-slate-400 text-xs mt-4">
-    These turns are role-specific offline learning scaffolds, not generative responses.
-    No transcript was uploaded or published.
+    These are source-aware offline role workflows, not a live AI-model conversation. No transcript is uploaded.
    </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open full course after discussion"
+    onPress={()=>router.push(course.route)} className="bg-emerald-700 rounded-xl p-4 mt-4">
+    <Text className="text-white text-center font-bold">Continue into the course →</Text>
+   </TouchableOpacity>
   </View>}
-  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
+  <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showDetails}}
+   accessibilityLabel="Show offline classroom limits and trial options"
+   onPress={()=>setShowDetails(value=>!value)} className="bg-slate-800 rounded-xl p-4 mt-5">
+   <Text className="text-slate-200 font-bold">Free classroom · {access.remaining} of {access.maxRuns} runs available · {showDetails?"Hide details ↑":"Details & trial ↓"}</Text>
+  </TouchableOpacity>
+  {showDetails&&<View>  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
    <Text className="text-amber-100 leading-5">
     This free version is a deterministic offline classroom, NOT 15 cloud-powered generative agents,
     an OpenMAIC deployment or an accredited university. Only selected local notes are inspected.
@@ -238,6 +271,7 @@ export default function ClassroomScreen(){
      <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
     </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
   </View>
+</View>}
   <View className="bg-slate-800 p-4 rounded-xl mt-3">
    <Text className="text-white font-bold">{review.unitTitle}</Text>
    <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showSource}}
@@ -260,6 +294,29 @@ export default function ClassroomScreen(){
      {includeAcademyReview?"☑":"☐"} Include this public review as a local classroom source
     </Text>
    </TouchableOpacity>
+  </View>
+  <View className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">PRACTISE WHAT YOU LEARNED</Text>
+   <Text className="text-white font-bold mt-2">In your own words, what is the main idea of {review.unitTitle}?</Text>
+   <TextInput accessibilityLabel="Your private lesson reflection" multiline value={reflection}
+    maxLength={1000} onChangeText={value=>{setReflection(value);setShowSelfCheck(false);}}
+    placeholder="Write a summary, a real-world example, or a question..."
+    placeholderTextColor="#94a3b8" className="bg-slate-900 border border-slate-600 text-white rounded-xl p-4 mt-3"
+    style={{minHeight:85,textAlignVertical:"top"}}/>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Reveal lesson self-check checklist"
+    disabled={!reflection.trim()} accessibilityState={{disabled:!reflection.trim()}}
+    onPress={()=>setShowSelfCheck(v=>!v)} className="bg-indigo-700 rounded-xl p-4 mt-3"
+    style={{opacity:reflection.trim()?1:0.5}}>
+    <Text className="text-white text-center font-bold">{showSelfCheck?"Hide self-check ↑":"Review my understanding →"}</Text>
+   </TouchableOpacity>
+   {showSelfCheck&&<View className="bg-slate-900 rounded-xl p-3 mt-3">
+    <Text className="text-white font-bold">Check your reflection against the lesson:</Text>
+    <Text className="text-slate-200 mt-2">1. Did you describe the central concept in your own words?</Text>
+    <Text className="text-slate-200 mt-2">2. Did you give an example consistent with the source?</Text>
+    <Text className="text-slate-200 mt-2">3. Did you identify one limitation or question?</Text>
+    <Text selectable className="text-slate-300 text-xs mt-3">Source for comparison: {review.source.content.slice(0,550)}</Text>
+    <Text className="text-slate-400 text-xs mt-3">Self-check only, not automated grading. Your reflection is not submitted.</Text>
+   </View>}
   </View>
   <Text className="text-white text-lg font-bold mt-7">2. Classroom mode</Text>
   <View className="flex-row mt-3">
