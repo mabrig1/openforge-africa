@@ -140,6 +140,7 @@ export default function ClassroomScreen(){
    </TouchableOpacity>
    {!access.remaining&&<Text className="text-amber-200 mt-3">Today's free run allowance is used. You can still read Academy lessons and practise in the offline labs.</Text>}
   </View>
+  {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
   {result&&<View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-6">
    <Text className="text-green-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
    {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 mt-2">
@@ -266,7 +267,6 @@ export default function ClassroomScreen(){
     {!access.remaining?"Today's free limit reached":"Run free local classroom →"}
    </Text>
   </TouchableOpacity>
-  {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
   <View className="bg-slate-800 p-4 rounded-xl mt-6">
    <Text className="text-white font-bold">Recent local dispatch history ({logs.length})</Text>
    {logs.slice(0,3).map(l=><Text key={l.id} selectable className="text-slate-300 text-xs mt-2">
