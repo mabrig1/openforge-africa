@@ -593,7 +593,7 @@ try {
   await page.goto(address+"/classroom?course=psy210",{waitUntil:"domcontentloaded"});
   await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
   await page.getByRole("button",{name:"Choose classroom unit 1"}).click();
-  await page.getByText("Foundations of Mind & AI",{exact:true}).waitFor({state:"visible"});
+  await page.getByText("Foundations of Mind & AI",{exact:true}).first().waitFor({state:"visible"});
   // First-run button must use the public course excerpt without requiring personal notes.
   await page.getByRole("button",{name:"Explain this course lesson now"}).click();
   await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
