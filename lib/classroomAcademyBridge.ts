@@ -54,11 +54,13 @@ export function academyCourseReview(
  const target=unitId??(course.next.number||all[0].id);
  const selected=all.find(u=>u.id===target);
  if(!selected)throw new Error("Unknown course review; choose a unit from this course.");
+ // Place substantive review evidence first; the keyword retriever picks the first
+ // best-matching passage, so course labels must not outrank learning content.
  const notes=[
-  "Course: "+course.title+" ("+course.code+").",
-  "Unit "+selected.id+": "+selected.title+".",
   "Public review: "+selected.overview,
   "Independent application (not a grade): "+selected.practice,
+  "Course: "+course.title+" ("+course.code+").",
+  "Unit "+selected.id+": "+selected.title+".",
  ].join("\n\n");
  return {
   courseId:course.id,code:course.code,title:course.title,unitId:selected.id,
