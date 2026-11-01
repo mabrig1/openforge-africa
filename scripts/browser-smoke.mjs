@@ -297,6 +297,37 @@ try {
   await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
     .waitFor({state:"visible"});
   console.log("PASS: unified four-course Academy shows authentic separate 59 review milestones");
+  await page.goto(address+"/statistics-lab",{waitUntil:"domcontentloaded"});
+  await page.getByText("Descriptive Statistics Laboratory").last().waitFor({state:"visible"});
+  await page.getByText("5.4",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Load statistics outlier example"}).click();
+  await page.getByText("21.167",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Statistics sample observations"}).fill("no values here");
+  await page.getByText("Enter valid comma-separated numbers.",{exact:false}).waitFor({state:"visible"});
+  console.log("PASS: descriptive statistics computes mean and responds safely to outlier and invalid inputs");
+  await page.goto(address+"/causal-lab",{waitUntil:"domcontentloaded"});
+  await page.getByText("Causal Inference & Simpson's Paradox").last().waitFor({state:"visible"});
+  await page.getByText("Raw difference: -22 percentage points").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Toggle within-stratum causal teaching comparisons"}).click();
+  await page.getByText("Within-group association: +10 pp").first().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Load balanced learner composition example"}).click();
+  await page.getByText("Raw difference: 10 percentage points").waitFor({state:"visible"});
+  console.log("PASS: Simpson paradox teaching dataset reverses on balanced composition with strata shown");
+  await page.goto(address+"/forge-portfolio",{waitUntil:"domcontentloaded"});
+  await page.getByText("Forge Evidence Portfolio Studio").last().waitFor({state:"visible"});
+  await page.getByText("1 / 10 draft URLs").waitFor({state:"visible"});
+  await page.getByText("Launcher — NOT VERIFIED").waitFor({state:"visible"});
+  const downloadPromise=page.waitForEvent("download");
+  await page.getByRole("button",{name:"Export private unverified Forge dossier"}).click();
+  const download=await downloadPromise;
+  if(download.suggestedFilename()!=="forge-studies-private-evidence-dossier.txt")throw Error("Unexpected Forge dossier filename");
+  const dossier=await readFile(await download.path(),"utf8");
+  if(!dossier.includes("NOT AN OFFICIAL SUBMISSION")||
+     !dossier.includes("https://example.org/public-project-demo")||
+     !dossier.includes("WEEK 10:"))throw Error("Forge dossier missing mandatory transparency/source content");
+  await page.getByRole("button",{name:"Edit Week 1 Forge artifact evidence draft"}).click();
+  await page.getByText("Introduction to Forge Studies").last().waitFor({state:"visible"});
+  console.log("PASS: ten-week Forge portfolio exports private human-review dossier with no credential issued");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
