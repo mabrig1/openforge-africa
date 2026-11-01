@@ -3,10 +3,10 @@ import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function TabLayout(){
  return <Tabs screenOptions={{
-  tabBarActiveTintColor:"#5EEAD4",tabBarInactiveTintColor:"#94A3B8",
+  tabBarActiveTintColor:"#087F74",tabBarInactiveTintColor:"#64748B",
   tabBarLabelStyle:{fontSize:11,fontWeight:"800"},
-  tabBarStyle:{backgroundColor:"#0F172A",borderTopColor:"#334155",height:65,paddingBottom:6},
-  headerStyle:{backgroundColor:"#0F172A"},headerTintColor:"#FFFFFF",
+  tabBarStyle:{backgroundColor:"#FFFFFF",borderTopColor:"#E2E8F0",height:65,paddingBottom:6},
+  headerStyle:{backgroundColor:"#F6F7FB"},headerTintColor:"#162036",
  }}>
   <Tabs.Screen name="index" options={{
    title:"Discover",tabBarIcon:({color,size})=>
