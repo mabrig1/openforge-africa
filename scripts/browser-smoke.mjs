@@ -33,6 +33,39 @@ try {
   if((await page.locator("body").innerText()).trim().toLowerCase()==="hello world")
     throw new Error("Page still displays the placeholder Worker");
   console.log("PASS: full Expo application rendered at 375px mobile viewport");
+
+  // Verify installable PWA rather than a fake APK or an inert download button.
+  const manifestResponse=await page.request.get(address+"/manifest.webmanifest");
+  if(manifestResponse.status()!==200)throw Error("PWA manifest unavailable");
+  const manifest=await manifestResponse.json();
+  if(manifest.display!=="standalone"||manifest.scope!=="/"||
+      manifest.icons?.length<2)throw Error("Invalid install manifest");
+  const workerResponse=await page.request.get(address+"/sw.js");
+  const sw=await workerResponse.text();
+  if(workerResponse.status()!==200||sw.includes("__BUILD_VERSION__")||
+    !sw.includes('url.pathname.startsWith("/api/")'))
+    throw Error("PWA worker unavailable or unsafe");
+  const iconResponse=await page.request.get(address+"/icons/openforge-512.png");
+  if(iconResponse.status()!==200||
+     (await iconResponse.body()).readUInt32BE(16)!==512)
+    throw Error("Install app icon missing or invalid");
+  await page.getByRole("button",{name:"Install OpenForge app"}).waitFor({state:"visible"});
+  console.log("PASS: PWA manifest, icon, service worker and discoverable install button");
+  // Test narrow phones, tablets, landscape and desktop without horizontal clipping.
+  for(const [w,h] of [[320,700],[390,844],[768,1024],[844,390],[1440,900]]){
+   await page.setViewportSize({width:w,height:h});
+   await page.getByText("Build the mind that",{exact:false}).waitFor({state:"visible"});
+   const dims=await page.evaluate(()=>({
+    width:document.documentElement.scrollWidth,
+    viewport:window.innerWidth,
+   }));
+   if(dims.width>dims.viewport+5)
+    throw Error("Discovery layout overflows on "+w+"x"+h+
+      " scrollWidth="+dims.width+" viewport="+dims.viewport);
+  }
+  await page.setViewportSize({width:375,height:812});
+  console.log("PASS: phone, tablet, mobile landscape and desktop widths without horizontal clipping");
+
   // Real OpenForge discovery interactions, not decorative search or static fake progress.
   await page.getByText("Build the mind that",{exact:false}).waitFor({state:"visible",timeout:15000});
   await page.getByText("10 of 10 courses").waitFor({state:"visible"});
