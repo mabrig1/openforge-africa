@@ -30,6 +30,8 @@ export default function AgentDesk(){
  const [selectedNotes,setSelectedNotes]=useState<string[]>([]);
  const [result,setResult]=useState<AgentResult|null>(null);
  const [error,setError]=useState("");
+ const [showSpecialists,setShowSpecialists]=useState(false);
+ const [showNotes,setShowNotes]=useState(false);
  const dashboard=getAcademyDashboard({
   logicRead:l.read,logicPassed:l.passed,logicSelected:l.selected,
   psyRead:p.read,psyScores:p.scores,psySelected:p.selected,
@@ -46,10 +48,13 @@ export default function AgentDesk(){
  // Public, short course reviews ship in the app. Private personal notes are opt-in.
  const review=academyCourseReview(course);
  const notes=[review.source,...savedNotes.filter(note=>selectedNotes.includes(note.id)).slice(0,2)];
- const run=()=>{
+ const run=(selected?:AgentId,suggested?:string)=>{
   setError("");
+  const activeAgent=selected??agent,activeQuestion=suggested??question;
+  if(selected)setAgent(selected);
+  if(suggested)setQuestion(suggested);
   try{
-   setResult(runAgent(agent,{course,question,notes,
+   setResult(runAgent(activeAgent,{course,question:activeQuestion,notes,
      weeklyTarget,sessions:academyWeeklySessions(sessions,localCalendarDay()).count}));
   }catch(err){setResult(null);setError(err instanceof Error?err.message:"Could not make local draft.");}
  };
@@ -68,8 +73,44 @@ export default function AgentDesk(){
   <Text className="text-green-400 text-xs font-bold">OPENFORGE AFRICA • AGENT DESK V0.1</Text>
   <Text className="text-white text-3xl font-extrabold mt-2">12-agent learning studio</Text>
   <Text className="text-slate-300 leading-6 mt-3">
-   Select a course and a specialist, then press Run. Your selected course's public review is already available to the agent. These are transparent offline study workflows, not twelve cloud AI models.
+   Use one of the quick learning actions, or choose a specialist and enter your own request. All twelve study roles work locally with course reviews; no paid AI is needed.
   </Text>
+  <View className="bg-emerald-950 border border-emerald-700 rounded-2xl p-4 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">ONE-TAP STUDY ASSISTANCE</Text>
+   <Text className="text-white text-lg font-bold mt-2">{course.title}</Text>
+   <Text className="text-slate-200 mt-2">Try a learning task now with the public review of {review.unitTitle}.</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quick start source based tutor"
+    onPress={()=>run("tutor","Explain "+review.unitTitle)}
+    className="bg-emerald-500 rounded-xl p-4 mt-4">
+    <Text className="text-slate-950 text-center font-extrabold">EXPLAIN THIS LESSON →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quick start study plan"
+    onPress={()=>run("coordinator","Plan a study session for "+review.unitTitle)}
+    className="bg-indigo-700 rounded-xl p-4 mt-3">
+    <Text className="text-white text-center font-bold">MAKE MY STUDY PLAN →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Quick start learning storyboard"
+    onPress={()=>run("multimedia","Storyboard "+review.unitTitle)}
+    className="bg-slate-700 rounded-xl p-4 mt-3">
+    <Text className="text-white text-center font-bold">MAKE A VISUAL OUTLINE →</Text>
+   </TouchableOpacity>
+  </View>
+  {result&&<View className="bg-slate-800 border border-green-700 p-5 rounded-2xl mt-6">
+   <Text className="text-green-300 text-xs font-bold">{result.name.toUpperCase()} • {result.status.replace("-"," ").toUpperCase()}</Text>
+   <Text className="text-white text-2xl font-bold mt-2">{result.headline}</Text>
+   {!!result.delegates&&<Text className="text-indigo-200 mt-3">Local delegation: {result.delegates.map(id=>AGENTS.find(a=>a.id===id)?.name).join(" → ")}</Text>}
+   {result.steps.map((step,index)=><Text key={index} selectable className="text-slate-100 leading-6 mt-4">{index+1}. {step}</Text>)}
+   {!!result.evidence.length&&<View className="bg-slate-900 p-3 rounded-xl mt-4">
+    <Text className="text-green-300 font-bold">Sources actually used</Text>
+    {result.evidence.map(item=><Text key={item.id} className="text-slate-200 mt-2">{item.title} — selected study source</Text>)}
+   </View>}
+   <Text className="text-amber-200 mt-5 text-sm">{result.notice}</Text>
+   {!!result.draft&&<TouchableOpacity accessibilityRole="button" onPress={openDraft}
+    accessibilityLabel={"Open draft in "+(result.agent==="accessibility"?"Text Reader":"Explainer Studio")}
+    className="bg-indigo-700 rounded-xl p-4 mt-4">
+    <Text className="text-white text-center font-bold">Open editable draft in {result.agent==="accessibility"?"Text Reader":"Explainer Studio"} →</Text>
+   </TouchableOpacity>}
+  </View>}
   <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
    <Text className="text-amber-100 leading-5">
     Runs only when you tap Run. No external AI, payment, search, uploads, automatic speech,
@@ -77,7 +118,7 @@ export default function AgentDesk(){
     Course milestones are not accredited credentials.
    </Text>
   </View>
-  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open interactive 15-agent free classroom"
+  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open the free group classroom"
     onPress={()=>router.push("/classroom")} className="bg-indigo-700 rounded-xl p-4 mt-5">
     <Text className="text-white text-center font-bold">Explore 15-Agent Free Classroom →</Text>
   </TouchableOpacity>
@@ -100,7 +141,12 @@ export default function AgentDesk(){
    </TouchableOpacity>
   </View>
   <Text className="text-white font-bold text-lg mt-6 mb-3">2. Choose one specialist</Text>
-  <View className="flex-row flex-wrap justify-between">
+  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Choose another specialist"
+   accessibilityState={{expanded:showSpecialists}} onPress={()=>setShowSpecialists(x=>!x)}
+   className="bg-slate-700 rounded-xl p-4 mb-3">
+   <Text className="text-white font-bold">Current: {AGENTS.find(a=>a.id===agent)?.name} · {showSpecialists?"Hide specialists ↑":"Choose another specialist ↓"}</Text>
+  </TouchableOpacity>
+  {showSpecialists&&<View className="flex-row flex-wrap justify-between">
    {AGENTS.map(def=><TouchableOpacity key={def.id} accessibilityRole="button"
     accessibilityState={{selected:agent===def.id}} accessibilityLabel={"Choose "+def.name}
     onPress={()=>{setAgent(def.id);setResult(null);}} style={{width:"48%"}}
@@ -108,8 +154,13 @@ export default function AgentDesk(){
     <Text className="text-white font-bold">{def.name}</Text>
     <Text className="text-slate-300 text-xs mt-2">{def.purpose}</Text>
    </TouchableOpacity>)}
-  </View>
-  <Text className="text-white font-bold text-lg mt-5 mb-3">3. Additional personal notes (optional, max 2)</Text>
+  </View>}
+  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Add optional personal study notes"
+   accessibilityState={{expanded:showNotes}} onPress={()=>setShowNotes(x=>!x)}
+   className="bg-slate-700 rounded-xl p-4 mt-5">
+   <Text className="text-white font-bold">Private study notes (optional) · {showNotes?"Hide ↑":"Select notes ↓"}</Text>
+  </TouchableOpacity>
+  {showNotes&&<View>
   <Text className="text-slate-300 mb-3">The public review for {course.code} — {review.unitTitle} is included automatically. You can optionally choose up to two private device notes; nothing is uploaded.</Text>
   {savedNotes.length===0?<Text className="text-amber-300">
    No personal notes saved yet. The Tutor, Library and Assessment can still use this course's public review.
@@ -120,6 +171,7 @@ export default function AgentDesk(){
    <Text className="text-white">{selectedNotes.includes(note.id)?"☑ ":"☐ "}{note.title}</Text>
    {selectedNotes.includes(note.id)&&<Text selectable className="text-slate-300 text-xs mt-2">{note.content.slice(0,300)}{note.content.length>300?"…":""}</Text>}
   </TouchableOpacity>)}
+  </View>}
   <Text className="text-white font-bold text-lg mt-5 mb-2">4. Topic or study request</Text>
   <TextInput accessibilityLabel="Agent question" multiline value={question} maxLength={500}
    onChangeText={value=>{setQuestion(value);setResult(null);}}
@@ -127,25 +179,9 @@ export default function AgentDesk(){
    placeholderTextColor="#94a3b8" className="text-white bg-slate-800 border border-slate-700 rounded-xl p-4"
    style={{minHeight:88,textAlignVertical:"top"}}/>
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run the selected local learning agent"
-   onPress={run} className="bg-green-700 rounded-xl p-4 mt-4">
+   onPress={()=>run()} className="bg-green-700 rounded-xl p-4 mt-4">
    <Text className="text-white text-center font-bold">Run {AGENTS.find(a=>a.id===agent)?.name} locally →</Text>
   </TouchableOpacity>
   {!!error&&<Text className="text-amber-300 mt-4">{error}</Text>}
-  {result&&<View className="bg-slate-800 border border-green-700 p-5 rounded-2xl mt-6">
-   <Text className="text-green-300 text-xs font-bold">{result.name.toUpperCase()} • {result.status.replace("-"," ").toUpperCase()}</Text>
-   <Text className="text-white text-2xl font-bold mt-2">{result.headline}</Text>
-   {!!result.delegates&&<Text className="text-indigo-200 mt-3">Local delegation: {result.delegates.map(id=>AGENTS.find(a=>a.id===id)?.name).join(" → ")}</Text>}
-   {result.steps.map((step,index)=><Text key={index} selectable className="text-slate-100 leading-6 mt-4">{index+1}. {step}</Text>)}
-   {!!result.evidence.length&&<View className="bg-slate-900 p-3 rounded-xl mt-4">
-    <Text className="text-green-300 font-bold">Sources actually used</Text>
-    {result.evidence.map(item=><Text key={item.id} className="text-slate-200 mt-2">{item.title} — selected study source</Text>)}
-   </View>}
-   <Text className="text-amber-200 mt-5 text-sm">{result.notice}</Text>
-   {!!result.draft&&<TouchableOpacity accessibilityRole="button" onPress={openDraft}
-    accessibilityLabel={"Open draft in "+(result.agent==="accessibility"?"Text Reader":"Explainer Studio")}
-    className="bg-indigo-700 rounded-xl p-4 mt-4">
-    <Text className="text-white text-center font-bold">Open editable draft in {result.agent==="accessibility"?"Text Reader":"Explainer Studio"} →</Text>
-   </TouchableOpacity>}
-  </View>}
  </ScrollView>;
 }
