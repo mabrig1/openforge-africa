@@ -30,6 +30,21 @@ The fifteen participants execute deterministic, domain-specific roles and a real
 
 OpenMAIC source project (MIT): https://github.com/THU-MAIC/OpenMAIC.
 
+## Optional owner-only model-backed execution (not public Free access)
+
+A separate Cloudflare Worker route POST /api/classroom-ai has been added. It accepts exactly one of the fifteen agent IDs per request, a question of at most 500 characters, and up to three short selected source excerpts. It sends a bounded single-agent prompt to an owner-configured OpenRouter model and returns the generated answer with explicit AI disclaimers. All fifteen role IDs are covered by mock-provider tests, so no billable inference is used during CI.
+
+The route fails closed by default and requires ALL of these server-only environment values to be set intentionally:
+
+    OPENFORGE_CLASSROOM_AI_ENABLED=true
+    OPENFORGE_CLASSROOM_ACCESS_TOKEN=<a private random value of at least 24 characters>
+    OPENROUTER_API_KEY=<owner key stored as a Cloudflare secret>
+    OPENROUTER_MODEL=<an owner-approved model identifier>
+
+Do not commit values to GitHub, do not put them in a client build, and do not give the owner access token to free students. The endpoint rejects cross-origin browser requests, invalid input, and unauthorised calls; each allowed request makes at most one model request with max_tokens=280 and a 16-second timeout. **There is no server-side account-level quota or spending limit yet.** It must not be enabled for the public or advertised as a free AI tier until those controls are implemented and verified. The existing free classroom neither calls this route nor asks for its access token.
+
+When disabled, the system is 15 locally functioning roles, 0 model-driven student turns. When explicitly enabled by the owner for private testing, one selected role may produce a real model-generated answer per authorised request; no such live provider call was started by this implementation.
+
 ## Trust and pedagogy boundaries
 
 1. Unanswered learner questions always dispatch Teacher first.
