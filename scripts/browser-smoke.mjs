@@ -471,6 +471,24 @@ try {
   await page.getByRole("button",{name:"Edit Week 1 Forge artifact evidence draft"}).click();
   await page.getByText("Introduction to Forge Studies").last().waitFor({state:"visible"});
   console.log("PASS: ten-week Forge portfolio exports private human-review dossier with no credential issued");
+  // Agent Desk: verify actual mobile SPA route, local coordination and editable handoff.
+  await page.goto(address+"/agents",{waitUntil:"domcontentloaded"});
+  await page.getByText("12-agent learning studio",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("Three-agent local learning plan",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/Local delegation:/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose AI Tutor"}).click();
+  await page.getByRole("textbox",{name:"Agent question"}).fill("photosynthesis");
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("No matching local passage",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose Multimedia Lecturer"}).click();
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("Editable multimedia outline",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open draft in Explainer Studio"}).click();
+  const agentDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!agentDraft.includes("Scene 4:")||!agentDraft.includes("source-verified"))
+    throw Error("Agent Desk explainer draft handoff missing");
+  console.log("PASS: 12-agent Desk Coordinator, missing-evidence refusal and local storyboard handoff");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
