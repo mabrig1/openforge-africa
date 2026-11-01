@@ -32,6 +32,9 @@ export default function RootLayout() {
         <Stack.Screen name="psychology-interview" options={{ title: "PSY 210 Interview Studio" }} />
         <Stack.Screen name="academy" options={{ title: "OpenForge Academy Dashboard" }} />
         <Stack.Screen name="agents" options={{ title: "Twelve-Agent Learning Studio" }} />
+        <Stack.Screen name="classroom" options={{ title: "15-Agent Free Classroom" }} />
+        <Stack.Screen name="classroom-verify" options={{ title: "Classroom Verification" }} />
+        <Stack.Screen name="classroom-live" options={{ title: "Authenticated AI Classroom (Optional)" }} />
         <Stack.Screen name="decision-science" options={{ title: "Human Intelligence, Logic and AI Decision Science" }} />
         <Stack.Screen name="ail101" options={{ title: "AIL 101: AI Literacy and Collaboration" }} />
         <Stack.Screen name="relationalics" options={{ title: "RLX 101 Foundations of Relationalics" }} />
