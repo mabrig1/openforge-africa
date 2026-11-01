@@ -19,7 +19,7 @@ export default function CirclesScreen() {
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
         onPress={()=>router.push("/academy")}
         className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
-        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Five-course dashboard →</Text>
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Seven-course dashboard →</Text>
         <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
@@ -63,6 +63,18 @@ export default function CirclesScreen() {
         className="bg-sky-900 border border-sky-500 rounded-xl p-4 mb-3">
         <Text className="text-white font-bold text-center">🎓 AIL 101 • AI Literacy and Human–AI Collaboration</Text>
         <Text className="text-sky-200 text-xs mt-1 text-center">20 source-aligned reviews • offline quizzes • voice and infographic transfer</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open RLX 101 Foundations of Relationalics"
+        onPress={()=>router.push("/relationalics")}
+        className="bg-purple-900 border border-purple-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 RLX 101 • Foundations of Relationalics</Text>
+        <Text className="text-purple-200 text-xs mt-1 text-center">12 modules • trust, identity, meaning and care between people and AI</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open CEAI-401 Advanced Computational Ethnobotany"
+        onPress={()=>router.push("/ethnobotany")}
+        className="bg-emerald-900 border border-emerald-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 CEAI-401 • Computational Ethnobotany & AI Health</Text>
+        <Text className="text-emerald-200 text-xs mt-1 text-center">7 research chapters • simulation only • no treatment or safety approval</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 Introduction to Forge Studies"
         onPress={()=>router.push("/forge-studies")}

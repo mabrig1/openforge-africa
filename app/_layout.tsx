@@ -33,6 +33,8 @@ export default function RootLayout() {
         <Stack.Screen name="academy" options={{ title: "OpenForge Academy Dashboard" }} />
         <Stack.Screen name="decision-science" options={{ title: "Human Intelligence, Logic and AI Decision Science" }} />
         <Stack.Screen name="ail101" options={{ title: "AIL 101: AI Literacy and Collaboration" }} />
+        <Stack.Screen name="relationalics" options={{ title: "RLX 101 Foundations of Relationalics" }} />
+        <Stack.Screen name="ethnobotany" options={{ title: "CEAI-401 Computational Ethnobotany" }} />
         <Stack.Screen name="decision-lab" options={{ title: "Probability and Decision Lab" }} />
         <Stack.Screen name="forge-studies" options={{ title: "FS 101: Introduction to Forge Studies" }} />
         <Stack.Screen name="forge-portfolio" options={{ title: "FS 101 Evidence Portfolio Studio" }} />

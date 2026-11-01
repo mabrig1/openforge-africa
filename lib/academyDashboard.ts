@@ -1,13 +1,14 @@
 /**
- * Deterministic, offline-only Academy dashboard shared by four courses.
+ * Deterministic, offline-only Academy dashboard shared by seven courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
 import { LOGIC_LESSONS } from "./logicCourse.ts";
 import { PSY210_MODULES } from "./psy210Course.ts";
 import {getExpansion,type ExpansionCourse} from "./academyExpansion.ts";
 import {AIL101_UNITS} from "./ail101Course.ts";
+import {getNewCourseUnits,NEW_COURSE_META,type NewCourseId} from "./additionalAcademyCourses.ts";
 
-export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -24,6 +25,12 @@ export interface AcademySnapshotInput {
   ailRead?:number[];
   ailPassed?:number[];
   ailSelected?:number;
+  rlxRead?:number[];
+  rlxPassed?:number[];
+  rlxSelected?:number;
+  ceaiRead?:number[];
+  ceaiPassed?:number[];
+  ceaiSelected?:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -32,7 +39,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany";
   total:number;
   completed:number;
   percent:number;
@@ -58,6 +65,8 @@ export const ACADEMY_COURSE_META={
     id:"ail101",code:"AIL 101",title:"AI Literacy and Human–AI Collaboration",
     route:"/ail101",notice:"Twenty original source-aligned reviews and formative quizzes. Full 100-page book remains private; not academic credit.",
   },
+  rlx101:{id:"rlx101",...NEW_COURSE_META.rlx101},
+  ceai401:{id:"ceai401",...NEW_COURSE_META.ceai401},
   forge:{
     id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
     route:"/forge-studies",notice:"Ten weeks of independent review. Public project evidence and mentor validation are separate and NOT awarded in this app.",
@@ -170,7 +179,30 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
        ailAction==="Review or retake quiz"?"Pass this unit's formative reasoning check.":
        "Review the unit and try its source-aligned reasoning check."}
  };
- const courses=[logic,psy,decision,forge,ail];
+
+ function additional(course:NewCourseId):AcademyCourseSummary{
+   const units=getNewCourseUnits(course);
+   const isRlx=course==="rlx101";
+   const read=distinctKnown(isRlx?input.rlxRead:input.ceaiRead,units.length);
+   const passed=distinctKnown(isRlx?input.rlxPassed:input.ceaiPassed,units.length);
+   const completed=read.filter(id=>passed.includes(id));
+   const selected=isRlx?input.rlxSelected:input.ceaiSelected;
+   const next=units.find(x=>x.id===selected&&!completed.includes(x.id))||
+     units.find(x=>!completed.includes(x.id));
+   const action:AcademyNext["action"]=!next?"Explore independently":
+     !read.includes(next.id)&&passed.includes(next.id)?"Mark reading reviewed":
+     read.includes(next.id)&&!passed.includes(next.id)?"Review or retake quiz":"Read and study";
+   return {...ACADEMY_COURSE_META[course],total:units.length,
+     completed:completed.length,percent:percent(completed.length,units.length),
+     read:read.length,practised:passed.length,
+     next:{number:next?.id??0,title:next?.title??"Self-study complete",
+       action,detail:!next?"All short independent review milestones recorded; instructor and domain reviews remain separate.":
+         action==="Mark reading reviewed"?"Practice passed; read and mark the review.":
+         action==="Review or retake quiz"?"Retake the formative check.":"Read the short source-aligned review and answer the practice question."}
+   };
+ }
+ const rlx=additional("rlx101"),ceai=additional("ceai401");
+ const courses=[logic,psy,decision,forge,ail,rlx,ceai];
  const total=courses.reduce((sum,x)=>sum+x.total,0),
     completed=courses.reduce((sum,x)=>sum+x.completed,0);
  return {courses,completed,total,percent:percent(completed,total)};
@@ -202,7 +234,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(!["logic","psy210","decision","forge","ail101"].includes(r.course as string))continue;
+  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -223,5 +255,7 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
      psy210:entries.filter(x=>x.course==="psy210").length,
      decision:entries.filter(x=>x.course==="decision").length,
      forge:entries.filter(x=>x.course==="forge").length,
-     ail101:entries.filter(x=>x.course==="ail101").length}};
+     ail101:entries.filter(x=>x.course==="ail101").length,
+     rlx101:entries.filter(x=>x.course==="rlx101").length,
+     ceai401:entries.filter(x=>x.course==="ceai401").length}};
 }
