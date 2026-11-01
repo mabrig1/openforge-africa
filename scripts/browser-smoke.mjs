@@ -228,7 +228,7 @@ try {
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
-  await page.getByText("2 / 79 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 98 milestones").waitFor({state:"visible",timeout:15000});
   await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
   await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
@@ -238,7 +238,7 @@ try {
     name:"Record today's study session for Psychology in the Age of AI"}).click();
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("2 / 79 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 98 milestones").waitFor({state:"visible"});
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
   await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
@@ -291,12 +291,12 @@ try {
      !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
   console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("4 / 79 milestones").waitFor({state:"visible"});
+  await page.getByText("4 / 98 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Human Intelligence, Logic and AI Decision Science"})
     .waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
     .waitFor({state:"visible"});
-  console.log("PASS: unified five-course Academy retains 79 separate review milestones");
+  console.log("PASS: unified seven-course Academy retains 98 separate review milestones");
 
   // AIL 101 course is a short on-device companion, NOT the complete copyrighted manuscript.
   await page.goto(address+"/ail101",{waitUntil:"domcontentloaded"});
@@ -316,10 +316,41 @@ try {
   if(!ailDraft.includes("independently checking important claims"))
     throw Error("AIL 101 review not transferred to offline explainer");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("5 / 79 milestones").waitFor({state:"visible"});
+  await page.getByText("5 / 98 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume AI Literacy and Human–AI Collaboration"})
     .waitFor({state:"visible"});
   console.log("PASS: AIL 101 wrong/correct quiz, dual milestone, persistence, local explainer and fifth subject");
+
+  await page.goto(address+"/relationalics",{waitUntil:"domcontentloaded"});
+  await page.getByText("Foundations of Relationalics").last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("radio",{name:/Answer 2:/}).click();
+  await page.getByRole("button",{name:"Check course answer"}).click();
+  await page.getByRole("button",{name:"Try formative answer again"}).click();
+  await page.getByRole("radio",{name:/Answer 1:/}).click();
+  await page.getByRole("button",{name:"Check course answer"}).click();
+  await page.getByRole("button",{name:"Mark RLX 101 review read"}).click();
+  await page.getByText("1 / 12",{exact:true}).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 12",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Send short review to offline Explainer"}).click();
+  const rlxDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!rlxDraft.includes("Relationalics studies patterns formed"))
+    throw Error("RLX review did not transfer to local Explainer");
+  await page.goto(address+"/ethnobotany",{waitUntil:"domcontentloaded"});
+  await page.getByText("Advanced Computational Ethnobotany").last().waitFor({state:"visible",timeout:15000});
+  await page.getByText(/NOT proof of herbal safety/).waitFor({state:"visible"});
+  await page.getByRole("radio",{name:/Answer 2:/}).click();
+  await page.getByRole("button",{name:"Check course answer"}).click();
+  await page.getByRole("button",{name:"Mark CEAI-401 review read"}).click();
+  await page.getByText("1 / 7",{exact:true}).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 7",{exact:true}).waitFor({state:"visible"});
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("7 / 98 milestones").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Foundations of Relationalics"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Advanced Computational Ethnobotany & Precision AI Phytotherapy"}).waitFor({state:"visible"});
+  console.log("PASS: RLX101 and CEAI401 practice, correct retry, persistence, safety disclosure, and seven-course catalogue");
+
 
   await page.goto(address+"/statistics-lab",{waitUntil:"domcontentloaded"});
   await page.getByText("Descriptive Statistics Laboratory").last().waitFor({state:"visible"});
