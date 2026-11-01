@@ -31,6 +31,9 @@ export default function RootLayout() {
         <Stack.Screen name="psychology-course" options={{ title: "PSY 210 Psychology and AI" }} />
         <Stack.Screen name="psychology-interview" options={{ title: "PSY 210 Interview Studio" }} />
         <Stack.Screen name="academy" options={{ title: "OpenForge Academy Dashboard" }} />
+        <Stack.Screen name="decision-science" options={{ title: "Human Intelligence, Logic and AI Decision Science" }} />
+        <Stack.Screen name="decision-lab" options={{ title: "Probability and Decision Lab" }} />
+        <Stack.Screen name="forge-studies" options={{ title: "FS 101: Introduction to Forge Studies" }} />
       </Stack>
     </PaperProvider>
   );
