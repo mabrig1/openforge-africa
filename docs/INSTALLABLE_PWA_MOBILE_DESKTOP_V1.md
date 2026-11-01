@@ -10,7 +10,7 @@ OpenForge runs from the same HTTPS website on desktop, Android and iPhone. It ca
 - **Already installed:** standalone mode hides the suggestion. Dismissing the banner hides it for the current browser session, not permanently.
 
 ### Built for multiple screen widths
-- Responsive Academy Discover page adapts its hero, course grid, study tools and filters to 320px/390px phones, 768px tablets and 1440px desktops. Tab navigation adopts a left sidebar on wider web desktops and a safe-area-aware bottom navigation on phones.
+- Responsive Academy Discover page adapts its hero, course grid, study tools and filters to 320px/390px phones, 768px tablets and 1440px desktops. Tab navigation adopts top navigation on wider web desktops and a safe-area-aware bottom navigation on phones.
 - Course progress continues to use existing on-device Academy stores. No new login for free offline learning.
 
 ### Offline and safe updates
