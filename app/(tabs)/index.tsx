@@ -19,7 +19,7 @@ export default function CirclesScreen() {
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
         onPress={()=>router.push("/academy")}
         className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
-        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Two-course dashboard →</Text>
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Four-course dashboard →</Text>
         <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
