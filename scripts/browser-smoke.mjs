@@ -489,6 +489,26 @@ try {
   if(!agentDraft.includes("Scene 4:")||!agentDraft.includes("source-verified"))
     throw Error("Agent Desk explainer draft handoff missing");
   console.log("PASS: 12-agent Desk Coordinator, missing-evidence refusal and local storyboard handoff");
+  // Free 15-agent classroom: validate browser UI, actual local dispatch and trial quota.
+  await page.goto(address+"/classroom",{waitUntil:"domcontentloaded"});
+  await page.getByText("15-agent classroom",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByText(/3 \/ 3 classroom runs left today/).waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What is logical validity?");
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText("VERIFIABLE DIRECTOR DISPATCH TRACE",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
+  await page.getByText(/Source gap: a learner question remains unverified/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Start free seven day Explorer preview"}).click();
+  await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Discussion mode"}).click();
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("Thinking and reasoning discussion");
+  await page.getByRole("button",{name:"Choose Visual Learner"}).click();
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText(/Round 1: Visual Learner/).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
+  await page.getByText(/6 \/ 8 classroom runs left today/).waitFor({state:"visible"});
+  console.log("PASS: 15-agent local classroom, teacher-first, rotated debate, persisted free trial counters");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
