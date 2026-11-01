@@ -33,6 +33,20 @@ try {
   if((await page.locator("body").innerText()).trim().toLowerCase()==="hello world")
     throw new Error("Page still displays the placeholder Worker");
   console.log("PASS: full Expo application rendered at 375px mobile viewport");
+  // Real OpenForge discovery interactions, not decorative search or static fake progress.
+  await page.getByText("Build the mind that",{exact:false}).waitFor({state:"visible",timeout:15000});
+  await page.getByText("10 of 10 courses").waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Search Academy courses"}).fill("Relationalics");
+  await page.getByText("1 of 10 courses").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open course Foundations of Relationalics"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Clear course search"}).click();
+  await page.getByRole("button",{name:"Filter courses: Communication"}).click();
+  await page.getByText("1 of 10 courses").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open course The Multi-Channel Speaker"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Filter courses: All courses"}).click();
+  await page.getByText("10 of 10 courses").waitFor({state:"visible"});
+  console.log("PASS: responsive discovery hero and working search/category filter across ten real courses");
+
   // The first screen must actually expose the Academy and fifteen-agent classroom.
   await page.getByRole("button",{name:"Explore all ten Academy courses"}).click();
   await page.getByText("My Learning Dashboard",{exact:true}).last().waitFor({state:"visible",timeout:15000});
