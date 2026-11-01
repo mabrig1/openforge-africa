@@ -569,14 +569,17 @@ try {
   // Free 15-agent classroom: validate browser UI, actual local dispatch and trial quota.
   await page.goto(address+"/classroom",{waitUntil:"domcontentloaded"});
   await page.getByText("15-agent classroom",{exact:true}).waitFor({state:"visible",timeout:15000});
-  await page.getByText(/3 \/ 3 classroom runs left today/).waitFor({state:"visible"});
+  await page.getByText(/3 of 3 runs available/).waitFor({state:"visible"});
   // Explicitly opt out of the *default* public Academy review to verify the source-gap path.
   await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
   await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What is logical validity?");
   await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText("YOUR LEARNING CONVERSATION",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show agent dispatch details"}).click();
   await page.getByText("VERIFIABLE DIRECTOR DISPATCH TRACE",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
-  await page.getByText(/Source gap: a learner question remains unverified/).waitFor({state:"visible"});
+  await page.getByText(/No matching source was found for this question/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show offline classroom limits and trial options"}).click();
   await page.getByRole("button",{name:"Start free seven day Explorer preview"}).click();
   await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Discussion mode"}).click();
@@ -584,20 +587,31 @@ try {
   await page.getByRole("button",{name:"Choose a different classroom role"}).click();
   await page.getByRole("button",{name:"Choose Visual Learner"}).click();
   await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByRole("button",{name:"Show agent dispatch details"}).click();
   await page.getByText(/Round 1: Visual Learner/).waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText(/6 of 8 runs available/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show offline classroom limits and trial options"}).click();
   await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
-  await page.getByText(/6 \/ 8 classroom runs left today/).waitFor({state:"visible"});
   console.log("PASS: 15-agent local classroom, teacher-first, rotated debate, persisted free trial counters");
   // Connected Academy course review, explicit local-source opt-in and audit dashboard.
   await page.goto(address+"/classroom?course=psy210",{waitUntil:"domcontentloaded"});
   await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Choose a different course or lesson"}).click();
   await page.getByRole("button",{name:"Choose classroom unit 1"}).click();
   await page.getByText("Foundations of Mind & AI",{exact:true}).first().waitFor({state:"visible"});
   // First-run button must use the public course excerpt without requiring personal notes.
   await page.getByRole("button",{name:"Explain this course lesson now"}).click();
-  await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
-  await page.getByText(/Local source: PSY 210/).first().waitFor({state:"visible"});
+  await page.getByText("YOUR LEARNING CONVERSATION",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/Based on: PSY 210/).first().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Read classroom conversation aloud"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Next lesson"}).click();
+  await page.getByText(/LESSON 2 OF 6/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Read this lesson source excerpt"}).click();
+  await page.getByText(/Public review:/).first().waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Your private lesson reflection"}).fill("This is a lesson about cognitive theories and their use in artificial intelligence.");
+  await page.getByRole("button",{name:"Reveal lesson self-check checklist"}).click();
+  await page.getByText("Check your reflection against the lesson:").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Open classroom verification dashboard"}).click();
   await page.getByText("Classroom Verification",{exact:true}).last().waitFor({state:"visible"});
   await page.getByText("SYNTHETIC CHECKS PASS",{exact:true}).waitFor({state:"visible"});
