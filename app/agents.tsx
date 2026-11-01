@@ -75,6 +75,10 @@ export default function AgentDesk(){
     Course milestones are not accredited credentials.
    </Text>
   </View>
+  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open interactive 15-agent free classroom"
+    onPress={()=>router.push("/classroom")} className="bg-indigo-700 rounded-xl p-4 mt-5">
+    <Text className="text-white text-center font-bold">Explore 15-Agent Free Classroom →</Text>
+  </TouchableOpacity>
   <Text className="text-white font-bold text-lg mt-6 mb-3">1. Select your course</Text>
   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
    {dashboard.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
