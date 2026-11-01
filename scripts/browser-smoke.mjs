@@ -524,6 +524,19 @@ try {
   await page.getByText("SYNTHETIC CHECKS PASS",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/15 local roles · 10 linked courses · 158 short study reviews/).waitFor({state:"visible"});
   console.log("PASS: PSY 210 Academy course/short review consent, local source evidence and transparent verification dashboard");
+  // Authenticated public model preview: OFF by default and no callable provider.
+  await page.goto(address+"/classroom-live",{waitUntil:"domcontentloaded"});
+  await page.getByText("Authenticated AI Classroom",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).waitFor({state:"visible"});
+  if(await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).isEnabled())
+    throw Error("Auth classroom should be disabled before verified Access identity and consent");
+  const disabledTrial=await fetch(address+"/api/classroom-public/status");
+  if(disabledTrial.status!==503)
+    throw Error("Unconfigured server-backed public AI trial must fail closed with HTTP 503");
+  const disabledBody=await disabledTrial.json();
+  if(!/not enabled/.test(disabledBody.error||""))
+    throw Error("Missing explicit disabled-trial response");
+  console.log("PASS: optional authenticated public AI preview is fail-closed; no provider calls or keys");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
