@@ -139,7 +139,7 @@ test("AI literacy's 20 units require reading and a successful formative check; i
  assert.equal(a.courses[4].read,2);
  assert.equal(a.courses[4].completed,1);
  assert.equal(a.courses[4].next.number,1);
- assert.equal(a.courses[4].next.action,"Read and study");
+ assert.equal(a.courses[4].next.action,"Review or retake quiz");
  assert.equal(a.courses[4].route,"/ail101");
  const b=academyWeeklySessions([{day:"2026-11-01",course:"ail101"}],"2026-11-01");
  assert.equal(b.byCourse.ail101,1);
