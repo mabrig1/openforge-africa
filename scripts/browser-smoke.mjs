@@ -247,7 +247,7 @@ try {
   console.log("PASS: unified Academy tracks both native courses, plans real local study records and resumes study");
   await page.goto(address+"/decision-science",{waitUntil:"domcontentloaded"});
   await page.getByText("Human Intelligence, Logic and AI Decision Science").last().waitFor({state:"visible"});
-  await page.getByText("0 / 20").waitFor({state:"visible"});
+  await page.getByText("0 / 20",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
   await page.getByRole("button",{name:"Open unit 20: AI Ethics, Risk Governance and Public Responsibility"})
     .waitFor({state:"visible"});
@@ -255,9 +255,9 @@ try {
   await page.getByRole("radio",{name:/Select expansion practice option 2:/}).click();
   await page.getByRole("button",{name:"Check expansion practice response"}).click();
   await page.getByRole("button",{name:"Mark expanded course reading reviewed"}).click();
-  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Create new course infographic or explainer"}).click();
   await page.getByRole("textbox",{name:"Explainer source text"}).waitFor({state:"visible"});
   const decisionDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
@@ -272,7 +272,7 @@ try {
   console.log("PASS: real Bayes posterior and expected-value calculations in mobile browser");
   await page.goto(address+"/forge-studies",{waitUntil:"domcontentloaded"});
   await page.getByText("Introduction to Forge Studies").last().waitFor({state:"visible"});
-  await page.getByText("0 / 10").waitFor({state:"visible"});
+  await page.getByText("0 / 10",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
   await page.getByRole("button",{name:"Open week 10: Demo Day"}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
@@ -286,7 +286,7 @@ try {
   await page.getByText("Saved locally as YOUR OWN UNVERIFIED evidence draft.",{exact:false})
     .waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("1 / 10").waitFor({state:"visible"});
+  await page.getByText("1 / 10",{exact:true}).waitFor({state:"visible"});
   if((await page.getByRole("textbox",{name:"Weekly Forge evidence URL"}).inputValue())
      !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
   console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
