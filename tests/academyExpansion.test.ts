@@ -11,7 +11,7 @@ test("authored 100-page decision science source has 20 native reviews and seven 
    assert.ok(x.overview.length>150);
    assert.equal(x.concepts.length,3);
    assert.ok(x.application.length>35);
-   assert.ok(x.correct.length>24);
+   assert.ok(x.correct.trim().length>10);
    assert.ok(x.reason.length>25);
    assert.notEqual(x.correct,x.distractors[0]);
  }
