@@ -512,6 +512,7 @@ try {
   // Connected Academy course review, explicit local-source opt-in and audit dashboard.
   await page.goto(address+"/classroom?course=psy210",{waitUntil:"domcontentloaded"});
   await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Choose classroom unit 1"}).click();
   await page.getByText("Foundations of Mind & AI",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
   await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What does psychology study?");
