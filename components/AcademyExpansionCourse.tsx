@@ -171,7 +171,7 @@ function CourseCompanion({course}:{course:ExpansionCourse}){
    <View className="bg-slate-800 border border-slate-700 rounded-2xl p-5 mt-5">
     <Text className="text-teal-300 font-bold">SOURCE-ALIGNED FORMATIVE PRACTICE</Text>
     <Text className="text-white text-lg mt-2 font-bold">Which statement is supported by this unit?</Text>
-    {[item.distractors[0],item.correct,item.distractors[1]].map((text,i)=>
+    {practiceChoices.map((text,i)=>
       <TouchableOpacity key={i} accessibilityRole="radio"
         accessibilityLabel={"Select expansion practice option "+(i+1)+": "+text}
         accessibilityState={{checked:choice===i}}
