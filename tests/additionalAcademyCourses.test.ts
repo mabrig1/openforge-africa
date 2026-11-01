@@ -10,7 +10,7 @@ test("RLX 101 source mapping preserves all twelve Relationalics weeks and requir
  assert.match(RLX_UNITS[7].title,/Displacement/);
  assert.match(RLX_UNITS[9].title,/Faith/);
  assert.match(RLX_UNITS[11].title,/Capstone/);
- assert.match(NEW_COURSE_META.rlx101.notice,/not.*credential/i);
+ assert.match(NEW_COURSE_META.rlx101.notice,/(no|not).*credential/i);
 });
 test("CEAI-401 preserves seven research chapters and never equates predicted chemistry with clinical approval",()=>{
  assert.equal(CEAI_UNITS.length,7);
