@@ -98,6 +98,11 @@ export default function AcademyDashboardScreen(){
        23 logic chapters + 6 psychology modules + 20 decision-science units + 10 Forge weeks + 20 AI literacy units + 12 Relationalics modules + 7 Computational Ethnobotany chapters + 12 Integrated Soul seminars + 24 Clear Sight reviews + 24 Multi-Channel Speaker reviews. Self-study only, not a cross-subject exam or verified Forge project evidence.
      </Text>
    </View>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open 12-agent learning studio"
+     onPress={()=>router.push("/agents")} className="bg-indigo-700 rounded-xl p-4 mt-5">
+     <Text className="text-white text-center font-bold">Open the 12-Agent Learning Studio →</Text>
+   </TouchableOpacity>
+   <Text className="text-slate-300 text-xs mt-2">Offline role workflows and local delegation; no paid model use or automatic grading.</Text>
    <Text className="text-white text-xl font-bold mt-7 mb-3">Course catalogue</Text>
    {dashboard.courses.map(course=>{
      const isFollowing=following.includes(course.id);
