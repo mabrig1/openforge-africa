@@ -185,6 +185,47 @@ try {
   if(!exportedDraft.includes("unequal device access")||!exportedDraft.includes("No AI services"))
     throw Error("Capstone export lost data or disclosure");
   console.log("PASS: capstone saves privately across reload, retains disclosure and exports readable TXT");
+  await page.goto(address+"/psychology-course",{waitUntil:"domcontentloaded"});
+  await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("0 / 6 reviewed and practised").waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Toggle psychology learning modules"}).click();
+  await page.getByRole("button",{name:"Read PSY 210 Module 6: Applied Capstone Project"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Toggle psychology learning modules"}).click();
+  await page.getByRole("radio",{name:/Module 1 question 1 answer 2:/}).click();
+  await page.getByRole("radio",{name:/Module 1 question 2 answer 1:/}).click();
+  await page.getByRole("radio",{name:/Module 1 question 3 answer 3:/}).click();
+  await page.getByRole("button",{name:"Save PSY 210 three-question check"}).click();
+  await page.getByText("3 / 3", {exact:false}).last().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Mark PSY 210 module reviewed"}).click();
+  await page.getByText("1 / 6 reviewed and practised").waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 6 reviewed and practised").waitFor({state:"visible"});
+  console.log("PASS: six-module PSY 210 native course, practice answers and offline milestone persistence");
+  await page.getByRole("button",{name:"Create psychology lesson infographic or video storyboard"}).click();
+  await page.getByRole("textbox",{name:"Explainer source text"}).waitFor({state:"visible"});
+  const psyDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!psyDraft.includes("Psychology studies mind and behavior"))
+    throw Error("PSY 210 did not transfer reading review into multimedia studio");
+  console.log("PASS: PSY 210 lesson transfers to infographic and video studio");
+  await page.goto(address+"/psychology-course",{waitUntil:"domcontentloaded"});
+  await page.getByRole("button",{name:"Save psychology lesson to offline circle and tutor"}).click();
+  await page.getByText("Ask your AI Tutor").waitFor({state:"visible"});
+  await page.getByText("PSY 210 — Module 1: Foundations of Mind & AI").waitFor({state:"visible"});
+  console.log("PASS: private PSY 210 course notes appear in offline study circle tutor");
+  await page.goto(address+"/psychology-interview",{waitUntil:"domcontentloaded"});
+  await page.getByText("Virtual Interview Practice").last().waitFor({state:"visible",timeout:15000});
+  for(const answer of [2,1,3,2,1]) {
+    await page.getByRole("button",{name:new RegExp("^Select interview response "+answer+":")}).click();
+  }
+  await page.getByText("Five-turn simulation complete").waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("Five-turn simulation complete").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Transfer fictional interview transcript to Text Reader"}).click();
+  await page.getByRole("textbox",{name:"Text reader content"}).waitFor({state:"visible"});
+  const transcript=await page.getByRole("textbox",{name:"Text reader content"}).inputValue();
+  if(!transcript.includes("Fictional practice case: Academic stress"))
+    throw Error("Synthetic psychology dialogue was not transferred to Reader");
+  console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
