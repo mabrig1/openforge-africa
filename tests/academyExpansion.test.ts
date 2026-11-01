@@ -29,9 +29,10 @@ test("FS 101 syllabus retains ten weekly artifacts, five externally verified mil
  }
 });
 test("formative answers are bounded and independent study always needs both reading and check",()=>{
- assert.equal(correctExpansionAnswer("decision",6,1),true);
- assert.equal(correctExpansionAnswer("forge",3,0),true);\n assert.equal(correctExpansionAnswer("decision",2,2),true);
- assert.equal(correctExpansionAnswer("forge",3,0),false);
+ assert.equal(correctExpansionAnswer("decision",6,0),true);
+ assert.equal(correctExpansionAnswer("forge",3,0),true);
+ assert.equal(correctExpansionAnswer("decision",2,2),true);
+ assert.equal(correctExpansionAnswer("forge",3,1),false);
  assert.equal(correctExpansionAnswer("decision",24,1),false);
  assert.equal(correctExpansionAnswer("forge",1,99),false);
  assert.deepEqual(expansionCompletion("decision",[1,1,3,99],[3,3,66]),
