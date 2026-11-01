@@ -125,9 +125,13 @@ export default function ClassroomScreen(){
   </ScrollView>
   <View className="bg-slate-800 p-4 rounded-xl mt-3">
    <Text className="text-white font-bold">{review.unitTitle}</Text>
-   <Text selectable className="text-slate-300 mt-2" numberOfLines={6}>{review.source.content}</Text>
+   <Text selectable className="text-slate-300 mt-2">{review.source.content}</Text>
    <Text className="text-slate-400 text-xs mt-2">{review.attribution}</Text>
+   {!includeAcademyReview&&chosenNotes.length>=3&&<Text className="text-amber-200 mt-3">
+    Deselect one personal note before adding this Academy review. At most three sources are used.
+   </Text>}
    <TouchableOpacity accessibilityRole="checkbox"
+    disabled={!includeAcademyReview&&chosenNotes.length>=3}
     accessibilityState={{checked:includeAcademyReview}}
     accessibilityLabel="Include displayed Academy review as local classroom source"
     onPress={()=>{setIncludeAcademyReview(value=>!value);setResult(null);}}
