@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test tests/*.test.ts tests/*.test.mjs",
     "benchmark:offline": "node --experimental-strip-types scripts/offline-benchmark.mjs",
-    "build": "expo export --platform web --output-dir dist",
+    "build": "expo export --platform web --output-dir dist && node scripts/pwa-postbuild.mjs",
     "check:web": "node scripts/check-web-output.mjs",
     "cf:dry-run": "wrangler deploy --config wrangler.staging.jsonc --dry-run",
     "check:worker-local": "node scripts/smoke-local-worker.mjs",
