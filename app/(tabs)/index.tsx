@@ -40,6 +40,12 @@ export default function CirclesScreen() {
         <Text className="text-white text-center font-bold">🎓 Logic and Critical Thinking — 23-Lesson Course</Text>
         <Text className="text-green-200 text-center text-xs mt-1">Interactive self-study • Mabrig Korie</Text>
       </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Psychology in the Age of AI PSY 210 course"
+        onPress={()=>router.push("/psychology-course")}
+        className="bg-teal-900 border border-teal-500 rounded-xl p-4 mb-3">
+        <Text className="text-white text-center font-bold">🎓 PSY 210 — Psychology in the Age of AI</Text>
+        <Text className="text-teal-200 text-center text-xs mt-1">Six modules • formative quizzes • fictional interview studio</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Innovation Challenge Lab" onPress={() => router.push("/challenge")}
         className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">⚡ Innovation Challenge Lab • Demo and proof</Text>
