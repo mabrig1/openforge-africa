@@ -28,6 +28,8 @@ export default function RootLayout() {
         <Stack.Screen name="course" options={{ title: "Logic and Critical Thinking Course" }} />
         <Stack.Screen name="logic-lab" options={{ title: "Formal Logic Lab" }} />
         <Stack.Screen name="capstone" options={{ title: "Capstone Research Studio" }} />
+        <Stack.Screen name="psychology-course" options={{ title: "PSY 210 Psychology and AI" }} />
+        <Stack.Screen name="psychology-interview" options={{ title: "PSY 210 Interview Studio" }} />
       </Stack>
     </PaperProvider>
   );
