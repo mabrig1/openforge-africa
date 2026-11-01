@@ -110,7 +110,7 @@ export default function AgentDesk(){
    </TouchableOpacity>)}
   </View>
   <Text className="text-white font-bold text-lg mt-5 mb-3">3. Additional personal notes (optional, max 2)</Text>
-  <Text className="text-slate-300 mb-3">The public review for {course.code{"}"} — {review.unitTitle{"}"} is included automatically. You can optionally choose up to two private device notes; nothing is uploaded.</Text>
+  <Text className="text-slate-300 mb-3">The public review for {course.code} — {review.unitTitle} is included automatically. You can optionally choose up to two private device notes; nothing is uploaded.</Text>
   {savedNotes.length===0?<Text className="text-amber-300">
    No personal notes saved yet. The Tutor, Library and Assessment can still use this course's public review.
   </Text>:savedNotes.map(note=><TouchableOpacity key={note.id} accessibilityRole="checkbox"
