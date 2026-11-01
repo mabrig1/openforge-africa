@@ -183,7 +183,7 @@ function CourseCompanion({course}:{course:ExpansionCourse}){
     {checked&&<View className="bg-slate-900 p-4 rounded-xl mt-4">
       <Text className="text-teal-300 font-bold">{choice===item.id%3?"✓ Supported conclusion":"Review: "+item.correct}</Text>
       <Text className="text-white mt-2 leading-6">{item.reason}</Text>
-      {! (choice===1)&&<TouchableOpacity accessibilityRole="button"
+      {choice!==item.id%3&&<TouchableOpacity accessibilityRole="button"
          accessibilityLabel="Retry expansion practice" onPress={()=>{setChoice(null);setChecked(false);setWarning("");}}
          className="bg-slate-700 rounded-xl p-3 mt-4">
          <Text className="text-white text-center">Try another answer</Text>
