@@ -21,6 +21,32 @@ export default function RootLayout() {
         <Stack.Screen name="add-material" options={{ title: "Save course notes", presentation: "modal" }} />
         <Stack.Screen name="transfer-pack" options={{ title: "Study pack exchange", presentation: "modal" }} />
         <Stack.Screen name="pilot" options={{ title: "Seven-day study pilot" }} />
+        <Stack.Screen name="challenge" options={{ title: "Innovation Challenge Lab" }} />
+        <Stack.Screen name="tutor" options={{ title: "AI Study Tutor" }} />
+        <Stack.Screen name="reader" options={{ title: "Text Reader" }} />
+        <Stack.Screen name="explainer" options={{ title: "Visual Learning Studio" }} />
+        <Stack.Screen name="course" options={{ title: "Logic and Critical Thinking Course" }} />
+        <Stack.Screen name="logic-lab" options={{ title: "Formal Logic Lab" }} />
+        <Stack.Screen name="capstone" options={{ title: "Capstone Research Studio" }} />
+        <Stack.Screen name="psychology-course" options={{ title: "PSY 210 Psychology and AI" }} />
+        <Stack.Screen name="psychology-interview" options={{ title: "PSY 210 Interview Studio" }} />
+        <Stack.Screen name="academy" options={{ title: "OpenForge Academy Dashboard" }} />
+        <Stack.Screen name="agents" options={{ title: "Twelve-Agent Learning Studio" }} />
+        <Stack.Screen name="classroom" options={{ title: "15-Agent Free Classroom" }} />
+        <Stack.Screen name="classroom-verify" options={{ title: "Classroom Verification" }} />
+        <Stack.Screen name="classroom-live" options={{ title: "Authenticated AI Classroom (Optional)" }} />
+        <Stack.Screen name="decision-science" options={{ title: "Human Intelligence, Logic and AI Decision Science" }} />
+        <Stack.Screen name="ail101" options={{ title: "AIL 101: AI Literacy and Collaboration" }} />
+        <Stack.Screen name="relationalics" options={{ title: "RLX 101 Foundations of Relationalics" }} />
+        <Stack.Screen name="ethnobotany" options={{ title: "CEAI-401 Computational Ethnobotany" }} />
+        <Stack.Screen name="integrated-soul" options={{ title: "The Integrated Soul" }} />
+        <Stack.Screen name="clear-sight" options={{ title: "Clear Sight: Mastering Discernment" }} />
+        <Stack.Screen name="multi-channel-speaker" options={{ title: "The Multi-Channel Speaker" }} />
+        <Stack.Screen name="decision-lab" options={{ title: "Probability and Decision Lab" }} />
+        <Stack.Screen name="forge-studies" options={{ title: "FS 101: Introduction to Forge Studies" }} />
+        <Stack.Screen name="forge-portfolio" options={{ title: "FS 101 Evidence Portfolio Studio" }} />
+        <Stack.Screen name="statistics-lab" options={{ title: "Descriptive Statistics Laboratory" }} />
+        <Stack.Screen name="causal-lab" options={{ title: "Causal Inference and Simpson's Paradox" }} />
       </Stack>
     </PaperProvider>
   );

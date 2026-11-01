@@ -16,6 +16,12 @@ export default function CirclesScreen() {
           <View><Text className="text-white text-2xl font-bold">{materials.length}</Text><Text className="text-slate-400 text-xs">Saved notes</Text></View>
         </View>
       </View>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
+        onPress={()=>router.push("/academy")}
+        className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Ten-course dashboard →</Text>
+        <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
+      </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
         className="bg-slate-700 border border-slate-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">⏱ Start an offline focus session</Text>
@@ -24,6 +30,102 @@ export default function CirclesScreen() {
         className="bg-green-800 border border-green-600 rounded-xl p-3 mb-3">
         <Text className="text-white text-center font-semibold">Start or review a seven-day study pilot</Text>
       </TouchableOpacity>
+      <View className="flex-row justify-between mb-3">
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Formal Logic Lab from home"
+          onPress={()=>router.push("/logic-lab")} className="bg-slate-800 border border-green-700 rounded-xl p-3" style={{width:"48%"}}>
+          <Text className="text-white text-center font-bold">Truth Table Lab</Text>
+        </TouchableOpacity>
+        <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Capstone Research Studio from home"
+          onPress={()=>router.push("/capstone")} className="bg-slate-800 border border-indigo-700 rounded-xl p-3" style={{width:"48%"}}>
+          <Text className="text-white text-center font-bold">Capstone Studio</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Logic and Critical Thinking course"
+        onPress={() => router.push("/course")}
+        className="bg-green-900 border border-green-500 rounded-xl p-4 mb-3">
+        <Text className="text-white text-center font-bold">🎓 Logic and Critical Thinking — 23-Lesson Course</Text>
+        <Text className="text-green-200 text-center text-xs mt-1">Interactive self-study • Mabrig Korie</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Psychology in the Age of AI PSY 210 course"
+        onPress={()=>router.push("/psychology-course")}
+        className="bg-teal-900 border border-teal-500 rounded-xl p-4 mb-3">
+        <Text className="text-white text-center font-bold">🎓 PSY 210 — Psychology in the Age of AI</Text>
+        <Text className="text-teal-200 text-center text-xs mt-1">Six modules • formative quizzes • fictional interview studio</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Human Intelligence Logic and AI Decision Science"
+        onPress={()=>router.push("/decision-science")}
+        className="bg-indigo-900 border border-indigo-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 Human Intelligence, Logic & AI Decision Science</Text>
+        <Text className="text-indigo-200 text-xs mt-1 text-center">20 interdisciplinary units • interactive probability and decisions lab</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open AIL 101 AI Literacy and Human AI Collaboration"
+        onPress={()=>router.push("/ail101")}
+        className="bg-sky-900 border border-sky-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 AIL 101 • AI Literacy and Human–AI Collaboration</Text>
+        <Text className="text-sky-200 text-xs mt-1 text-center">20 source-aligned reviews • offline quizzes • voice and infographic transfer</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open RLX 101 Foundations of Relationalics"
+        onPress={()=>router.push("/relationalics")}
+        className="bg-purple-900 border border-purple-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 RLX 101 • Foundations of Relationalics</Text>
+        <Text className="text-purple-200 text-xs mt-1 text-center">12 modules • trust, identity, meaning and care between people and AI</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open CEAI-401 Advanced Computational Ethnobotany"
+        onPress={()=>router.push("/ethnobotany")}
+        className="bg-emerald-900 border border-emerald-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 CEAI-401 • Computational Ethnobotany & AI Health</Text>
+        <Text className="text-emerald-200 text-xs mt-1 text-center">7 research chapters • simulation only • no treatment or safety approval</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open The Integrated Soul Christian formation course"
+        onPress={()=>router.push("/integrated-soul")}
+        className="bg-amber-900 border border-amber-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 The Integrated Soul • Philosophy, Psychology & Christian Transformation</Text>
+        <Text className="text-amber-200 text-xs mt-1 text-center">6 weeks • 12 expanded seminar reviews • voluntary practicum &amp; capstone</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Clear Sight Mastering Discernment course"
+        onPress={()=>router.push("/clear-sight")}
+        className="bg-sky-900 border border-sky-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 Clear Sight • Mastering Discernment</Text>
+        <Text className="text-sky-200 text-xs mt-1 text-center">6 source modules • 24 practice reviews • evidence, safety and Brier scoring</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open The Multi-Channel Speaker course"
+        onPress={()=>router.push("/multi-channel-speaker")}
+        className="bg-cyan-900 border border-cyan-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 The Multi-Channel Speaker • Eight-Week Communication Masterclass</Text>
+        <Text className="text-cyan-200 text-xs mt-1 text-center">24 practice reviews • one project across written, video and live formats</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 Introduction to Forge Studies"
+        onPress={()=>router.push("/forge-studies")}
+        className="bg-teal-900 border border-teal-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 FS 101 • Introduction to Forge Studies</Text>
+        <Text className="text-teal-200 text-xs mt-1 text-center">10-week Forge Cycle • public-proof preparation notebook</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 private evidence portfolio studio from home"
+        onPress={()=>router.push("/forge-portfolio")} className="bg-slate-800 border border-teal-700 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-bold">📁 FS 101 • Evidence Portfolio Studio</Text>
+        <Text className="text-slate-300 text-center text-xs mt-1">Prepare human-review dossier • private • no automatic credential</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Innovation Challenge Lab" onPress={() => router.push("/challenge")}
+        className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
+        <Text className="text-white text-center font-semibold">⚡ Innovation Challenge Lab • Demo and proof</Text>
+      </TouchableOpacity>
+      <View className="bg-slate-800 border border-slate-600 rounded-xl p-3 mb-3">
+        <Text className="text-green-300 font-bold text-base mb-2">✨ AI & Creative Learning Studio</Text>
+        <View className="flex-row flex-wrap justify-between">
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open AI Study Tutor"
+            onPress={() => router.push("/tutor")} className="bg-indigo-800 rounded-xl p-3 mb-2" style={{width:"48%"}}>
+            <Text className="text-white text-center font-semibold">AI Tutor</Text>
+          </TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Text Reader"
+            onPress={() => router.push("/reader")} className="bg-green-800 rounded-xl p-3 mb-2" style={{width:"48%"}}>
+            <Text className="text-white text-center font-semibold">Text Reader</Text>
+          </TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Infographic and Video Studio"
+            onPress={() => router.push("/explainer")} className="bg-slate-700 rounded-xl p-3" style={{width:"100%"}}>
+            <Text className="text-white text-center font-semibold">Infographics & Text-to-Video →</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/transfer-pack")}
         className="bg-green-950 border border-green-800 rounded-xl p-3 mb-5">
         <Text className="text-green-300 text-center font-semibold">↙ Received a study pack? Import it here</Text>

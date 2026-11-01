@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { router } from "expo-router";
 import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { useCircleStore } from "../../stores/circleStore";
 import { groundedReply } from "../../lib/study";
@@ -22,6 +23,11 @@ export default function CoachScreen() {
   return <KeyboardAvoidingView className="flex-1 bg-slate-900" behavior={Platform.OS==="ios"?"padding":undefined}>
     <View className="p-4 border-b border-slate-700">
       <Text className="text-white text-2xl font-bold">Study Coach</Text>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open twelve-agent offline learning studio"
+        onPress={() => router.push("/agents")} className="bg-green-700 p-3 rounded-xl mt-3">
+        <Text className="text-white text-center font-bold">Open 12-agent offline studio →</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open optional generative AI tutor" onPress={() => router.push("/tutor")} className="bg-indigo-700 p-3 rounded-xl mt-3"><Text className="text-white text-center font-bold">Open optional cloud AI Tutor →</Text></TouchableOpacity>
       <Text className="text-slate-300 text-sm mt-2 leading-5">Private keyword-based retrieval from saved course notes. No cloud AI, fabricated citations or hidden uploads.</Text>
       <Text className="text-slate-400 mt-3 mb-2">Choose a course</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>

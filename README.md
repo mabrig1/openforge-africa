@@ -4,6 +4,13 @@
 
 > Study together. Even when mobile data runs out.
 
+## Draft upgrade: Innovation Challenge Lab (not released)
+
+An opt-in `/challenge` page now offers a clearly fictional judge walkthrough, validated local study-pack import, six deterministic integrity self-checks, and a proposed 100-point "Build Better Than OpenForge Africa" evaluation rubric. The import creates only a new local course circle and never overwrites a learner's existing circles. This is a **draft feature branch**, not a launched competition or independently verified ranking. See [the complete upgrade roadmap and challenge protocol](docs/OPEN_CHALLENGE.md).
+
+The current Study Coach **does not run generative AI**, and six local self-checks do **not** establish that OpenForge is Nigeria's best AI application. The roadmap separates a future opt-in, protected AI gateway, a true offline-capable PWA, real privacy-safe collaboration, and independently evaluated pilots from what actually works today.
+
+
 ## Draft pilot-first upgrade (not released)
 
 A new opt-in **seven-day study journal** is under review on a stacked feature branch. From the Circles screen, a learner can start a local pilot and self-report daily study mode, biggest obstacle and usefulness (1–5); optional aggregate-only report sharing remains voluntary. This is local **self-report**, not attendance validation, real peer sync, demonstrated retention impact, or institution-grade analytics. It does not connect to a backend or upload data. See [Pilot upgrade and Cloudflare-only architecture](docs/PILOT_CLOUDFLARE_ONLY.md) for real boundaries and Android release gates.

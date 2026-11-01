@@ -1,0 +1,62 @@
+{
+  "suite": "openforge-offline-grounding-public-v1",
+  "purpose": "Synthetic, public developer regression set; not a hidden or independently audited competition benchmark",
+  "materials": [
+    {
+      "id": "source-accountability",
+      "circleId": "synthetic-judge",
+      "title": "Fictional Civic Accountability Notes",
+      "content": "Public accountability means officials explain decisions and accept scrutiny. Transparent budgets allow communities to monitor public spending. These fictional notes are for software testing only.",
+      "createdAt": 0
+    },
+    {
+      "id": "source-offline",
+      "circleId": "synthetic-judge",
+      "title": "Fictional Offline Learning Notes",
+      "content": "Offline learning allows students to practice when network connection is unavailable. A learner can save local notes, attempt practice quizzes and review progress without internet. This fictional passage makes no claim about learning outcomes.",
+      "createdAt": 0
+    }
+  ],
+  "cases": [
+    {
+      "id": "source-1",
+      "question": "What does public accountability mean?",
+      "expectedTitle": "Fictional Civic Accountability Notes"
+    },
+    {
+      "id": "source-2",
+      "question": "How can communities monitor public spending?",
+      "expectedTitle": "Fictional Civic Accountability Notes"
+    },
+    {
+      "id": "source-3",
+      "question": "What does offline learning allow students to do?",
+      "expectedTitle": "Fictional Offline Learning Notes"
+    },
+    {
+      "id": "source-4",
+      "question": "Can students attempt practice quizzes without internet?",
+      "expectedTitle": "Fictional Offline Learning Notes"
+    },
+    {
+      "id": "no-evidence-1",
+      "question": "What is photosynthesis?",
+      "expectedTitle": null
+    },
+    {
+      "id": "no-evidence-2",
+      "question": "Explain mitochondrial genetics",
+      "expectedTitle": null
+    },
+    {
+      "id": "no-evidence-3",
+      "question": "Describe oceanic plate tectonics",
+      "expectedTitle": null
+    },
+    {
+      "id": "no-evidence-4",
+      "question": "What is quantum entanglement?",
+      "expectedTitle": null
+    }
+  ]
+}
