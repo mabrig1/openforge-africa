@@ -1,5 +1,5 @@
 /**
- * Deterministic, offline-only Academy dashboard shared by seven courses.
+ * Deterministic, offline-only Academy dashboard shared by eight courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
 import { LOGIC_LESSONS } from "./logicCourse.ts";
@@ -7,8 +7,9 @@ import { PSY210_MODULES } from "./psy210Course.ts";
 import {getExpansion,type ExpansionCourse} from "./academyExpansion.ts";
 import {AIL101_UNITS} from "./ail101Course.ts";
 import {getNewCourseUnits,NEW_COURSE_META,type NewCourseId} from "./additionalAcademyCourses.ts";
+import {SOUL_LESSONS} from "./integratedSoulCourse.ts";
 
-export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401"|"soul";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -31,6 +32,9 @@ export interface AcademySnapshotInput {
   ceaiRead?:number[];
   ceaiPassed?:number[];
   ceaiSelected?:number;
+  soulRead?:number[];
+  soulPassed?:number[];
+  soulSelected?:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -39,7 +43,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany"|"/integrated-soul";
   total:number;
   completed:number;
   percent:number;
@@ -67,6 +71,7 @@ export const ACADEMY_COURSE_META={
   },
   rlx101:{id:"rlx101",...NEW_COURSE_META.rlx101},
   ceai401:{id:"ceai401",...NEW_COURSE_META.ceai401},
+  soul:{id:"soul",code:"TIS SELF-STUDY",title:"The Integrated Soul: Philosophy, Psychology and Christian Transformation",route:"/integrated-soul",notice:"Six-week Christian formation masterclass, twelve adapted seminar reviews. No diagnosis, therapy, verified spiritual outcome or academic credit."},
   forge:{
     id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
     route:"/forge-studies",notice:"Ten weeks of independent review. Public project evidence and mentor validation are separate and NOT awarded in this app.",
@@ -202,7 +207,27 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
    };
  }
  const rlx=additional("rlx101"),ceai=additional("ceai401");
- const courses=[logic,psy,decision,forge,ail,rlx,ceai];
+
+ const soulRead=distinctKnown(input.soulRead??[],SOUL_LESSONS.length);
+ const soulPassed=distinctKnown(input.soulPassed??[],SOUL_LESSONS.length);
+ const soulCompleted=soulRead.filter(id=>soulPassed.includes(id));
+ const soulNext=SOUL_LESSONS.find(x=>x.id===input.soulSelected&&!soulCompleted.includes(x.id))||
+    SOUL_LESSONS.find(x=>!soulCompleted.includes(x.id));
+ const soulAction:AcademyNext["action"]=!soulNext?"Explore independently":
+    !soulRead.includes(soulNext.id)&&soulPassed.includes(soulNext.id)?"Mark reading reviewed":
+    soulRead.includes(soulNext.id)&&!soulPassed.includes(soulNext.id)?"Review or retake quiz":"Read and study";
+ const soul:AcademyCourseSummary={...ACADEMY_COURSE_META.soul,
+   total:SOUL_LESSONS.length,completed:soulCompleted.length,
+   percent:percent(soulCompleted.length,SOUL_LESSONS.length),
+   read:soulRead.length,practised:soulPassed.length,
+   next:{number:soulNext?.id??0,title:soulNext?.title??"Self-study complete",
+    action:soulAction,
+    detail:!soulNext?"Twelve local review milestones recorded. Personal transformation is not assessed by a quiz.":
+      soulAction==="Mark reading reviewed"?"Practice passed; review the seminar and mark its reading complete.":
+      soulAction==="Review or retake quiz"?"Try the formative question, not a clinical or spiritual test.":
+      "Read the short source-aligned seminar and reflect on its fictional learning case."}
+ };
+ const courses=[logic,psy,decision,forge,ail,rlx,ceai,soul];
  const total=courses.reduce((sum,x)=>sum+x.total,0),
     completed=courses.reduce((sum,x)=>sum+x.completed,0);
  return {courses,completed,total,percent:percent(completed,total)};
@@ -234,7 +259,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401"].includes(r.course as string))continue;
+  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401","soul"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -257,5 +282,6 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
      forge:entries.filter(x=>x.course==="forge").length,
      ail101:entries.filter(x=>x.course==="ail101").length,
      rlx101:entries.filter(x=>x.course==="rlx101").length,
-     ceai401:entries.filter(x=>x.course==="ceai401").length}};
+     ceai401:entries.filter(x=>x.course==="ceai401").length,
+     soul:entries.filter(x=>x.course==="soul").length}};
 }
