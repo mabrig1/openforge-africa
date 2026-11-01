@@ -1,11 +1,22 @@
 import {Tabs} from "expo-router";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import {Platform,useWindowDimensions} from "react-native";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 export default function TabLayout(){
+ const {width,height}=useWindowDimensions();
+ const inset=useSafeAreaInsets();
+ const sidebar=Platform.OS==="web"&&width>=1024;
+ const compact=width<370||height<620;
  return <Tabs screenOptions={{
+  tabBarPosition:sidebar?"left":"bottom",
+  tabBarLabelPosition:"below-icon",
   tabBarActiveTintColor:"#087F74",tabBarInactiveTintColor:"#64748B",
-  tabBarLabelStyle:{fontSize:11,fontWeight:"800"},
-  tabBarStyle:{backgroundColor:"#FFFFFF",borderTopColor:"#E2E8F0",height:65,paddingBottom:6},
+  tabBarLabelStyle:{fontSize:sidebar?12:compact?9:11,fontWeight:"800"},
+  tabBarStyle:{backgroundColor:"#FFFFFF",borderTopColor:"#E2E8F0",
+   borderRightColor:"#E2E8F0",borderRightWidth:sidebar?1:0,
+   width:sidebar?105:undefined,height:sidebar?undefined:56+Math.max(inset.bottom,6),
+   paddingBottom:sidebar?0:Math.max(inset.bottom,6)},
   headerStyle:{backgroundColor:"#F6F7FB"},headerTintColor:"#162036",
  }}>
   <Tabs.Screen name="index" options={{
