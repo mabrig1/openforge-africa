@@ -520,7 +520,7 @@ try {
   await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
   await page.getByText(/Local source: PSY 210/).first().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Open classroom verification dashboard"}).click();
-  await page.getByText("Classroom Verification",{exact:true}).waitFor({state:"visible"});
+  await page.getByText("Classroom Verification",{exact:true}).last().waitFor({state:"visible"});
   await page.getByText("SYNTHETIC CHECKS PASS",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/15 local roles · 10 linked courses · 158 short study reviews/).waitFor({state:"visible"});
   console.log("PASS: PSY 210 Academy course/short review consent, local source evidence and transparent verification dashboard");
