@@ -401,9 +401,11 @@ try {
   await page.getByText("1 / 24",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Send short Clear Sight review to offline Explainer"}).click();
   const clarityDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
-  if(!clarityDraft.includes("Observation, Inference and Unresolved Claims")||
+  const clarityTitle=await page.getByRole("textbox",{name:"Explainer topic"}).inputValue();
+  if(!clarityTitle.includes("Observation, Inference and Unresolved Claims")||
+     !clarityDraft.includes("Discernment begins by stating what happened")||
      !clarityDraft.includes("Mastering Discernment"))
-    throw Error("Clear Sight brief review did not transfer to local Explainer");
+    throw Error("Clear Sight short review or separate topic did not transfer to local Explainer");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("9 / 134 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Clear Sight: Mastering Discernment"}).waitFor({state:"visible"});
