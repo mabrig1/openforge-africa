@@ -221,8 +221,8 @@ try {
   await page.reload({waitUntil:"domcontentloaded"});
   await page.getByText("Five-turn simulation complete").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Transfer fictional interview transcript to Text Reader"}).click();
-  await page.getByRole("textbox",{name:"Text reader content"}).waitFor({state:"visible"});
-  const transcript=await page.getByRole("textbox",{name:"Text reader content"}).inputValue();
+  await page.getByRole("textbox",{name:"Text for speech reader"}).waitFor({state:"visible"});
+  const transcript=await page.getByRole("textbox",{name:"Text for speech reader"}).inputValue();
   if(!transcript.includes("Fictional practice case: Academic stress"))
     throw Error("Synthetic psychology dialogue was not transferred to Reader");
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
