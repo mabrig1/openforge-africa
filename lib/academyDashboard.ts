@@ -5,8 +5,9 @@
 import { LOGIC_LESSONS } from "./logicCourse.ts";
 import { PSY210_MODULES } from "./psy210Course.ts";
 import {getExpansion,type ExpansionCourse} from "./academyExpansion.ts";
+import {AIL101_UNITS} from "./ail101Course.ts";
 
-export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -20,6 +21,9 @@ export interface AcademySnapshotInput {
   forgeRead:number[];
   forgePassed:number[];
   forgeSelected:number;
+  ailRead?:number[];
+  ailPassed?:number[];
+  ailSelected?:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -28,7 +32,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101";
   total:number;
   completed:number;
   percent:number;
@@ -49,6 +53,10 @@ export const ACADEMY_COURSE_META={
   decision:{
     id:"decision",code:"HILADS",title:"Human Intelligence, Logic and AI Decision Science",
     route:"/decision-science",notice:"Twenty adapted reviews; complete 100-page Mabrig Korie textbook is in the private offline library. Institutional credit is not granted.",
+  },
+  ail101:{
+    id:"ail101",code:"AIL 101",title:"AI Literacy and Human–AI Collaboration",
+    route:"/ail101",notice:"Twenty original source-aligned reviews and formative quizzes. Full 100-page book remains private; not academic credit.",
   },
   forge:{
     id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
@@ -145,7 +153,24 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
      next:{number:next?.id??0,title:next?.title??"Self-study complete",action,detail}};
  }
  const decision=expanded("decision"),forge=expanded("forge");
- const courses=[logic,psy,decision,forge];
+ const ailRead=distinctKnown(input.ailRead??[],AIL101_UNITS.length);
+ const ailPassed=distinctKnown(input.ailPassed??[],AIL101_UNITS.length);
+ const ailCompleted=ailRead.filter(id=>ailPassed.includes(id));
+ const ailNext=AIL101_UNITS.find(u=>u.id===input.ailSelected&&!ailCompleted.includes(u.id))||
+   AIL101_UNITS.find(u=>!ailCompleted.includes(u.id));
+ const ailAction:AcademyNext["action"]=!ailNext?"Explore independently":
+   !ailRead.includes(ailNext.id)&&ailPassed.includes(ailNext.id)?"Mark reading reviewed":
+   ailRead.includes(ailNext.id)&&!ailPassed.includes(ailNext.id)?"Review or retake quiz":"Read and study";
+ const ail:AcademyCourseSummary={...ACADEMY_COURSE_META.ail101,
+   total:AIL101_UNITS.length,completed:ailCompleted.length,
+   percent:percent(ailCompleted.length,AIL101_UNITS.length),read:ailRead.length,practised:ailPassed.length,
+   next:{number:ailNext?.id??0,title:ailNext?.title??"Self-study complete",action:ailAction,
+     detail:!ailNext?"All independent AIL 101 review milestones recorded.":
+       ailAction==="Mark reading reviewed"?"Practice is passed; complete the reading review.":
+       ailAction==="Review or retake quiz"?"Pass this unit's formative reasoning check.":
+       "Review the unit and try its source-aligned reasoning check."}
+ };
+ const courses=[logic,psy,decision,forge,ail];
  const total=courses.reduce((sum,x)=>sum+x.total,0),
     completed=courses.reduce((sum,x)=>sum+x.completed,0);
  return {courses,completed,total,percent:percent(completed,total)};
@@ -177,7 +202,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(!["logic","psy210","decision","forge"].includes(r.course as string))continue;
+  if(!["logic","psy210","decision","forge","ail101"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -197,5 +222,6 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
    byCourse:{logic:entries.filter(x=>x.course==="logic").length,
      psy210:entries.filter(x=>x.course==="psy210").length,
      decision:entries.filter(x=>x.course==="decision").length,
-     forge:entries.filter(x=>x.course==="forge").length}};
+     forge:entries.filter(x=>x.course==="forge").length,
+     ail101:entries.filter(x=>x.course==="ail101").length}};
 }

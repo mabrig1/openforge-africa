@@ -19,7 +19,7 @@ export default function CirclesScreen() {
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
         onPress={()=>router.push("/academy")}
         className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
-        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Four-course dashboard →</Text>
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Five-course dashboard →</Text>
         <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
@@ -57,6 +57,12 @@ export default function CirclesScreen() {
         className="bg-indigo-900 border border-indigo-500 rounded-xl p-4 mb-3">
         <Text className="text-white font-bold text-center">🎓 Human Intelligence, Logic & AI Decision Science</Text>
         <Text className="text-indigo-200 text-xs mt-1 text-center">20 interdisciplinary units • interactive probability and decisions lab</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open AIL 101 AI Literacy and Human AI Collaboration"
+        onPress={()=>router.push("/ail101")}
+        className="bg-sky-900 border border-sky-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 AIL 101 • AI Literacy and Human–AI Collaboration</Text>
+        <Text className="text-sky-200 text-xs mt-1 text-center">20 source-aligned reviews • offline quizzes • voice and infographic transfer</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 Introduction to Forge Studies"
         onPress={()=>router.push("/forge-studies")}
