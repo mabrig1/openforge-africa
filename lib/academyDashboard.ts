@@ -183,7 +183,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
   const key=r.course+":"+r.day;
   if(seen.has(key))continue;
-  seen.add(key);clean.push({day:r.day,course:r.course});
+  seen.add(key);clean.push({day:r.day,course:r.course as AcademyCourseId});
  }
  return clean.slice(-90);
 }
