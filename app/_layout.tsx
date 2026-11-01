@@ -36,6 +36,7 @@ export default function RootLayout() {
         <Stack.Screen name="relationalics" options={{ title: "RLX 101 Foundations of Relationalics" }} />
         <Stack.Screen name="ethnobotany" options={{ title: "CEAI-401 Computational Ethnobotany" }} />
         <Stack.Screen name="integrated-soul" options={{ title: "The Integrated Soul" }} />
+        <Stack.Screen name="clear-sight" options={{ title: "Clear Sight: Mastering Discernment" }} />
         <Stack.Screen name="decision-lab" options={{ title: "Probability and Decision Lab" }} />
         <Stack.Screen name="forge-studies" options={{ title: "FS 101: Introduction to Forge Studies" }} />
         <Stack.Screen name="forge-portfolio" options={{ title: "FS 101 Evidence Portfolio Studio" }} />

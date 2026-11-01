@@ -228,7 +228,7 @@ try {
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
-  await page.getByText("2 / 110 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 134 milestones").waitFor({state:"visible",timeout:15000});
   await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
   await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
@@ -238,7 +238,7 @@ try {
     name:"Record today's study session for Psychology in the Age of AI"}).click();
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("2 / 110 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 134 milestones").waitFor({state:"visible"});
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
   await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
@@ -291,7 +291,7 @@ try {
      !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
   console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("4 / 110 milestones").waitFor({state:"visible"});
+  await page.getByText("4 / 134 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Human Intelligence, Logic and AI Decision Science"})
     .waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
@@ -316,7 +316,7 @@ try {
   if(!ailDraft.includes("independently checking important claims"))
     throw Error("AIL 101 review not transferred to offline explainer");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("5 / 110 milestones").waitFor({state:"visible"});
+  await page.getByText("5 / 134 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume AI Literacy and Human–AI Collaboration"})
     .waitFor({state:"visible"});
   console.log("PASS: AIL 101 wrong/correct quiz, dual milestone, persistence, local explainer and fifth subject");
@@ -346,7 +346,7 @@ try {
   await page.reload({waitUntil:"domcontentloaded"});
   await page.getByText("1 / 7",{exact:true}).waitFor({state:"visible"});
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("7 / 110 milestones").waitFor({state:"visible"});
+  await page.getByText("7 / 134 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Foundations of Relationalics"}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Advanced Computational Ethnobotany & Precision AI Phytotherapy"}).waitFor({state:"visible"});
   console.log("PASS: RLX101 and CEAI401 practice, correct retry, persistence, safety disclosure, and eight-course catalogue");
@@ -372,10 +372,45 @@ try {
      !soulDraft.includes("Plato"))
     throw Error("Integrated Soul review transfer was not source grounded");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("8 / 110 milestones").waitFor({state:"visible"});
+  await page.getByText("8 / 134 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume The Integrated Soul: Philosophy, Psychology and Christian Transformation"})
     .waitFor({state:"visible"});
   console.log("PASS: Integrated Soul preserves six weeks, correct/retry review, local persistence, transfer and eight-course milestones");
+
+  // Clear Sight: source-aligned 24-unit review, local offline calibration and source-aware transfer.
+  await page.goto(address+"/clear-sight",{waitUntil:"domcontentloaded"});
+  await page.getByText("Clear Sight",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByText("0 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show Clear Sight practice tools and Brier scoring laboratory"}).click();
+  await page.getByRole("button",{name:"Calculate synthetic binary Brier score"}).click();
+  await page.getByText("Brier score: 0.0900").waitFor({state:"visible"});
+  await page.getByRole("radio",{name:"Synthetic event did not occur"}).click();
+  await page.getByRole("button",{name:"Calculate synthetic binary Brier score"}).click();
+  await page.getByText("Brier score: 0.4900").waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Synthetic forecast percentage"}).fill("105");
+  await page.getByRole("button",{name:"Calculate synthetic binary Brier score"}).click();
+  await page.getByText("Enter a probability between 0% and 100%.").waitFor({state:"visible"});
+  await page.getByRole("radio",{name:/Clear Sight answer 2:/}).click();
+  await page.getByRole("button",{name:"Check Clear Sight formative answer"}).click();
+  await page.getByRole("button",{name:"Retry Clear Sight formative question"}).click();
+  await page.getByRole("radio",{name:/Clear Sight answer 1:/}).click();
+  await page.getByRole("button",{name:"Check Clear Sight formative answer"}).click();
+  await page.getByRole("button",{name:"Mark Clear Sight review as read"}).click();
+  await page.getByText("1 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Send short Clear Sight review to offline Explainer"}).click();
+  const clarityDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  const clarityTitle=await page.getByRole("textbox",{name:"Explainer topic"}).inputValue();
+  if(!clarityTitle.includes("Observation, Inference and Unresolved Claims")||
+     !clarityDraft.includes("Discernment begins by stating what happened")||
+     !clarityDraft.includes("Mastering Discernment"))
+    throw Error("Clear Sight short review or separate topic did not transfer to local Explainer");
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("9 / 134 milestones").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Clear Sight: Mastering Discernment"}).waitFor({state:"visible"});
+  console.log("PASS: Clear Sight course, Brier synthetic calculation, quiz retry, persistence, explainer and nine-course dashboard");
+
 
 
 
