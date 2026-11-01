@@ -21,7 +21,11 @@ export interface GlobalQuota{
 }
 export function utcDay(now=new Date()):string{return now.toISOString().slice(0,10);}
 export function utcMonth(now=new Date()):string{return now.toISOString().slice(0,7);}
-const isDay=(value:string)=>{\n if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;\n const date=new Date(value+"T00:00:00Z");\n return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value;\n};
+const isDay=(value:string)=>{
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+ const date=new Date(value+"T00:00:00Z");
+ return Number.isFinite(date.getTime())&&date.toISOString().slice(0,10)===value;
+};
 export function isActiveExplorer(start:string|null,day:string):boolean{
  if(!start||!isDay(start)||!isDay(day))return false;
  const elapsed=(Date.parse(day+"T00:00:00Z")-Date.parse(start+"T00:00:00Z"))/86400000;
