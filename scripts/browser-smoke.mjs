@@ -228,7 +228,7 @@ try {
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
-  await page.getByText("2 / 29 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 59 milestones").waitFor({state:"visible",timeout:15000});
   await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
   await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
@@ -238,13 +238,65 @@ try {
     name:"Record today's study session for Psychology in the Age of AI"}).click();
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("2 / 29 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 59 milestones").waitFor({state:"visible"});
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
   await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Return to unified Academy dashboard from Psychology course"}).click();
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible"});
   console.log("PASS: unified Academy tracks both native courses, plans real local study records and resumes study");
+  await page.goto(address+"/decision-science",{waitUntil:"domcontentloaded"});
+  await page.getByText("Human Intelligence, Logic and AI Decision Science").last().waitFor({state:"visible"});
+  await page.getByText("0 / 20",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
+  await page.getByRole("button",{name:"Open unit 20: AI Ethics, Risk Governance and Public Responsibility"})
+    .waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
+  await page.getByRole("radio",{name:/Select expansion practice option 2:/}).click();
+  await page.getByRole("button",{name:"Check expansion practice response"}).click();
+  await page.getByRole("button",{name:"Mark expanded course reading reviewed"}).click();
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Create new course infographic or explainer"}).click();
+  await page.getByRole("textbox",{name:"Explainer source text"}).waitFor({state:"visible"});
+  const decisionDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!decisionDraft.includes("capable demonstration"))throw Error("Decision course text not transferred to studio");
+  console.log("PASS: twenty decision-science units, practice persistence and explainer transfer");
+  await page.goto(address+"/decision-lab",{waitUntil:"domcontentloaded"});
+  await page.getByText("Probability & Choice").last().waitFor({state:"visible"});
+  await page.getByText("16.1%",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Set Bayes example with ten percent prevalence"}).click();
+  await page.getByText("67.86%",{exact:true}).waitFor({state:"visible"});
+  await page.getByText("30 units",{exact:true}).waitFor({state:"visible"});
+  console.log("PASS: real Bayes posterior and expected-value calculations in mobile browser");
+  await page.goto(address+"/forge-studies",{waitUntil:"domcontentloaded"});
+  await page.getByText("Introduction to Forge Studies").last().waitFor({state:"visible"});
+  await page.getByText("0 / 10",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
+  await page.getByRole("button",{name:"Open week 10: Demo Day"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show or hide all units or weeks"}).click();
+  await page.getByRole("radio",{name:/Select expansion practice option 2:/}).click();
+  await page.getByRole("button",{name:"Check expansion practice response"}).click();
+  await page.getByRole("button",{name:"Mark expanded course reading reviewed"}).click();
+  await page.getByRole("textbox",{name:"Weekly Forge evidence URL"}).fill("https://example.org/public-project-demo");
+  await page.getByRole("textbox",{name:"Weekly Forge evidence preparation notes"}).fill(
+   "Fictional QA example, not a submitted or verified project.");
+  await page.getByRole("button",{name:"Save unverified Forge evidence draft"}).click();
+  await page.getByText("Saved locally as YOUR OWN UNVERIFIED evidence draft.",{exact:false})
+    .waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 10",{exact:true}).waitFor({state:"visible"});
+  if((await page.getByRole("textbox",{name:"Weekly Forge evidence URL"}).inputValue())
+     !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
+  console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("4 / 59 milestones").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Human Intelligence, Logic and AI Decision Science"})
+    .waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
+    .waitFor({state:"visible"});
+  console.log("PASS: unified four-course Academy shows authentic separate 59 review milestones");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();

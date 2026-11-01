@@ -19,7 +19,7 @@ export default function CirclesScreen() {
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
         onPress={()=>router.push("/academy")}
         className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
-        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Two-course dashboard →</Text>
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Four-course dashboard →</Text>
         <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
@@ -51,6 +51,18 @@ export default function CirclesScreen() {
         className="bg-teal-900 border border-teal-500 rounded-xl p-4 mb-3">
         <Text className="text-white text-center font-bold">🎓 PSY 210 — Psychology in the Age of AI</Text>
         <Text className="text-teal-200 text-center text-xs mt-1">Six modules • formative quizzes • fictional interview studio</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Human Intelligence Logic and AI Decision Science"
+        onPress={()=>router.push("/decision-science")}
+        className="bg-indigo-900 border border-indigo-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 Human Intelligence, Logic & AI Decision Science</Text>
+        <Text className="text-indigo-200 text-xs mt-1 text-center">20 interdisciplinary units • interactive probability and decisions lab</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 Introduction to Forge Studies"
+        onPress={()=>router.push("/forge-studies")}
+        className="bg-teal-900 border border-teal-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 FS 101 • Introduction to Forge Studies</Text>
+        <Text className="text-teal-200 text-xs mt-1 text-center">10-week Forge Cycle • public-proof preparation notebook</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Innovation Challenge Lab" onPress={() => router.push("/challenge")}
         className="bg-indigo-900 border border-indigo-600 rounded-xl p-3 mb-3">
