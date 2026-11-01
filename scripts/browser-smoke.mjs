@@ -308,9 +308,9 @@ try {
   await page.getByRole("radio",{name:/Option 3:/}).click();
   await page.getByRole("button",{name:"Check formative answer"}).click();
   await page.getByRole("button",{name:"Mark AI literacy review as read"}).click();
-  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.getByText("1 / 20",{exact:true}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Send review to offline infographic and explainer studio"}).click();
   const ailDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
   if(!ailDraft.includes("independently checking important claims"))
