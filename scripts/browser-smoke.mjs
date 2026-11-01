@@ -550,6 +550,7 @@ try {
   // Agent Desk: verify actual mobile SPA route, local coordination and editable handoff.
   await page.goto(address+"/agents",{waitUntil:"domcontentloaded"});
   await page.getByText("12-agent learning studio",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Choose University Coordinator"}).click();
   await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
   await page.getByText("Three-agent local learning plan",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/Local delegation:/).waitFor({state:"visible"});
@@ -569,6 +570,8 @@ try {
   await page.goto(address+"/classroom",{waitUntil:"domcontentloaded"});
   await page.getByText("15-agent classroom",{exact:true}).waitFor({state:"visible",timeout:15000});
   await page.getByText(/3 \/ 3 classroom runs left today/).waitFor({state:"visible"});
+  // Explicitly opt out of the *default* public Academy review to verify the source-gap path.
+  await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
   await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What is logical validity?");
   await page.getByRole("button",{name:"Run free local classroom"}).click();
   await page.getByText("VERIFIABLE DIRECTOR DISPATCH TRACE",{exact:true}).waitFor({state:"visible"});
@@ -578,6 +581,7 @@ try {
   await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Discussion mode"}).click();
   await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("Thinking and reasoning discussion");
+  await page.getByRole("button",{name:"Choose a different classroom role"}).click();
   await page.getByRole("button",{name:"Choose Visual Learner"}).click();
   await page.getByRole("button",{name:"Run free local classroom"}).click();
   await page.getByText(/Round 1: Visual Learner/).waitFor({state:"visible"});
@@ -590,9 +594,8 @@ try {
   await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
   await page.getByRole("button",{name:"Choose classroom unit 1"}).click();
   await page.getByText("Foundations of Mind & AI",{exact:true}).waitFor({state:"visible"});
-  await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
-  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What does psychology study?");
-  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  // First-run button must use the public course excerpt without requiring personal notes.
+  await page.getByRole("button",{name:"Explain this course lesson now"}).click();
   await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
   await page.getByText(/Local source: PSY 210/).first().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Open classroom verification dashboard"}).click();
@@ -602,7 +605,9 @@ try {
   console.log("PASS: PSY 210 Academy course/short review consent, local source evidence and transparent verification dashboard");
   // Authenticated public model preview: OFF by default and no callable provider.
   await page.goto(address+"/classroom-live",{waitUntil:"domcontentloaded"});
-  await page.getByText("Authenticated AI Classroom",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("Your classroom is ready",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Start working free classroom now"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Show optional AI trial settings"}).click();
   await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).waitFor({state:"visible"});
   if(await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).isEnabled())
     throw Error("Auth classroom should be disabled before verified Access identity and consent");
