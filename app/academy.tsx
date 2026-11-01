@@ -169,6 +169,21 @@ export default function AcademyDashboardScreen(){
        One optional self-reported study session per subject per device-local day; cannot replace reading checks, quizzes or formal instructor assessments.
      </Text>
    </View>
+   <Text className="text-white text-xl font-bold mt-7 mb-3">Applied research & evidence tools</Text>
+   <View className="flex-row justify-between">
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open statistics lab from four-course Academy"
+       onPress={()=>router.push("/statistics-lab")} className="bg-slate-700 rounded-xl p-3" style={{width:"48%"}}>
+       <Text className="text-white text-center font-bold">Statistics Lab →</Text>
+     </TouchableOpacity>
+     <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open causal inference lab from Academy"
+       onPress={()=>router.push("/causal-lab")} className="bg-slate-700 rounded-xl p-3" style={{width:"48%"}}>
+       <Text className="text-white text-center font-bold">Causal Reasoning →</Text>
+     </TouchableOpacity>
+   </View>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open Forge Studies evidence portfolio studio"
+     onPress={()=>router.push("/forge-portfolio")} className="bg-indigo-800 rounded-xl p-4 mt-3">
+     <Text className="text-white text-center font-bold">Forge Evidence Portfolio Studio →</Text>
+   </TouchableOpacity>
    <Text className="text-white text-xl font-bold mt-7 mb-3">Learning tools</Text>
    <View className="flex-row justify-between">
      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open offline Tutor from Academy"
