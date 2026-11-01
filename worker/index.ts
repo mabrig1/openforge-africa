@@ -1,5 +1,8 @@
+import {handleClassroomAI} from "./classroomInference.ts";
+import {handlePublicClassroom,type PublicClassroomEnv} from "./publicClassroom.ts";
+export {ClassroomTrialLedger} from "./trialLedger.ts";
 /** Cloudflare Worker: private, opt-in, source-grounded tutor. No secret is shipped in Expo assets. */
-interface Env {
+interface Env extends PublicClassroomEnv {
   ASSETS: { fetch(request: Request): Promise<Response> };
   OPENROUTER_API_KEY?: string;
   OPENROUTER_MODEL?: string;
@@ -103,9 +106,12 @@ export async function handleTutorRequest(request: Request, env: Env): Promise<Re
   } finally { clearTimeout(timer); }
 }
 export default {
-  async fetch(request: Request, env: Env) {
+  async fetch(request: Request, env: Env, ctx?: Parameters<typeof handlePublicClassroom>[2]) {
     const path = new URL(request.url).pathname;
     if (path === "/api/tutor") return handleTutorRequest(request, env);
+    if (path === "/api/classroom-ai") return handleClassroomAI(request, env);
+    if (path.startsWith("/api/classroom-public/"))
+      return handlePublicClassroom(request,env,ctx??{},path);
     if (path.startsWith("/api/")) return json({ error: "Unknown API route" }, 404);
     return env.ASSETS.fetch(request);
   },

@@ -471,6 +471,72 @@ try {
   await page.getByRole("button",{name:"Edit Week 1 Forge artifact evidence draft"}).click();
   await page.getByText("Introduction to Forge Studies").last().waitFor({state:"visible"});
   console.log("PASS: ten-week Forge portfolio exports private human-review dossier with no credential issued");
+  // Agent Desk: verify actual mobile SPA route, local coordination and editable handoff.
+  await page.goto(address+"/agents",{waitUntil:"domcontentloaded"});
+  await page.getByText("12-agent learning studio",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("Three-agent local learning plan",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/Local delegation:/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose AI Tutor"}).click();
+  await page.getByRole("textbox",{name:"Agent question"}).fill("photosynthesis");
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("No matching local passage",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose Multimedia Lecturer"}).click();
+  await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
+  await page.getByText("Editable multimedia outline",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open draft in Explainer Studio"}).click();
+  const agentDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!agentDraft.includes("Scene 4:")||!agentDraft.includes("source-verified"))
+    throw Error("Agent Desk explainer draft handoff missing");
+  console.log("PASS: 12-agent Desk Coordinator, missing-evidence refusal and local storyboard handoff");
+  // Free 15-agent classroom: validate browser UI, actual local dispatch and trial quota.
+  await page.goto(address+"/classroom",{waitUntil:"domcontentloaded"});
+  await page.getByText("15-agent classroom",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByText(/3 \/ 3 classroom runs left today/).waitFor({state:"visible"});
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What is logical validity?");
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText("VERIFIABLE DIRECTOR DISPATCH TRACE",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
+  await page.getByText(/Source gap: a learner question remains unverified/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Start free seven day Explorer preview"}).click();
+  await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Discussion mode"}).click();
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("Thinking and reasoning discussion");
+  await page.getByRole("button",{name:"Choose Visual Learner"}).click();
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText(/Round 1: Visual Learner/).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText(/FREE EXPLORER TRIAL/).waitFor({state:"visible"});
+  await page.getByText(/6 \/ 8 classroom runs left today/).waitFor({state:"visible"});
+  console.log("PASS: 15-agent local classroom, teacher-first, rotated debate, persisted free trial counters");
+  // Connected Academy course review, explicit local-source opt-in and audit dashboard.
+  await page.goto(address+"/classroom?course=psy210",{waitUntil:"domcontentloaded"});
+  await page.getByText("Psychology in the Age of AI",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Choose classroom unit 1"}).click();
+  await page.getByText("Foundations of Mind & AI",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("checkbox",{name:"Include displayed Academy review as local classroom source"}).click();
+  await page.getByRole("textbox",{name:"Classroom question or topic"}).fill("What does psychology study?");
+  await page.getByRole("button",{name:"Run free local classroom"}).click();
+  await page.getByText(/Round 1: Lead Teacher/).waitFor({state:"visible"});
+  await page.getByText(/Local source: PSY 210/).first().waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Open classroom verification dashboard"}).click();
+  await page.getByText("Classroom Verification",{exact:true}).last().waitFor({state:"visible"});
+  await page.getByText("SYNTHETIC CHECKS PASS",{exact:true}).waitFor({state:"visible"});
+  await page.getByText(/15 local roles · 10 linked courses · 158 short study reviews/).waitFor({state:"visible"});
+  console.log("PASS: PSY 210 Academy course/short review consent, local source evidence and transparent verification dashboard");
+  // Authenticated public model preview: OFF by default and no callable provider.
+  await page.goto(address+"/classroom-live",{waitUntil:"domcontentloaded"});
+  await page.getByText("Authenticated AI Classroom",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).waitFor({state:"visible"});
+  if(await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).isEnabled())
+    throw Error("Auth classroom should be disabled before verified Access identity and consent");
+  const disabledTrial=await fetch(address+"/api/classroom-public/status");
+  if(disabledTrial.status!==503)
+    throw Error("Unconfigured server-backed public AI trial must fail closed with HTTP 503");
+  const disabledBody=await disabledTrial.json();
+  if(!/not enabled/.test(disabledBody.error||""))
+    throw Error("Missing explicit disabled-trial response");
+  console.log("PASS: optional authenticated public AI preview is fail-closed; no provider calls or keys");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
   await context.close();
