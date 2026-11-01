@@ -103,6 +103,10 @@ export default function AcademyDashboardScreen(){
      <Text className="text-white text-center font-bold">Launch free 15-Agent Classroom →</Text>
    </TouchableOpacity>
    <Text className="text-slate-300 text-xs mt-2">Basic: 3 local runs/day · 7-day Explorer preview: 8 runs/day · zero paid inference.</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="View classroom verification results"
+     onPress={()=>router.push("/classroom-verify")} className="bg-slate-700 rounded-xl p-3 mt-3">
+     <Text className="text-white text-center font-bold">Verify classroom agents and ten-course connectivity →</Text>
+   </TouchableOpacity>
    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open 12-agent learning studio"
      onPress={()=>router.push("/agents")} className="bg-indigo-700 rounded-xl p-4 mt-5">
      <Text className="text-white text-center font-bold">Open the 12-Agent Learning Studio →</Text>
@@ -139,6 +143,12 @@ export default function AcademyDashboardScreen(){
          <Text className="text-white text-center font-bold">
            {course.completed===course.total?"Revisit subject →":"Resume subject →"}
          </Text>
+       </TouchableOpacity>
+       <TouchableOpacity accessibilityRole="button"
+         accessibilityLabel={"Open fifteen-agent classroom for "+course.title}
+         onPress={()=>router.push({pathname:"/classroom",params:{course:course.id}})}
+         className="bg-indigo-700 rounded-xl p-3 mt-3">
+         <Text className="text-white text-center font-bold">Discuss this course with 15-agent classroom →</Text>
        </TouchableOpacity>
        <TouchableOpacity accessibilityRole="button"
          accessibilityLabel={(isFollowing?"Stop following ":"Follow ")+course.title+" in weekly plan"}

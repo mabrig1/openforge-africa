@@ -69,6 +69,12 @@ export async function handleClassroomAI(request:Request,env:ClassroomAIEnv):Prom
  }catch{return json({error:"Malformed JSON"},400);}
  const parsed=validateClassroomAIInput(raw);
  if(!parsed)return json({error:"Invalid agent, question or up to three selected excerpts"},400);
+ return requestClassroomModel(parsed,env);
+
+}
+
+/** Shared owner/public one-agent provider call; external callers must authenticate and reserve first. */
+export async function requestClassroomModel(parsed:ClassroomAIInput,env:Pick<ClassroomAIEnv,"OPENROUTER_API_KEY"|"OPENROUTER_MODEL">):Promise<Response>{
  const agent=CLASSROOM_AGENTS.find(a=>a.id===parsed.agentId)!;
  const excerpts=parsed.sources.map((s,i)=>"[S"+(i+1)+"] "+s.title+"\n"+s.excerpt).join("\n\n");
  const controller=new AbortController();

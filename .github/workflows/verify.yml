@@ -22,6 +22,8 @@ jobs:
       - run: npm test
       - name: Verify 15-agent OpenMAIC-compatible roster
         run: npm run check:classroom-roster
+      - name: Verify ten-course classroom integration and synthetic Director policies
+        run: npm run check:classroom-verification
       - name: Simulate Cloudflare Workers Builds install lifecycle (no deployment)
         run: WORKERS_CI=1 node scripts/prepare-cloudflare-build.mjs
       - name: Run synthetic offline grounding regression
@@ -37,6 +39,8 @@ jobs:
         run: npm run check:web
       - name: Verify Wrangler config without deployment
         run: npm run cf:dry-run
+      - name: Validate isolated authenticated trial Durable Object candidate (dry run only)
+        run: npx wrangler deploy --config wrangler.classroom-preview.jsonc --dry-run
       - name: Test SPA routes and assets with local Wrangler
         run: npm run check:worker-local
       - name: Validate matching configuration for existing Worker (dry run only)
