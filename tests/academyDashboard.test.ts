@@ -27,8 +27,14 @@ test("marks only read AND successful formative practice; distinguishes missing c
  assert.equal(s.courses[0].next.number,1);
  assert.equal(s.courses[0].next.action,"Complete practice check");
  assert.equal(s.courses[1].completed,1);
- assert.equal(s.courses[1].next.number,3);
- assert.equal(s.courses[1].next.action,"Review or retake quiz");
+ assert.equal(s.courses[1].next.number,2);
+ assert.equal(s.courses[1].next.action,"Mark reading reviewed");
+ const needsReview=getAcademyDashboard({
+  ...blank,psyRead:[1,3],psyScores:{"1":2,"2":3,"3":1},
+  psySelected:3,
+ }).courses[1];
+ assert.equal(needsReview.next.number,3);
+ assert.equal(needsReview.next.action,"Review or retake quiz");
  assert.equal(s.completed,2);
 });
 test("invalid duplicate and out-of-range counts cannot inflate progress",()=>{
