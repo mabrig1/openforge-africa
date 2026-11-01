@@ -27,6 +27,12 @@ function CourseCompanion({course}:{course:ExpansionCourse}){
  const [evidenceUrl,setEvidenceUrl]=useState(drafts[String(item.id)]?.url??"");
  const [evidenceNote,setEvidenceNote]=useState(drafts[String(item.id)]?.note??"");
  useEffect(()=>()=>stopSpeech(),[]);
+ useEffect(()=>{
+  // AsyncStorage can hydrate after the first render: synchronize saved drafts.
+  setEvidenceUrl(drafts[String(item.id)]?.url??"");
+  setEvidenceNote(drafts[String(item.id)]?.note??"");
+ },[item.id,drafts[String(item.id)]?.url,drafts[String(item.id)]?.note]);
+
  const completion=expandedSummary(course,read,passed);
  const practiceChoices=[item.distractors[0],item.distractors[1]];
  practiceChoices.splice(item.id%3,0,item.correct);
