@@ -59,3 +59,16 @@ test("synthetic verification dashboard reports precise provenance and bounded sc
  assert.equal(report.trace[0].agentId,"of-quiet-observer");
  assert.equal(report.trace[1].agentId,"of-teacher");
 });
+
+test("first-run lesson prompts for all ten courses find their included public review",()=>{
+ for(const id of ids){
+  const selected=sample(id);
+  const review=academyCourseReview(selected);
+  const result=runClassroom({topic:"Explain "+review.unitTitle+
+   " using the selected lesson review",mode:"qa",maxSpeakers:3},[review.source]);
+  assert.equal(result.dispatched[0].agentId,"of-teacher");
+  assert.equal(result.turns[0].evidence.length,1,"Missing default source: "+id);
+  assert.equal(result.questionUnanswered,false,"Unexpected empty lesson: "+id);
+  assert.ok(result.turns[0].message.length>80);
+ }
+});
