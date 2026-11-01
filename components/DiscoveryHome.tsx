@@ -1,4 +1,5 @@
 import {useState} from "react";
+import InstallAppPrompt from "./InstallAppPrompt";
 import {ScrollView,Text,TextInput,TouchableOpacity,View,useWindowDimensions} from "react-native";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {router} from "expo-router";
