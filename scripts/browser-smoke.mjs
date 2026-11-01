@@ -530,8 +530,12 @@ try {
   await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).waitFor({state:"visible"});
   if(await page.getByRole("button",{name:"Ask one metered authenticated AI agent"}).isEnabled())
     throw Error("Auth classroom should be disabled before verified Access identity and consent");
-  await page.getByRole("button",{name:"Check server-backed trial status"}).click();
-  await page.getByText(/Public AI preview is not enabled/).waitFor({state:"visible"});
+  const disabledTrial=await fetch(address+"/api/classroom-public/status");
+  if(disabledTrial.status!==503)
+    throw Error("Unconfigured server-backed public AI trial must fail closed with HTTP 503");
+  const disabledBody=await disabledTrial.json();
+  if(!/not enabled/.test(disabledBody.error||""))
+    throw Error("Missing explicit disabled-trial response");
   console.log("PASS: optional authenticated public AI preview is fail-closed; no provider calls or keys");
   if(runtimeErrors.length)throw Error("Browser JS errors: "+runtimeErrors.slice(0,5).join(" | "));
   console.log("PASS: no captured JavaScript exceptions");
