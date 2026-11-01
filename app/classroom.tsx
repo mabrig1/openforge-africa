@@ -312,6 +312,14 @@ export default function ClassroomScreen(){
     </View>}
    </View>}
   </View>
+  <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open optional authenticated AI classroom preview"
+   onPress={()=>router.push({pathname:"/classroom-live",params:{course:course.id}})}
+   className="bg-indigo-800 rounded-xl p-4 mt-5">
+   <Text className="text-white text-center font-bold">Optional authenticated AI trial (server-gated) →</Text>
+  </TouchableOpacity>
+  <Text className="text-slate-400 text-xs mt-2">
+   Generative access is off until account authentication, durable limits and budget safeguards are approved and configured.
+  </Text>
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open classroom verification dashboard"
    onPress={()=>router.push("/classroom-verify")} className="bg-slate-700 rounded-xl p-4 mt-5">
    <Text className="text-white text-center font-bold">View reproducible verification & agent roster →</Text>
