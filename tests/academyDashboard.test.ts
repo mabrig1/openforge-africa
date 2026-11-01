@@ -12,8 +12,10 @@ const blank={
 };
 test("catalog combines 23 logic, 6 psychology, 20 decision and 10 Forge milestones without falsely counting unfinished study",()=>{
  const s=getAcademyDashboard(blank);
- assert.deepEqual([s.completed,s.total,s.percent],[0,59,0]);
- assert.equal(s.courses.length,4);
+ assert.deepEqual([s.completed,s.total,s.percent],[0,79,0]);
+ assert.equal(s.courses.length,5);
+ assert.equal(s.courses[4].total,20);
+ assert.equal(s.courses[4].route,"/ail101");
  assert.equal(s.courses[2].total,20);
  assert.equal(s.courses[3].total,10);
  assert.equal(s.courses[2].route,"/decision-science");
@@ -60,7 +62,7 @@ test("both courses complete only with all respective course milestones",()=>{
   logicPassed:Array.from({length:23},(_,i)=>i+1),
   psyRead:[1,2,3,4,5,6],psyScores:{"1":2,"2":3,"3":2,"4":2,"5":2,"6":2},
  });
- assert.deepEqual([data.completed,data.total,data.percent],[29,59,49]);
+ assert.deepEqual([data.completed,data.total,data.percent],[29,79,37]);
  assert.equal(data.courses[0].next.number,0);
  assert.equal(data.courses[1].next.action,"Explore independently");
 });
@@ -88,10 +90,10 @@ test("weekly study log is bounded, deduplicated and rejects future, forged or im
  assert.equal(valid.length,4);
  const thisWeek=academyWeeklySessions(rows,"2026-11-01");
  assert.deepEqual(thisWeek,{
-  count:3,activeDays:2,byCourse:{logic:2,psy210:1,decision:0,forge:0}
+  count:3,activeDays:2,byCourse:{logic:2,psy210:1,decision:0,forge:0,ail101:0}
  });
  assert.deepEqual(academyWeeklySessions([{day:"2026-11-01",course:"logic"}],"2026-11-02"),
-  {count:0,activeDays:0,byCourse:{logic:0,psy210:0,decision:0,forge:0}});
+  {count:0,activeDays:0,byCourse:{logic:0,psy210:0,decision:0,forge:0,ail101:0}});
 });
 
 test("new decision and Forge weekly review milestones count only when read and practised",()=>{
@@ -99,7 +101,7 @@ test("new decision and Forge weekly review milestones count only when read and p
    decisionRead:[1,2,4],decisionPassed:[1,3],decisionSelected:2,
    forgeRead:[1,2,11],forgePassed:[2,5],forgeSelected:1,
  });
- assert.equal(s.total,59);
+ assert.equal(s.total,79);
  assert.equal(s.courses[2].completed,1);
  assert.equal(s.courses[3].completed,1);
  assert.equal(s.courses[2].next.number,2);
@@ -108,7 +110,7 @@ test("new decision and Forge weekly review milestones count only when read and p
  assert.equal(s.courses[3].next.action,"Review or retake quiz");
  assert.equal(s.completed,2);
 });
-test("all four subjects reaching independent self-study mastery is 59 of 59, but not academic credit",()=>{
+test("all five subjects reaching independent self-study mastery is 79 of 79, but not academic credit",()=>{
  const a=getAcademyDashboard({...blank,
   logicRead:Array.from({length:23},(_,i)=>i+1),
   logicPassed:Array.from({length:23},(_,i)=>i+1),
@@ -117,12 +119,28 @@ test("all four subjects reaching independent self-study mastery is 59 of 59, but
   decisionPassed:Array.from({length:20},(_,i)=>i+1),
   forgeRead:Array.from({length:10},(_,i)=>i+1),
   forgePassed:Array.from({length:10},(_,i)=>i+1),
+  ailRead:Array.from({length:20},(_,i)=>i+1),
+  ailPassed:Array.from({length:20},(_,i)=>i+1),
  });
- assert.deepEqual([a.completed,a.total,a.percent],[59,59,100]);
+ assert.deepEqual([a.completed,a.total,a.percent],[79,79,100]);
  assert.ok(a.courses.every(c=>c.next.action==="Explore independently"));
  assert.match(a.courses[3].next.detail,/unverified/);
 });
-test("weekly calendar includes decision and Forge, not only earlier courses",()=>{
+test("weekly calendar includes decision, Forge and AI Literacy, not only earlier courses",()=>{
  const t=academyWeeklySessions([{day:"2026-11-01",course:"decision"},{day:"2026-11-01",course:"forge"}],"2026-11-01");
- assert.deepEqual(t,{count:2,activeDays:1,byCourse:{logic:0,psy210:0,decision:1,forge:1}});
+ assert.deepEqual(t,{count:2,activeDays:1,byCourse:{logic:0,psy210:0,decision:1,forge:1,ail101:0}});
+});
+
+test("AI literacy's 20 units require reading and a successful formative check; invalid data cannot inflate progress",()=>{
+ const a=getAcademyDashboard({...blank,
+  ailRead:[1,1,2,88],ailPassed:[2,2,99],ailSelected:1
+ });
+ assert.equal(a.total,79);
+ assert.equal(a.courses[4].read,2);
+ assert.equal(a.courses[4].completed,1);
+ assert.equal(a.courses[4].next.number,1);
+ assert.equal(a.courses[4].next.action,"Read and study");
+ assert.equal(a.courses[4].route,"/ail101");
+ const b=academyWeeklySessions([{day:"2026-11-01",course:"ail101"}],"2026-11-01");
+ assert.equal(b.byCourse.ail101,1);
 });
