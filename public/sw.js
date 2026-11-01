@@ -1,7 +1,7 @@
 /*
  * Versioned PUBLIC app-shell cache only. No API responses or notes are cached.
  * Network-first HTML avoids keeping users on an old release after deploy.
- * This worker is valid only after replacing __BUILD_VERSION__/__SHELL_URLS__.
+ * Build replaces compile-time version and public asset manifest placeholders.
  */
 const CACHE="openforge-public-__BUILD_VERSION__";
 const SHELL=__SHELL_URLS__;
