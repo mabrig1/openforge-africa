@@ -30,6 +30,7 @@ export default function RootLayout() {
         <Stack.Screen name="capstone" options={{ title: "Capstone Research Studio" }} />
         <Stack.Screen name="psychology-course" options={{ title: "PSY 210 Psychology and AI" }} />
         <Stack.Screen name="psychology-interview" options={{ title: "PSY 210 Interview Studio" }} />
+        <Stack.Screen name="academy" options={{ title: "OpenForge Academy Dashboard" }} />
       </Stack>
     </PaperProvider>
   );
