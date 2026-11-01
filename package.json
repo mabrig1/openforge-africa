@@ -19,7 +19,10 @@
     "cf:preview": "npm run build && npm run check:web && wrangler preview",
     "check:browser": "node scripts/browser-smoke.mjs",
     "test:worker": "node --experimental-strip-types --test tests/worker.test.ts",
-    "test:visual": "node --experimental-strip-types --test tests/explainVisual.test.ts"
+    "test:visual": "node --experimental-strip-types --test tests/explainVisual.test.ts",
+    "postinstall": "node scripts/prepare-cloudflare-build.mjs",
+    "cf:build": "npm run build && npm run check:web",
+    "cf:build:verify": "npm run cf:build && npm run cf:dry-run:live"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",

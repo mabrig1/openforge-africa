@@ -16,6 +16,8 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm test
+      - name: Simulate Cloudflare Workers Builds install lifecycle (no deployment)
+        run: WORKERS_CI=1 node scripts/prepare-cloudflare-build.mjs
       - name: Run synthetic offline grounding regression
         run: npm run benchmark:offline
       - name: Diagnose Metro versions

@@ -228,7 +228,7 @@ try {
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
-  await page.getByText("2 / 134 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 158 milestones").waitFor({state:"visible",timeout:15000});
   await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
   await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
@@ -238,7 +238,7 @@ try {
     name:"Record today's study session for Psychology in the Age of AI"}).click();
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("2 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 158 milestones").waitFor({state:"visible"});
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
   await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
@@ -291,7 +291,7 @@ try {
      !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
   console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("4 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("4 / 158 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Human Intelligence, Logic and AI Decision Science"})
     .waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
@@ -316,7 +316,7 @@ try {
   if(!ailDraft.includes("independently checking important claims"))
     throw Error("AIL 101 review not transferred to offline explainer");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("5 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("5 / 158 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume AI Literacy and Human–AI Collaboration"})
     .waitFor({state:"visible"});
   console.log("PASS: AIL 101 wrong/correct quiz, dual milestone, persistence, local explainer and fifth subject");
@@ -346,7 +346,7 @@ try {
   await page.reload({waitUntil:"domcontentloaded"});
   await page.getByText("1 / 7",{exact:true}).waitFor({state:"visible"});
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("7 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("7 / 158 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Foundations of Relationalics"}).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Advanced Computational Ethnobotany & Precision AI Phytotherapy"}).waitFor({state:"visible"});
   console.log("PASS: RLX101 and CEAI401 practice, correct retry, persistence, safety disclosure, and eight-course catalogue");
@@ -372,7 +372,7 @@ try {
      !soulDraft.includes("Plato"))
     throw Error("Integrated Soul review transfer was not source grounded");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("8 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("8 / 158 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume The Integrated Soul: Philosophy, Psychology and Christian Transformation"})
     .waitFor({state:"visible"});
   console.log("PASS: Integrated Soul preserves six weeks, correct/retry review, local persistence, transfer and eight-course milestones");
@@ -407,9 +407,35 @@ try {
      !clarityDraft.includes("Mastering Discernment"))
     throw Error("Clear Sight short review or separate topic did not transfer to local Explainer");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("9 / 134 milestones").waitFor({state:"visible"});
+  await page.getByText("9 / 158 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Clear Sight: Mastering Discernment"}).waitFor({state:"visible"});
   console.log("PASS: Clear Sight course, Brier synthetic calculation, quiz retry, persistence, explainer and nine-course dashboard");
+  // Speaker: eight source weeks; independent review, consent-aware practice and offline media transfer.
+  await page.goto(address+"/multi-channel-speaker",{waitUntil:"domcontentloaded"});
+  await page.getByText("The Multi-Channel Speaker",{exact:true}).last().waitFor({state:"visible",timeout:15000});
+  await page.getByText("0 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"View Multi-Channel Speaker course showcase and synthetic case"}).click();
+  await page.getByText(/Descriptive return rate: 40%/).waitFor({state:"visible"});
+  await page.getByRole("radio",{name:/Speaker answer 1:/}).click();
+  await page.getByRole("button",{name:"Check Speaker formative answer"}).click();
+  await page.getByRole("button",{name:"Retry Speaker formative quiz"}).click();
+  await page.getByRole("radio",{name:/Speaker answer 3:/}).click();
+  await page.getByRole("button",{name:"Check Speaker formative answer"}).click();
+  await page.getByRole("button",{name:"Mark Speaker review as read"}).click();
+  await page.getByText("1 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 24",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Send Speaker review to offline Explainer"}).click();
+  const speakerTitle=await page.getByRole("textbox",{name:"Explainer topic"}).inputValue();
+  const speakerDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!speakerTitle.includes("Listening Before Persuading")||
+     !speakerDraft.includes("Active listening requires a neutral paraphrase"))
+    throw Error("Speaker review transfer missing original source-aligned material");
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("10 / 158 milestones").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume The Multi-Channel Speaker"}).waitFor({state:"visible"});
+  console.log("PASS: Speaker eight-week track, synthetic capstone, quiz retry, persistent progress and tenth Academy course");
+
 
 
 

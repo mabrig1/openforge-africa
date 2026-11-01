@@ -1,5 +1,5 @@
 /**
- * Deterministic, offline-only Academy dashboard shared by nine courses.
+ * Deterministic, offline-only Academy dashboard shared by ten courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
 import { LOGIC_LESSONS } from "./logicCourse.ts";
@@ -9,8 +9,9 @@ import {AIL101_UNITS} from "./ail101Course.ts";
 import {getNewCourseUnits,NEW_COURSE_META,type NewCourseId} from "./additionalAcademyCourses.ts";
 import {SOUL_LESSONS} from "./integratedSoulCourse.ts";
 import {CLEAR_SIGHT_UNITS} from "./clearSightCourse.ts";
+import {SPEAKER_UNITS} from "./multiChannelSpeakerCourse.ts";
 
-export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401"|"soul"|"clearSight";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401"|"soul"|"clearSight"|"speaker";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -39,6 +40,9 @@ export interface AcademySnapshotInput {
   clearRead?:number[];
   clearPassed?:number[];
   clearSelected?:number;
+  speakerRead?:number[];
+  speakerPassed?:number[];
+  speakerSelected?:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -47,7 +51,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany"|"/integrated-soul"|"/clear-sight";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany"|"/integrated-soul"|"/clear-sight"|"/multi-channel-speaker";
   total:number;
   completed:number;
   percent:number;
@@ -77,6 +81,7 @@ export const ACADEMY_COURSE_META={
   ceai401:{id:"ceai401",...NEW_COURSE_META.ceai401},
   soul:{id:"soul",code:"TIS SELF-STUDY",title:"The Integrated Soul: Philosophy, Psychology and Christian Transformation",route:"/integrated-soul",notice:"Six-week Christian formation masterclass, twelve adapted seminar reviews. No diagnosis, therapy, verified spiritual outcome or academic credit."},
   clearSight:{id:"clearSight",code:"CSD SELF-STUDY",title:"Clear Sight: Mastering Discernment",route:"/clear-sight",notice:"24 source-aligned reviews spanning six modules; full private 100-page textbook stays outside GitHub. Not investigation, therapy or an accredited credential."},
+  speaker:{id:"speaker",code:"MCS SELF-STUDY",title:"The Multi-Channel Speaker",route:"/multi-channel-speaker",notice:"Eight-week professional communication programme, 24 original self-study reviews. Full 100-page manuscript remains private; live assessment and portfolio need human review."},
   forge:{
     id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
     route:"/forge-studies",notice:"Ten weeks of independent review. Public project evidence and mentor validation are separate and NOT awarded in this app.",
@@ -250,7 +255,24 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
       clearAction==="Mark reading reviewed"?"Practice passed; mark this review as read after studying.":
       clearAction==="Review or retake quiz"?"Pass the source-aligned formative question.":"Read the brief lesson and check its evidence-based reasoning."}
  };
- const courses=[logic,psy,decision,forge,ail,rlx,ceai,soul,clearSight];
+
+ const speakerRead=distinctKnown(input.speakerRead??[],SPEAKER_UNITS.length);
+ const speakerPassed=distinctKnown(input.speakerPassed??[],SPEAKER_UNITS.length);
+ const speakerCompleted=speakerRead.filter(id=>speakerPassed.includes(id));
+ const speakerNext=SPEAKER_UNITS.find(x=>x.id===input.speakerSelected&&!speakerCompleted.includes(x.id))||
+     SPEAKER_UNITS.find(x=>!speakerCompleted.includes(x.id));
+ const speakerAction:AcademyNext["action"]=!speakerNext?"Explore independently":
+     !speakerRead.includes(speakerNext.id)&&speakerPassed.includes(speakerNext.id)?"Mark reading reviewed":
+     speakerRead.includes(speakerNext.id)&&!speakerPassed.includes(speakerNext.id)?"Review or retake quiz":"Read and study";
+ const speaker:AcademyCourseSummary={...ACADEMY_COURSE_META.speaker,total:SPEAKER_UNITS.length,
+   completed:speakerCompleted.length,percent:percent(speakerCompleted.length,SPEAKER_UNITS.length),
+   read:speakerRead.length,practised:speakerPassed.length,
+   next:{number:speakerNext?.id??0,title:speakerNext?.title??"Self-study complete",
+    action:speakerAction,detail:!speakerNext?"24 adapted reviews recorded; the live capstone requires independent human review.":
+      speakerAction==="Mark reading reviewed"?"Pass is recorded; study and mark the review as read.":
+      speakerAction==="Review or retake quiz"?"Try the low-stakes formative question.":"Read the original short review and practise its fictional communication case."}
+ };
+ const courses=[logic,psy,decision,forge,ail,rlx,ceai,soul,clearSight,speaker];
  const total=courses.reduce((sum,x)=>sum+x.total,0),
     completed=courses.reduce((sum,x)=>sum+x.completed,0);
  return {courses,completed,total,percent:percent(completed,total)};
@@ -282,7 +304,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401","soul","clearSight"].includes(r.course as string))continue;
+  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401","soul","clearSight","speaker"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -307,5 +329,6 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
      rlx101:entries.filter(x=>x.course==="rlx101").length,
      ceai401:entries.filter(x=>x.course==="ceai401").length,
      soul:entries.filter(x=>x.course==="soul").length,
-     clearSight:entries.filter(x=>x.course==="clearSight").length}};
+     clearSight:entries.filter(x=>x.course==="clearSight").length,
+     speaker:entries.filter(x=>x.course==="speaker").length}};
 }
