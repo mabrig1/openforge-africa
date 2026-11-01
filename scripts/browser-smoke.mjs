@@ -550,6 +550,11 @@ try {
   // Agent Desk: verify actual mobile SPA route, local coordination and editable handoff.
   await page.goto(address+"/agents",{waitUntil:"domcontentloaded"});
   await page.getByText("12-agent learning studio",{exact:true}).waitFor({state:"visible",timeout:15000});
+  await page.getByRole("button",{name:"Quick start source based tutor"}).click();
+  await page.getByText("Matching selected note",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Quick start study plan"}).click();
+  await page.getByText("Three-agent local learning plan",{exact:true}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose another specialist"}).click();
   await page.getByRole("button",{name:"Choose University Coordinator"}).click();
   await page.getByRole("button",{name:"Run the selected local learning agent"}).click();
   await page.getByText("Three-agent local learning plan",{exact:true}).waitFor({state:"visible"});
