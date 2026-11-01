@@ -19,7 +19,7 @@ export default function CirclesScreen() {
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open unified Academy learning dashboard"
         onPress={()=>router.push("/academy")}
         className="bg-indigo-700 border border-indigo-500 rounded-xl p-4 mb-4">
-        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Seven-course dashboard →</Text>
+        <Text className="text-white font-bold text-center text-lg">🎓 My Academy • Eight-course dashboard →</Text>
         <Text className="text-indigo-100 text-center text-xs mt-1">Resume courses, review milestones and plan weekly study offline</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" onPress={() => router.push("/(tabs)/sessions")}
@@ -75,6 +75,12 @@ export default function CirclesScreen() {
         className="bg-emerald-900 border border-emerald-500 rounded-xl p-4 mb-3">
         <Text className="text-white font-bold text-center">🎓 CEAI-401 • Computational Ethnobotany & AI Health</Text>
         <Text className="text-emerald-200 text-xs mt-1 text-center">7 research chapters • simulation only • no treatment or safety approval</Text>
+      </TouchableOpacity>
+      <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open The Integrated Soul Christian formation course"
+        onPress={()=>router.push("/integrated-soul")}
+        className="bg-amber-900 border border-amber-500 rounded-xl p-4 mb-3">
+        <Text className="text-white font-bold text-center">🎓 The Integrated Soul • Philosophy, Psychology & Christian Transformation</Text>
+        <Text className="text-amber-200 text-xs mt-1 text-center">6 weeks • 12 expanded seminar reviews • voluntary practicum &amp; capstone</Text>
       </TouchableOpacity>
       <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open FS 101 Introduction to Forge Studies"
         onPress={()=>router.push("/forge-studies")}
