@@ -26,11 +26,7 @@ export class ClassroomTrialLedger{
   this.sql.exec("CREATE TABLE IF NOT EXISTS trials (account TEXT PRIMARY KEY, trial_start TEXT, utc_day TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0)");
   this.sql.exec("CREATE TABLE IF NOT EXISTS totals (id INTEGER PRIMARY KEY CHECK(id=1), utc_day TEXT NOT NULL, day_used INTEGER NOT NULL DEFAULT 0, utc_month TEXT NOT NULL, month_used INTEGER NOT NULL DEFAULT 0)");
  }
- fetch(request:Request):Response{
-  if(request.method!=="POST")return respond({error:"Not allowed"},405);
-  // DO internal fetch uses a Request body; no fetch to external providers here.
-  return respond({error:"Use async internal dispatch"},405);
- }
+ fetch(request:Request):Promise<Response>{return this.fetchCommand(request);}
  async handleCommand(command:Command):Promise<Response>{
   if(!command||!["status","activate","spend"].includes(command.kind)||
     !/^[0-9a-f]{64}$/.test(command.account)||
