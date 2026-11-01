@@ -9,6 +9,7 @@ import {useAil101Progress} from "../stores/ail101Store";
 import {useAdditionalAcademyProgress} from "../stores/additionalAcademyStore";
 import {useSoulProgress} from "../stores/integratedSoulStore";
 import {useClearSightProgress} from "../stores/clearSightStore";
+import {useSpeakerProgress} from "../stores/multiChannelSpeakerStore";
 import {
  getAcademyDashboard,academyWeeklySessions,localCalendarDay,
  type AcademyCourseId,
@@ -42,6 +43,9 @@ export default function AcademyDashboardScreen(){
  const clearRead=useClearSightProgress(s=>s.read);
  const clearPassed=useClearSightProgress(s=>s.passed);
  const clearSelected=useClearSightProgress(s=>s.selected);
+ const speakerRead=useSpeakerProgress(s=>s.read);
+ const speakerPassed=useSpeakerProgress(s=>s.passed);
+ const speakerSelected=useSpeakerProgress(s=>s.selected);
  const following=useAcademyStudyStore(s=>s.following);
  const weeklyTarget=useAcademyStudyStore(s=>s.weeklyTarget);
  const sessions=useAcademyStudyStore(s=>s.sessions);
@@ -56,6 +60,7 @@ export default function AcademyDashboardScreen(){
   rlxRead,rlxPassed,rlxSelected,ceaiRead,ceaiPassed,ceaiSelected,
   soulRead,soulPassed,soulSelected,
   clearRead,clearPassed,clearSelected,
+  speakerRead,speakerPassed,speakerSelected,
  });
  const today=localCalendarDay();
  const weekly=academyWeeklySessions(sessions,today);
@@ -67,7 +72,7 @@ export default function AcademyDashboardScreen(){
    <Text className="text-green-400 text-xs font-bold tracking-widest">OPENFORGE AFRICA • ACADEMY</Text>
    <Text className="text-white text-3xl font-extrabold mt-2">My Learning Dashboard</Text>
    <Text className="text-slate-300 leading-6 mt-3">
-     Continue your nine independent subjects in one place. Your learning checks,
+     Continue your ten independent subjects in one place. Your learning checks,
      study preferences and manually recorded study sessions stay on this device.
    </Text>
    <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
@@ -78,19 +83,19 @@ export default function AcademyDashboardScreen(){
      </Text>
    </View>
    <View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-5">
-     <Text className="text-green-300 font-bold">NINE-COURSE OVERVIEW</Text>
+     <Text className="text-green-300 font-bold">TEN-COURSE OVERVIEW</Text>
      <Text className="text-white text-3xl font-extrabold mt-2">
        {dashboard.completed} / {dashboard.total} milestones
      </Text>
      <Text className="text-slate-300 mt-2">
-       {dashboard.percent}% of the nine native review tracks · {following.length} followed subject(s)
+       {dashboard.percent}% of the ten native review tracks · {following.length} followed subject(s)
      </Text>
      <View className="bg-slate-700 rounded-full mt-4 overflow-hidden" style={{height:12}}>
        <View className="bg-green-500 h-3"
          style={{width:(dashboard.percent+"%") as `${number}%`}}/>
      </View>
      <Text className="text-slate-400 text-xs mt-3">
-       23 logic chapters + 6 psychology modules + 20 decision-science units + 10 Forge weeks + 20 AI literacy units + 12 Relationalics modules + 7 Computational Ethnobotany chapters + 12 Integrated Soul seminars + 24 Clear Sight reviews. Self-study only, not a cross-subject exam or verified Forge project evidence.
+       23 logic chapters + 6 psychology modules + 20 decision-science units + 10 Forge weeks + 20 AI literacy units + 12 Relationalics modules + 7 Computational Ethnobotany chapters + 12 Integrated Soul seminars + 24 Clear Sight reviews + 24 Multi-Channel Speaker reviews. Self-study only, not a cross-subject exam or verified Forge project evidence.
      </Text>
    </View>
    <Text className="text-white text-xl font-bold mt-7 mb-3">Course catalogue</Text>
@@ -113,7 +118,7 @@ export default function AcademyDashboardScreen(){
        <View className="bg-slate-900 border-l-4 border-indigo-500 rounded-xl p-4 mt-4">
          <Text className="text-indigo-300 font-bold">YOUR NEXT LEARNING STEP</Text>
          <Text className="text-white mt-2 font-bold">{course.next.number?
-           (course.id==="logic"?"Chapter ":course.id==="psy210"?"Module ":course.id==="decision"||course.id==="ail101"?"Unit ":course.id==="rlx101"?"Module ":course.id==="ceai401"?"Chapter ":course.id==="soul"?"Seminar ":course.id==="clearSight"?"Review ":"Week ")+course.next.number+": "+course.next.title:
+           (course.id==="logic"?"Chapter ":course.id==="psy210"?"Module ":course.id==="decision"||course.id==="ail101"?"Unit ":course.id==="rlx101"?"Module ":course.id==="ceai401"?"Chapter ":course.id==="soul"?"Seminar ":course.id==="clearSight"||course.id==="speaker"?"Review ":"Week ")+course.next.number+": "+course.next.title:
            "All review milestones recorded"}</Text>
          <Text className="text-slate-300 mt-2">{course.next.action} — {course.next.detail}</Text>
        </View>
@@ -145,7 +150,7 @@ export default function AcademyDashboardScreen(){
        {weekly.count} / {weeklyTarget} sessions recorded this device-calendar week
      </Text>
      <Text className="text-slate-300 mt-2">
-       {weekly.activeDays} active study day(s) · Logic {weekly.byCourse.logic} · Psychology {weekly.byCourse.psy210} · Decision {weekly.byCourse.decision} · Forge {weekly.byCourse.forge} · AI Literacy {weekly.byCourse.ail101} · Relationalics {weekly.byCourse.rlx101} · Ethnobotany {weekly.byCourse.ceai401} · Integrated Soul {weekly.byCourse.soul} · Clear Sight {weekly.byCourse.clearSight}
+       {weekly.activeDays} active study day(s) · Logic {weekly.byCourse.logic} · Psychology {weekly.byCourse.psy210} · Decision {weekly.byCourse.decision} · Forge {weekly.byCourse.forge} · AI Literacy {weekly.byCourse.ail101} · Relationalics {weekly.byCourse.rlx101} · Ethnobotany {weekly.byCourse.ceai401} · Integrated Soul {weekly.byCourse.soul} · Clear Sight {weekly.byCourse.clearSight} · Speaker {weekly.byCourse.speaker}
      </Text>
      <View className="bg-slate-700 rounded-full overflow-hidden mt-3" style={{height:10}}>
        <View className="bg-indigo-400 h-3"
