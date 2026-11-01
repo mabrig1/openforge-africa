@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useLocalSearchParams} from "expo-router";
-import {ScrollView,Text,TextInput,TouchableOpacity,View} from "react-native";
+import {Platform,ScrollView,Text,TextInput,TouchableOpacity,View} from "react-native";
 import {router} from "expo-router";
 import {useCircleStore} from "../stores/circleStore";
 import {useClassroomStore} from "../stores/classroomStore";
@@ -31,13 +31,42 @@ export default function ClassroomScreen(){
  const [chosenNotes,setChosenNotes]=useState<string[]>([]);
  const [result,setResult]=useState<ClassroomRun|null>(null);
  const [error,setError]=useState("");
+ const [ownerOpen,setOwnerOpen]=useState(false);
+ const [ownerAgent,setOwnerAgent]=useState<ClassroomAgentId>("of-teacher");
+ const [ownerAccess,setOwnerAccess]=useState("");
+ const [ownerConsent,setOwnerConsent]=useState(false);
+ const [ownerBusy,setOwnerBusy]=useState(false);
+ const [ownerError,setOwnerError]=useState("");
+ const [ownerAnswer,setOwnerAnswer]=useState<{name:string;answer:string;warning:string}|null>(null);
  const access=getFreeAccess({trialStartedOn,dailyUsage},today);
  const course=academy.courses.find(c=>c.id===courseId)??academy.courses[0];
  const review=academyCourseReview(course,unitId??undefined);
  const reviewUnits=listAcademyClassroomUnits(course.id);
  const roster=validateClassroomRoster();
  const selection=notes.filter(n=>chosenNotes.includes(n.id)).slice(0,3);
- const setSubject=(next:ClassroomMode)=>{setMode(next);setResult(null);};
+ const setSubject=(next:ClassroomMode)=>{setMode(next);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);};
+ const askOwnerModel=async()=>{
+  const sources=[...(includeAcademyReview?[review.source]:[]),...selection].slice(0,3);
+  if(ownerBusy||!ownerConsent||!ownerAccess.trim()||!topic.trim()||!sources.length)return;
+  setOwnerBusy(true);setOwnerAnswer(null);setOwnerError("");
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),22000);
+  try{
+   const endpoint=Platform.OS==="web"?"/api/classroom-ai":
+    "https://openforge.mabrigkorie.org/api/classroom-ai";
+   const response=await fetch(endpoint,{method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","X-OpenForge-Classroom-Token":ownerAccess.trim()},
+    body:JSON.stringify({agentId:ownerAgent,question:topic.trim(),
+     sources:sources.map((s,i)=>({id:"note_"+(i+1),title:s.title,
+      excerpt:s.content.slice(0,1500)}))})});
+   const result=await response.json() as {answer?:string;name?:string;warning?:string;error?:string};
+   if(!response.ok||typeof result.answer!=="string")
+    throw new Error(result.error||"Owner model inference is unavailable. Free local classroom still works.");
+   setOwnerAnswer({name:result.name??"Selected AI Agent",answer:result.answer,
+    warning:result.warning??"Model-generated text is unverified. Check original notes."});
+  }catch(err){setOwnerError(err instanceof Error?err.message:"Owner model request failed.");}
+  finally{clearTimeout(timeout);setOwnerBusy(false);setOwnerConsent(false);setOwnerAccess("");}
+ };
  const toggleNote=(id:string)=>{
   setChosenNotes(prev=>prev.includes(id)?prev.filter(x=>x!==id):
    prev.length<(includeAcademyReview?2:3)?[...prev,id]:prev);
@@ -97,7 +126,7 @@ export default function ClassroomScreen(){
   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
    {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
     accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
-    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(false);setResult(null);}}
+    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
     className={course.id===c.id?"bg-green-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
     <Text className="text-white font-bold">{c.code}</Text>
    </TouchableOpacity>)}
@@ -118,7 +147,7 @@ export default function ClassroomScreen(){
    {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
     accessibilityLabel={"Choose classroom unit "+u.id}
     accessibilityState={{selected:review.unitId===u.id}}
-    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(false);setResult(null);}}
+    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
     className={review.unitId===u.id?"bg-green-800 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
     <Text className="text-white">Unit {u.id}</Text>
    </TouchableOpacity>)}
@@ -134,7 +163,7 @@ export default function ClassroomScreen(){
     disabled={!includeAcademyReview&&chosenNotes.length>=3}
     accessibilityState={{checked:includeAcademyReview}}
     accessibilityLabel="Include displayed Academy review as local classroom source"
-    onPress={()=>{setIncludeAcademyReview(value=>!value);setResult(null);}}
+    onPress={()=>{setIncludeAcademyReview(value=>!value);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
     className="bg-slate-700 border border-slate-600 p-3 rounded-xl mt-4">
     <Text className="text-white font-bold">
      {includeAcademyReview?"☑":"☐"} Include this public review as a local classroom source
@@ -153,7 +182,7 @@ export default function ClassroomScreen(){
   </View>
   <Text className="text-white text-lg font-bold mt-7">3. Question or topic</Text>
   <TextInput accessibilityLabel="Classroom question or topic" multiline maxLength={500}
-   value={topic} onChangeText={value=>{setTopic(value);setResult(null);}}
+   value={topic} onChangeText={value=>{setTopic(value);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
    placeholder="e.g. What makes an argument logically valid?"
    placeholderTextColor="#94a3b8" className="bg-slate-800 text-white border border-slate-700 rounded-xl p-4 mt-3"
    style={{minHeight:90,textAlignVertical:"top"}}/>
@@ -221,6 +250,67 @@ export default function ClassroomScreen(){
     Only agent IDs, date, mode and evidence-match status are retained locally—not your questions or note text.
     Clearing browser storage can reset this demo quota. Public trials require server-side account enforcement.
    </Text>
+  </View>
+  <View className="bg-slate-800 border border-amber-800 rounded-xl p-4 mt-6">
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show owner only model testing"
+    onPress={()=>{setOwnerOpen(v=>!v);setOwnerConsent(false);setOwnerAnswer(null);setOwnerError("");}}>
+    <Text className="text-amber-200 font-bold">OWNER TESTING ONLY — optional generative model {ownerOpen?"▲":"▼"}</Text>
+   </TouchableOpacity>
+   <Text className="text-slate-300 text-xs mt-2">
+    Closed by default. No provider call is made by Free Basic or Explorer.
+    The owner-only endpoint is disabled unless explicitly configured on the server.
+   </Text>
+   {ownerOpen&&<View className="mt-3">
+    <Text className="text-amber-100">
+     This is NOT part of the free trial. A live call may incur charges.
+     Requires your private owner access code, not an OpenRouter API key.
+     The provider may receive the question and up to three selected local excerpts.
+    </Text>
+    <Text className="text-white font-bold mt-4">Choose one model-backed role</Text>
+    <ScrollView horizontal className="mt-2" showsHorizontalScrollIndicator={false}>
+     {CLASSROOM_AGENTS.map(a=><TouchableOpacity key={a.id} accessibilityRole="button"
+      accessibilityState={{selected:ownerAgent===a.id}} accessibilityLabel={"Owner AI agent "+a.name}
+      onPress={()=>{setOwnerAgent(a.id);setOwnerConsent(false);setOwnerAnswer(null);}}
+      className={ownerAgent===a.id?"bg-green-700 rounded-xl p-3 mr-2":"bg-slate-700 rounded-xl p-3 mr-2"}>
+      <Text className="text-white">{a.name}</Text>
+     </TouchableOpacity>)}
+    </ScrollView>
+    <TextInput accessibilityLabel="Owner classroom access code, not provider key"
+     secureTextEntry autoCapitalize="none" value={ownerAccess}
+     onChangeText={value=>{setOwnerAccess(value);setOwnerConsent(false);}}
+     placeholder="Private owner access code" placeholderTextColor="#94a3b8"
+     className="bg-slate-900 border border-slate-600 rounded-xl p-3 text-white mt-4"/>
+    <Text className="text-slate-300 text-xs mt-3">
+     Exact excerpts for this call (only after consent):
+    </Text>
+    {[...(includeAcademyReview?[review.source]:[]),...selection].slice(0,3)
+     .map((note,i)=><View key={i} className="bg-slate-900 p-3 rounded-xl mt-2">
+      <Text className="text-green-200 font-bold">{note.title}</Text>
+      <Text selectable className="text-slate-300 text-xs mt-2">{note.content.slice(0,1500)}</Text>
+     </View>)}
+    <TouchableOpacity accessibilityRole="checkbox" accessibilityState={{checked:ownerConsent}}
+     accessibilityLabel="Consent to owner paid AI call and excerpt transmission"
+     onPress={()=>setOwnerConsent(x=>!x)}
+     className="bg-slate-700 rounded-xl p-3 mt-4">
+     <Text className="text-white">
+      {ownerConsent?"☑":"☐"} I am the authorized owner and approve this optional paid-provider call and transfer of the displayed selected excerpts.
+     </Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Request one authorized owner AI response"
+     disabled={ownerBusy||!ownerConsent||!ownerAccess.trim()||!topic.trim()||
+       !(includeAcademyReview||selection.length)}
+     onPress={askOwnerModel} className="bg-indigo-700 rounded-xl p-4 mt-3">
+     <Text className="text-white text-center font-bold">
+      {ownerBusy?"Requesting one owner-authorized response…":"Request one owner-authorized AI response →"}
+     </Text>
+    </TouchableOpacity>
+    {!!ownerError&&<Text className="text-amber-200 mt-3">{ownerError}</Text>}
+    {ownerAnswer&&<View className="bg-slate-900 rounded-xl p-4 mt-4">
+     <Text className="text-green-300 font-bold">{ownerAnswer.name} • OWNER CLOUD TEST</Text>
+     <Text selectable className="text-white mt-3">{ownerAnswer.answer}</Text>
+     <Text className="text-amber-200 text-xs mt-3">{ownerAnswer.warning}</Text>
+    </View>}
+   </View>}
   </View>
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open classroom verification dashboard"
    onPress={()=>router.push("/classroom-verify")} className="bg-slate-700 rounded-xl p-4 mt-5">
