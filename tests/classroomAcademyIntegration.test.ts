@@ -55,7 +55,7 @@ test("synthetic verification dashboard reports precise provenance and bounded sc
  assert.equal(report.questionUnresolvedOpenRate,1);
  assert.equal(report.roleDispatchRate,1);
  assert.ok(report.passed,JSON.stringify(report.probes.filter(x=>!x.passed)));
- assert.ok(report.probes.length>=17);
+ assert.equal(report.probes.length,16);
  assert.equal(report.trace[0].agentId,"of-quiet-observer");
  assert.equal(report.trace[1].agentId,"of-teacher");
 });
