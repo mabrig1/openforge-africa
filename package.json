@@ -23,7 +23,9 @@
     "postinstall": "node scripts/prepare-cloudflare-build.mjs",
     "cf:build": "npm run build && npm run check:web",
     "cf:build:verify": "npm run cf:build && npm run cf:dry-run:live",
-    "check:release:live": "node scripts/verify-live-academy.mjs https://openforge.mabrigkorie.org"
+    "check:release:live": "node scripts/verify-live-academy.mjs https://openforge.mabrigkorie.org",
+    "check:classroom-roster": "node --experimental-strip-types scripts/export-classroom-roster.mjs",
+    "export:classroom-roster": "node --experimental-strip-types scripts/export-classroom-roster.mjs --export"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
