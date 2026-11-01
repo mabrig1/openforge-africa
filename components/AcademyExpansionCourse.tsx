@@ -164,6 +164,21 @@ function CourseCompanion({course}:{course:ExpansionCourse}){
       onPress={()=>router.push("/logic-lab")} className="bg-teal-800 rounded-xl p-3 mt-2">
       <Text className="text-white text-center">Open interactive Truth Table Lab →</Text>
     </TouchableOpacity>}
+    {isForge&&<TouchableOpacity accessibilityRole="button"
+      accessibilityLabel="Open FS 101 evidence portfolio and human review checklist"
+      onPress={()=>router.push("/forge-portfolio")} className="bg-indigo-700 rounded-xl p-3 mt-3">
+      <Text className="text-white text-center font-bold">Open ten-week Evidence Portfolio →</Text>
+    </TouchableOpacity>}
+    {!isForge&&item.id===12&&<TouchableOpacity accessibilityRole="button"
+      accessibilityLabel="Open real descriptive statistics lab"
+      onPress={()=>router.push("/statistics-lab")} className="bg-teal-800 rounded-xl p-3 mt-3">
+      <Text className="text-white text-center font-bold">Calculate mean, median and spread →</Text>
+    </TouchableOpacity>}
+    {!isForge&&item.id===13&&<TouchableOpacity accessibilityRole="button"
+      accessibilityLabel="Open synthetic causal inference lab"
+      onPress={()=>router.push("/causal-lab")} className="bg-teal-800 rounded-xl p-3 mt-3">
+      <Text className="text-white text-center font-bold">Explore Simpson's paradox →</Text>
+    </TouchableOpacity>}
     {!isForge&&[10,11,16].includes(item.id)&&<TouchableOpacity accessibilityRole="button"
       accessibilityLabel="Open decision science interactive probability and value laboratory"
       onPress={()=>router.push("/decision-lab")} className="bg-teal-800 rounded-xl p-3 mt-2">
