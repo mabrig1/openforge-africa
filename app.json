@@ -3,7 +3,7 @@
     "name": "OpenForge Africa",
     "slug": "openforge-africa",
     "version": "0.3.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0F172A",
     "assetBundlePatterns": [
@@ -21,7 +21,9 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "name": "OpenForge Africa",
+      "shortName": "OpenForge"
     },
     "plugins": [
       "expo-router",

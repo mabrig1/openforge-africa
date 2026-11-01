@@ -1,4 +1,5 @@
 import {useState} from "react";
+import InstallAppPrompt from "./InstallAppPrompt";
 import {ScrollView,Text,TextInput,TouchableOpacity,View,useWindowDimensions} from "react-native";
 import {MaterialCommunityIcons} from "@expo/vector-icons";
 import {router} from "expo-router";
@@ -173,6 +174,7 @@ export default function DiscoveryHome(){
      <Text style={{color:"#0B7667",fontSize:12,fontWeight:"900",marginLeft:6}}>My Academy</Text>
     </TouchableOpacity>
    </View>
+   <InstallAppPrompt/>
    <View style={{backgroundColor:colors.navy,borderRadius:27,
     paddingHorizontal:wide?35:22,paddingVertical:wide?27:25,overflow:"hidden",
     flexDirection:wide?"row":"column",alignItems:wide?"center":"stretch"}}>
