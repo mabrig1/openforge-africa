@@ -20,6 +20,8 @@ jobs:
         run: node --check scripts/verify-live-academy.mjs
       - run: npm run typecheck
       - run: npm test
+      - name: Verify 15-agent OpenMAIC-compatible roster
+        run: npm run check:classroom-roster
       - name: Simulate Cloudflare Workers Builds install lifecycle (no deployment)
         run: WORKERS_CI=1 node scripts/prepare-cloudflare-build.mjs
       - name: Run synthetic offline grounding regression
