@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect,useState} from "react";
 import {useLocalSearchParams} from "expo-router";
 import {Platform,ScrollView,Text,TextInput,TouchableOpacity,View} from "react-native";
 import {router} from "expo-router";
@@ -8,6 +8,7 @@ import {getFreeAccess,localDayKey} from "../lib/classroomAccess";
 import {useClassroomAcademyDashboard} from "../hooks/useClassroomAcademyDashboard";
 import {academyCourseExists,academyCourseReview,listAcademyClassroomUnits} from "../lib/classroomAcademyBridge";
 import type {AcademyCourseId} from "../lib/academyDashboard";
+import {speakText,stopSpeech} from "../lib/speech";
 import {CLASSROOM_AGENTS,runClassroom,validateClassroomRoster,
  type ClassroomAgentId,type ClassroomMode,type ClassroomRun} from "../lib/openMaicClassroom";
 
@@ -29,6 +30,13 @@ export default function ClassroomScreen(){
  const [topic,setTopic]=useState("");
  const [initiator,setInitiator]=useState<ClassroomAgentId>("of-physics-questioner");
  const [showRolePicker,setShowRolePicker]=useState(false);
+ const [showCoursePicker,setShowCoursePicker]=useState(false);
+ const [showSource,setShowSource]=useState(false);
+ const [showTrace,setShowTrace]=useState(false);
+ const [showDetails,setShowDetails]=useState(false);
+ const [reflection,setReflection]=useState("");
+ const [showSelfCheck,setShowSelfCheck]=useState(false);
+ const [speechError,setSpeechError]=useState("");
  const [chosenNotes,setChosenNotes]=useState<string[]>([]);
  const [result,setResult]=useState<ClassroomRun|null>(null);
  const [error,setError]=useState("");
@@ -43,6 +51,21 @@ export default function ClassroomScreen(){
  const course=academy.courses.find(c=>c.id===courseId)??academy.courses[0];
  const review=academyCourseReview(course,unitId??undefined);
  const reviewUnits=listAcademyClassroomUnits(course.id);
+ const unitIndex=reviewUnits.findIndex(u=>u.id===review.unitId);
+ useEffect(()=>()=>{stopSpeech();},[]);
+ const resetLesson=()=>{setResult(null);setError("");setShowTrace(false);setShowSource(false);
+   setReflection("");setShowSelfCheck(false);stopSpeech();};
+ const changeUnit=(offset:number)=>{
+   const target=reviewUnits[unitIndex+offset];
+   if(!target)return;
+   setUnitId(target.id);setIncludeAcademyReview(true);resetLesson();
+   setOwnerConsent(false);setOwnerAnswer(null);
+ };
+ const playTranscript=()=>{
+   if(!result)return;
+   try{setSpeechError("");speakText(result.turns.map(t=>t.name+". "+t.message).join("\n\n"),0.9);}
+   catch(e){setSpeechError(e instanceof Error?e.message:"Speech is not available on this device.");}
+ };
  const roster=validateClassroomRoster();
  const selection=notes.filter(n=>chosenNotes.includes(n.id)).slice(0,3);
  const setSubject=(next:ClassroomMode)=>{setMode(next);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);};
@@ -74,7 +97,7 @@ export default function ClassroomScreen(){
   setResult(null);
  };
  const run=(suggested?:string,suggestedMode?:ClassroomMode)=>{
-  setError("");
+  setError("");setShowTrace(false);stopSpeech();
   const prompt=typeof suggested==="string"&&suggested.trim()?suggested.trim():topic.trim();
   if(!prompt){setError("Enter a question or discussion topic.");return;}
   if(suggested){setTopic(prompt);setMode(suggestedMode??"qa");}
@@ -100,6 +123,59 @@ export default function ClassroomScreen(){
   <Text className="text-slate-300 leading-6 mt-3">
    Choose a course, practise with a source-based teacher response and hear distinct perspectives from selectable educational roles. No subscription is needed.
   </Text>
+  <View className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">YOUR COURSE · LESSON {review.unitId} OF {reviewUnits.length}</Text>
+   <Text className="text-white text-lg font-bold mt-2">{course.title}</Text>
+   <Text className="text-slate-300 mt-1">{review.unitTitle}</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open corresponding Academy course"
+    onPress={()=>router.push(course.route)} className="mt-3">
+    <Text className="text-emerald-300 font-bold">Read the complete available course track →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showCoursePicker}}
+    accessibilityLabel="Choose a different course or lesson"
+    onPress={()=>setShowCoursePicker(value=>!value)} className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white text-center font-bold">{showCoursePicker?"Close course selector ↑":"Change course or lesson ↓"}</Text>
+   </TouchableOpacity>
+   <View className="flex-row justify-between mt-3">
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous lesson"
+     accessibilityState={{disabled:unitIndex<=0}} disabled={unitIndex<=0}
+     onPress={()=>changeUnit(-1)} className="bg-slate-700 rounded-xl p-3"
+     style={{opacity:unitIndex<=0?0.4:1,width:"48%",minHeight:47}}>
+     <Text className="text-white text-center font-bold">← Previous</Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Next lesson"
+     accessibilityState={{disabled:unitIndex>=reviewUnits.length-1}}
+     disabled={unitIndex>=reviewUnits.length-1}
+     onPress={()=>changeUnit(1)} className="bg-slate-700 rounded-xl p-3"
+     style={{opacity:unitIndex>=reviewUnits.length-1?0.4:1,width:"48%",minHeight:47}}>
+     <Text className="text-white text-center font-bold">Next →</Text>
+    </TouchableOpacity>
+   </View>
+   {showCoursePicker&&<View className="mt-4">
+    <Text className="text-white font-bold mb-2">Choose a subject</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+     {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
+      accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
+      onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(true);
+       resetLesson();setOwnerConsent(false);setOwnerAnswer(null);}}
+      className={course.id===c.id?"bg-emerald-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}
+      style={{minWidth:125,minHeight:48}}>
+      <Text className="text-white font-bold">{c.code}</Text>
+      <Text className="text-slate-200 text-xs" numberOfLines={2} style={{maxWidth:170}}>{c.title}</Text>
+     </TouchableOpacity>)}
+    </ScrollView>
+    <Text className="text-white font-bold mt-4 mb-2">Choose a lesson</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+     {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
+      accessibilityLabel={"Choose classroom unit "+u.id}
+      accessibilityState={{selected:review.unitId===u.id}}
+      onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(true);resetLesson();setOwnerConsent(false);setOwnerAnswer(null);}}
+      className={review.unitId===u.id?"bg-emerald-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"} style={{minHeight:46}}>
+      <Text className="text-white">Lesson {u.id}</Text>
+     </TouchableOpacity>)}
+    </ScrollView>
+   </View>}
+  </View>
   <View className="bg-emerald-950 border border-emerald-700 rounded-2xl p-5 mt-5">
    <Text className="text-emerald-300 text-xs font-bold">START HERE · GUIDED STUDY</Text>
    <Text className="text-white text-xl font-bold mt-2">{review.unitTitle}</Text>
@@ -116,7 +192,7 @@ export default function ClassroomScreen(){
     disabled={!access.remaining}
     onPress={()=>run("Discuss "+review.unitTitle+" and test its main assumptions","discussion")}
     className="bg-indigo-700 rounded-xl p-4 mt-3">
-    <Text className="text-white text-center font-bold">HEAR THE CLASS DISCUSS IT →</Text>
+    <Text className="text-white text-center font-bold">START A CLASS DISCUSSION →</Text>
    </TouchableOpacity>
    {!access.remaining&&<Text className="text-amber-200 mt-3">Today's free run allowance is used. You can still read Academy lessons and practise in the offline labs.</Text>}
   </View>
@@ -162,44 +238,15 @@ export default function ClassroomScreen(){
      <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
     </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
   </View>
-  <Text className="text-white text-lg font-bold mt-7">1. Choose an Academy course</Text>
-  <Text className="text-slate-300 mt-2 mb-3">
-   The classroom reads the same ten course progress stores as Academy. Choose a short original public review to study.
-   Private full-length textbooks are never loaded here.
-  </Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-   {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
-    accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
-    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(true);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
-    className={course.id===c.id?"bg-green-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
-    <Text className="text-white font-bold">{c.code}</Text>
-   </TouchableOpacity>)}
-  </ScrollView>
-  <View className="bg-slate-800 border border-slate-700 p-4 rounded-xl mt-3">
-   <Text className="text-white font-bold">{course.title}</Text>
-   <Text className="text-slate-300 mt-2">
-    {course.percent}% self-reported milestones · Next: {course.next.action}
-   </Text>
-   <Text className="text-slate-300 mt-2">{course.next.title}</Text>
-   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open corresponding Academy course"
-    onPress={()=>router.push(course.route)} className="bg-indigo-800 p-3 rounded-xl mt-3">
-    <Text className="text-white text-center font-bold">Open full Academy course →</Text>
-   </TouchableOpacity>
-  </View>
-  <Text className="text-white font-bold mt-5 mb-3">Select a short public unit review</Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-   {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
-    accessibilityLabel={"Choose classroom unit "+u.id}
-    accessibilityState={{selected:review.unitId===u.id}}
-    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(true);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
-    className={review.unitId===u.id?"bg-green-800 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
-    <Text className="text-white">Unit {u.id}</Text>
-   </TouchableOpacity>)}
-  </ScrollView>
   <View className="bg-slate-800 p-4 rounded-xl mt-3">
    <Text className="text-white font-bold">{review.unitTitle}</Text>
-   <Text selectable className="text-slate-300 mt-2">{review.source.content}</Text>
-   <Text className="text-slate-400 text-xs mt-2">{review.attribution}</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showSource}}
+    accessibilityLabel="Read this lesson source excerpt" onPress={()=>setShowSource(v=>!v)}
+    className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white font-bold">{showSource?"Hide source excerpt ↑":"Read lesson source excerpt ↓"}</Text>
+   </TouchableOpacity>
+   {showSource&&<View><Text selectable className="text-slate-200 leading-6 mt-3">{review.source.content}</Text>
+    <Text className="text-slate-400 text-xs mt-3">{review.attribution}</Text></View>}
    {!includeAcademyReview&&chosenNotes.length>=3&&<Text className="text-amber-200 mt-3">
     Deselect one personal note before adding this Academy review. At most three sources are used.
    </Text>}
