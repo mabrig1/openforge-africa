@@ -1,7 +1,7 @@
 import {create} from "zustand";
 import {persist,createJSONStorage} from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {type ExpansionCourse,getExpansionItem,expansionCompletion} from "../lib/academyExpansion";
+import {type ExpansionCourse,getExpansionItem,expansionCompletion,correctExpansionAnswer} from "../lib/academyExpansion";
 export type EvidenceDraft={url:string;note:string};
 interface ExpandedCoursesProgress{
  read:Record<ExpansionCourse,number[]>;
@@ -33,7 +33,7 @@ export const useExpandedCoursesProgress=create<ExpandedCoursesProgress>()(persis
   set(s=>({read:{...s.read,[course]:[...new Set([...s.read[course],id])]}}));},
  passQuiz:(course,id,answer)=>{
   if(!valid(course)||!getExpansionItem(course,id)||!Number.isInteger(answer)||answer<0||answer>2)return false;
-  if(answer!==1)return false;
+  if(!correctExpansionAnswer(course,id,answer))return false;
   set(s=>({passed:{...s.passed,[course]:[...new Set([...s.passed[course],id])]}}));
   return true;
  },
