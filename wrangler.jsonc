@@ -3,6 +3,7 @@
   "name": "openforge-africa",
   "compatibility_date": "2026-10-25",
   "workers_dev": false,
+  "preview_urls": true,
   "previews": {},
   "assets": {
     "directory": "./dist",
