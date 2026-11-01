@@ -92,8 +92,8 @@ export function getExpansionItem(course:ExpansionCourse,id:number):ReviewItem|un
 }
 export function correctExpansionAnswer(course:ExpansionCourse,id:number,index:number):boolean{
  const item=getExpansionItem(course,id);
- // App displays distractor 1, correct, distractor 2, to avoid always putting correct first.
- return !!item&&Number.isInteger(index)&&index===1;
+ // A deterministic per-unit answer position prevents a fixed "option 2" shortcut.
+ return !!item&&Number.isInteger(index)&&index===id%3;
 }
 export function expansionCompletion(course:ExpansionCourse,read:number[],passed:number[]):{
  total:number;completed:number;percent:number;
