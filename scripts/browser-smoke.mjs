@@ -228,7 +228,7 @@ try {
   console.log("PASS: three-case ethical interviewing lab branches, persists anonymously and exports scripted transcript to Reader");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
   await page.getByText("My Learning Dashboard").last().waitFor({state:"visible",timeout:15000});
-  await page.getByText("2 / 59 milestones").waitFor({state:"visible",timeout:15000});
+  await page.getByText("2 / 79 milestones").waitFor({state:"visible",timeout:15000});
   await page.getByText(/1\/23 milestones complete/).waitFor({state:"visible"});
   await page.getByText(/1\/6 milestones complete/).waitFor({state:"visible"});
   await page.getByRole("button",{name:"Set weekly study goal to 4 sessions"}).click();
@@ -238,7 +238,7 @@ try {
     name:"Record today's study session for Psychology in the Age of AI"}).click();
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.reload({waitUntil:"domcontentloaded"});
-  await page.getByText("2 / 59 milestones").waitFor({state:"visible"});
+  await page.getByText("2 / 79 milestones").waitFor({state:"visible"});
   await page.getByText("2 / 4 sessions recorded this device-calendar week").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Psychology in the Age of AI"}).click();
   await page.getByText("PSY 210: Psychology in the Age of AI").last().waitFor({state:"visible"});
@@ -291,12 +291,36 @@ try {
      !=="https://example.org/public-project-demo")throw Error("Forge local evidence draft lost after reload");
   console.log("PASS: FS101 10-week course, unverified proof draft and persistence without credential issuance");
   await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
-  await page.getByText("4 / 59 milestones").waitFor({state:"visible"});
+  await page.getByText("4 / 79 milestones").waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Human Intelligence, Logic and AI Decision Science"})
     .waitFor({state:"visible"});
   await page.getByRole("button",{name:"Resume Introduction to Forge Studies"})
     .waitFor({state:"visible"});
-  console.log("PASS: unified four-course Academy shows authentic separate 59 review milestones");
+  console.log("PASS: unified five-course Academy retains 79 separate review milestones");
+
+  // AIL 101 course is a short on-device companion, NOT the complete copyrighted manuscript.
+  await page.goto(address+"/ail101",{waitUntil:"domcontentloaded"});
+  await page.getByText("AI Literacy and Human–AI Collaboration").last()
+    .waitFor({state:"visible",timeout:15000});
+  await page.getByRole("radio",{name:/Option 1:/}).click();
+  await page.getByRole("button",{name:"Check formative answer"}).click();
+  await page.getByRole("button",{name:"Retry this formative quiz"}).click();
+  await page.getByRole("radio",{name:/Option 3:/}).click();
+  await page.getByRole("button",{name:"Check formative answer"}).click();
+  await page.getByRole("button",{name:"Mark AI literacy review as read"}).click();
+  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.reload({waitUntil:"domcontentloaded"});
+  await page.getByText("1 / 20").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Send review to offline infographic and explainer studio"}).click();
+  const ailDraft=await page.getByRole("textbox",{name:"Explainer source text"}).inputValue();
+  if(!ailDraft.includes("independently checking important claims"))
+    throw Error("AIL 101 review not transferred to offline explainer");
+  await page.goto(address+"/academy",{waitUntil:"domcontentloaded"});
+  await page.getByText("5 / 79 milestones").waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Resume AI Literacy and Human–AI Collaboration"})
+    .waitFor({state:"visible"});
+  console.log("PASS: AIL 101 wrong/correct quiz, dual milestone, persistence, local explainer and fifth subject");
+
   await page.goto(address+"/statistics-lab",{waitUntil:"domcontentloaded"});
   await page.getByText("Descriptive Statistics Laboratory").last().waitFor({state:"visible"});
   await page.getByText("5.4",{exact:true}).waitFor({state:"visible"});
