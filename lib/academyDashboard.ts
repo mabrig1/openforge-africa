@@ -1,11 +1,12 @@
 /**
- * Deterministic, offline-only Academy dashboard shared by two courses.
+ * Deterministic, offline-only Academy dashboard shared by four courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
 import { LOGIC_LESSONS } from "./logicCourse.ts";
 import { PSY210_MODULES } from "./psy210Course.ts";
+import {getExpansion,type ExpansionCourse} from "./academyExpansion.ts";
 
-export type AcademyCourseId = "logic"|"psy210";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -13,6 +14,12 @@ export interface AcademySnapshotInput {
   psyRead: number[];
   psyScores: Record<string,number>;
   psySelected: number;
+  decisionRead:number[];
+  decisionPassed:number[];
+  decisionSelected:number;
+  forgeRead:number[];
+  forgePassed:number[];
+  forgeSelected:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -21,7 +28,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies";
   total:number;
   completed:number;
   percent:number;
@@ -39,6 +46,14 @@ export const ACADEMY_COURSE_META={
     id:"psy210",code:"PSY 210",title:"Psychology in the Age of AI",
     route:"/psychology-course",notice:"Six adapted module reviews; full reader and larger practice bank are in the separate course kit.",
   },
+  decision:{
+    id:"decision",code:"HILADS",title:"Human Intelligence, Logic and AI Decision Science",
+    route:"/decision-science",notice:"Twenty adapted reviews; complete 100-page Mabrig Korie textbook is in the private offline library. Institutional credit is not granted.",
+  },
+  forge:{
+    id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
+    route:"/forge-studies",notice:"Ten weeks of independent review. Public project evidence and mentor validation are separate and NOT awarded in this app.",
+  },
 } as const;
 function distinctKnown(ids:unknown, total:number):number[]{
   if(!Array.isArray(ids))return [];
@@ -49,7 +64,7 @@ function boundedScore(value:unknown):number{
 }
 function percent(completed:number,total:number){return Math.round(100*completed/total);}
 export function getAcademyDashboard(input:AcademySnapshotInput):{
- courses:[AcademyCourseSummary,AcademyCourseSummary];
+ courses:AcademyCourseSummary[];
  completed:number;total:number;percent:number;
 }{
  const logicRead=distinctKnown(input.logicRead,LOGIC_LESSONS.length);
@@ -107,8 +122,33 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
   next:{number:psyNext?.id??0,title:psyNext?.name??"Self-study complete",
     action:psyNextAction,detail:psyNextDetail},
  };
- const total=logic.total+psy.total, completed=logic.completed+psy.completed;
- return {courses:[logic,psy],completed,total,percent:percent(completed,total)};
+
+ function expanded(course:ExpansionCourse):AcademyCourseSummary{
+   const all=getExpansion(course);
+   const isDecision=course==="decision";
+   const read=distinctKnown(isDecision?input.decisionRead:input.forgeRead,all.length);
+   const passed=distinctKnown(isDecision?input.decisionPassed:input.forgePassed,all.length);
+   const complete=read.filter(id=>passed.includes(id));
+   const selected=isDecision?input.decisionSelected:input.forgeSelected;
+   const next=all.find(x=>x.id===selected&&!complete.includes(x.id))||
+      all.find(x=>!complete.includes(x.id));
+   const action:AcademyNext["action"]=!next?"Explore independently":
+      !read.includes(next.id)&&passed.includes(next.id)?"Mark reading reviewed":
+      read.includes(next.id)&&!passed.includes(next.id)?"Review or retake quiz":"Read and study";
+   const detail=!next?
+      (isDecision?"All independent unit reviews recorded.":"Weekly self-study reviews finished; external project proof remains unverified."):
+      action==="Mark reading reviewed"?"Read the complete unit and mark the review in the app.":
+      action==="Review or retake quiz"?"Pass the source-aligned formative check.":"Read the source-aligned summary and try its practice question.";
+   return {...ACADEMY_COURSE_META[course],
+     total:all.length,completed:complete.length,percent:percent(complete.length,all.length),
+     read:read.length,practised:passed.length,
+     next:{number:next?.id??0,title:next?.title??"Self-study complete",action,detail}};
+ }
+ const decision=expanded("decision"),forge=expanded("forge");
+ const courses=[logic,psy,decision,forge];
+ const total=courses.reduce((sum,x)=>sum+x.total,0),
+    completed=courses.reduce((sum,x)=>sum+x.completed,0);
+ return {courses,completed,total,percent:percent(completed,total)};
 }
 /** Stored date-only records use the DEVICE calendar, never a timezone-shifted ISO timestamp. */
 export function localCalendarDay(now:Date=new Date()):string {
@@ -137,7 +177,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(r.course!=="logic"&&r.course!=="psy210")continue;
+  if(!["logic","psy210","decision","forge"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -155,5 +195,7 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
  const entries=valid.filter(x=>dayUTC(x.day)>=monday);
  return {count:entries.length,activeDays:new Set(entries.map(x=>x.day)).size,
    byCourse:{logic:entries.filter(x=>x.course==="logic").length,
-     psy210:entries.filter(x=>x.course==="psy210").length}};
+     psy210:entries.filter(x=>x.course==="psy210").length,
+     decision:entries.filter(x=>x.course==="decision").length,
+     forge:entries.filter(x=>x.course==="forge").length}};
 }
