@@ -191,7 +191,7 @@ export default function ClassroomScreen(){
    {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
     accessibilityLabel={"Choose classroom unit "+u.id}
     accessibilityState={{selected:review.unitId===u.id}}
-    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
+    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(true);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
     className={review.unitId===u.id?"bg-green-800 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
     <Text className="text-white">Unit {u.id}</Text>
    </TouchableOpacity>)}
