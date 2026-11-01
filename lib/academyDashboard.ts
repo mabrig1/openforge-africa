@@ -1,5 +1,5 @@
 /**
- * Deterministic, offline-only Academy dashboard shared by eight courses.
+ * Deterministic, offline-only Academy dashboard shared by nine courses.
  * Course checks remain independent; this does NOT grant credits or grades.
  */
 import { LOGIC_LESSONS } from "./logicCourse.ts";
@@ -8,8 +8,9 @@ import {getExpansion,type ExpansionCourse} from "./academyExpansion.ts";
 import {AIL101_UNITS} from "./ail101Course.ts";
 import {getNewCourseUnits,NEW_COURSE_META,type NewCourseId} from "./additionalAcademyCourses.ts";
 import {SOUL_LESSONS} from "./integratedSoulCourse.ts";
+import {CLEAR_SIGHT_UNITS} from "./clearSightCourse.ts";
 
-export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401"|"soul";
+export type AcademyCourseId = "logic"|"psy210"|"decision"|"forge"|"ail101"|"rlx101"|"ceai401"|"soul"|"clearSight";
 export interface AcademySnapshotInput {
   logicRead: number[];
   logicPassed: number[];
@@ -35,6 +36,9 @@ export interface AcademySnapshotInput {
   soulRead?:number[];
   soulPassed?:number[];
   soulSelected?:number;
+  clearRead?:number[];
+  clearPassed?:number[];
+  clearSelected?:number;
 }
 export interface AcademyNext {
   number:number; title:string; action:"Read and study"|"Complete practice check"|"Mark reading reviewed"|"Review or retake quiz"|"Explore independently"; detail:string;
@@ -43,7 +47,7 @@ export interface AcademyCourseSummary {
   id:AcademyCourseId;
   title:string;
   code:string;
-  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany"|"/integrated-soul";
+  route:"/course"|"/psychology-course"|"/decision-science"|"/forge-studies"|"/ail101"|"/relationalics"|"/ethnobotany"|"/integrated-soul"|"/clear-sight";
   total:number;
   completed:number;
   percent:number;
@@ -72,6 +76,7 @@ export const ACADEMY_COURSE_META={
   rlx101:{id:"rlx101",...NEW_COURSE_META.rlx101},
   ceai401:{id:"ceai401",...NEW_COURSE_META.ceai401},
   soul:{id:"soul",code:"TIS SELF-STUDY",title:"The Integrated Soul: Philosophy, Psychology and Christian Transformation",route:"/integrated-soul",notice:"Six-week Christian formation masterclass, twelve adapted seminar reviews. No diagnosis, therapy, verified spiritual outcome or academic credit."},
+  clearSight:{id:"clearSight",code:"CSD SELF-STUDY",title:"Clear Sight: Mastering Discernment",route:"/clear-sight",notice:"24 source-aligned reviews spanning six modules; full private 100-page textbook stays outside GitHub. Not investigation, therapy or an accredited credential."},
   forge:{
     id:"forge",code:"FS 101",title:"Introduction to Forge Studies",
     route:"/forge-studies",notice:"Ten weeks of independent review. Public project evidence and mentor validation are separate and NOT awarded in this app.",
@@ -227,7 +232,25 @@ export function getAcademyDashboard(input:AcademySnapshotInput):{
       soulAction==="Review or retake quiz"?"Try the formative question, not a clinical or spiritual test.":
       "Read the short source-aligned seminar and reflect on its fictional learning case."}
  };
- const courses=[logic,psy,decision,forge,ail,rlx,ceai,soul];
+
+ const clearRead=distinctKnown(input.clearRead??[],CLEAR_SIGHT_UNITS.length);
+ const clearPassed=distinctKnown(input.clearPassed??[],CLEAR_SIGHT_UNITS.length);
+ const clearCompleted=clearRead.filter(id=>clearPassed.includes(id));
+ const clearNext=CLEAR_SIGHT_UNITS.find(x=>x.id===input.clearSelected&&!clearCompleted.includes(x.id))||
+   CLEAR_SIGHT_UNITS.find(x=>!clearCompleted.includes(x.id));
+ const clearAction:AcademyNext["action"]=!clearNext?"Explore independently":
+   !clearRead.includes(clearNext.id)&&clearPassed.includes(clearNext.id)?"Mark reading reviewed":
+   clearRead.includes(clearNext.id)&&!clearPassed.includes(clearNext.id)?"Review or retake quiz":"Read and study";
+ const clearSight:AcademyCourseSummary={...ACADEMY_COURSE_META.clearSight,
+   total:CLEAR_SIGHT_UNITS.length,completed:clearCompleted.length,
+   percent:percent(clearCompleted.length,CLEAR_SIGHT_UNITS.length),
+   read:clearRead.length,practised:clearPassed.length,
+   next:{number:clearNext?.id??0,title:clearNext?.title??"Self-study complete",
+     action:clearAction,detail:!clearNext?"All 24 local review checks recorded; the full source capstone remains unverified.":
+      clearAction==="Mark reading reviewed"?"Practice passed; mark this review as read after studying.":
+      clearAction==="Review or retake quiz"?"Pass the source-aligned formative question.":"Read the brief lesson and check its evidence-based reasoning."}
+ };
+ const courses=[logic,psy,decision,forge,ail,rlx,ceai,soul,clearSight];
  const total=courses.reduce((sum,x)=>sum+x.total,0),
     completed=courses.reduce((sum,x)=>sum+x.completed,0);
  return {courses,completed,total,percent:percent(completed,total)};
@@ -259,7 +282,7 @@ export function sanitizeAcademySessions(rows:unknown,referenceDay:string):Academ
  for(const row of rows){
   if(!row||typeof row!=="object")continue;
   const r=row as Record<string,unknown>;
-  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401","soul"].includes(r.course as string))continue;
+  if(!["logic","psy210","decision","forge","ail101","rlx101","ceai401","soul","clearSight"].includes(r.course as string))continue;
   if(typeof r.day!=="string")continue;
   const time=dayUTC(r.day);
   if(!Number.isFinite(time)||time>current||time<current-90*86400000)continue;
@@ -283,5 +306,6 @@ export function academyWeeklySessions(rows:unknown,referenceDay:string):{
      ail101:entries.filter(x=>x.course==="ail101").length,
      rlx101:entries.filter(x=>x.course==="rlx101").length,
      ceai401:entries.filter(x=>x.course==="ceai401").length,
-     soul:entries.filter(x=>x.course==="soul").length}};
+     soul:entries.filter(x=>x.course==="soul").length,
+     clearSight:entries.filter(x=>x.course==="clearSight").length}};
 }
