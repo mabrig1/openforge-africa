@@ -67,5 +67,10 @@ test("Nigerian enhanced male-name voice is preferred only if actually installed;
  assert.ok(scoreVoice(voices[1])>scoreVoice(voices[2]));
  assert.equal(bestAvailableVoice(voices,"uk")?.id,"uk");
  assert.equal(bestAvailableVoice(voices,"deleted")?.id,"abeo");
+ const regionalChoices=[
+  {id:"female",name:"Ezinne Neural",lang:"en-NG",quality:"enhanced" as const},
+  {id:"male",name:"Chilemba Neural",lang:"en-KE",quality:"enhanced" as const}
+ ];
+ assert.equal(bestAvailableVoice(regionalChoices)?.id,"male");
  assert.equal(bestAvailableVoice([]),null);
 });
