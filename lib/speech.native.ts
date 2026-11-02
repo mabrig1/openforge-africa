@@ -1,7 +1,21 @@
-/** Native Android/iOS device TTS. May use installed platform voices. */
+/** Android/iOS installed speech voices. Never upload text or impersonate a
+ * Nigerian male voice if the device did not install one.
+ */
 import * as Speech from "expo-speech";
-export function speakText(text: string, rate = 1) {
-  Speech.stop();
-  Speech.speak(text.slice(0, 4000), { language: "en", rate: Math.min(1.6, Math.max(0.7, rate)) });
+import {bestAvailableVoice,orderSpeechVoices,type SpeechVoiceChoice} from "./voiceSelection";
+export async function getSpeechVoices():Promise<SpeechVoiceChoice[]>{
+ const all=await Speech.getAvailableVoicesAsync();
+ return orderSpeechVoices(all.map(v=>({
+  id:v.identifier,name:v.name,lang:v.language,
+  quality:String(v.quality).toLowerCase().includes("enhanced")?"enhanced":"standard"
+ })));
 }
-export function stopSpeech() { Speech.stop(); }
+export function speakText(text:string,rate=0.94,voiceId?:string|null){
+ Speech.stop();
+ const chosen=voiceId||undefined;
+ Speech.speak(text.slice(0,4000),{
+  language:"en-NG",rate:Math.min(1.3,Math.max(0.75,rate)),pitch:0.96,
+  ...(chosen?{voice:chosen}:{})
+ });
+}
+export function stopSpeech(){Speech.stop();}
