@@ -147,6 +147,8 @@ try {
   await page.getByText("OFFLINE NOTE LOOKUP").waitFor({state:"visible",timeout:15000});
   console.log("PASS: offline tutor with explicit selected notes");
   await page.goto(address+"/reader",{waitUntil:"domcontentloaded"});
+  await page.getByRole("button",{name:"Preview narrator voice"}).waitFor({state:"visible"});
+  await page.getByRole("button",{name:"Choose installed narrator voice"}).click();
   await page.getByText("Text Reader").last().waitFor({state:"visible",timeout:15000});
   await page.getByRole("textbox",{name:"Text for speech reader"}).fill("Public accountability means explaining decisions.");
   await page.getByRole("button",{name:"Speed 1.2 times"}).click();
@@ -610,9 +612,16 @@ try {
   await page.getByText("YOUR LEARNING CONVERSATION",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/Based on: PSY 210/).first().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Read classroom conversation aloud"}).waitFor({state:"visible"});
+  // New release gate: next lesson must remain locked until the authentic quiz passes.
+  if(await page.getByRole("button",{name:"Next lesson"}).isEnabled())
+    throw Error("Student advanced without passing the lesson's formative assessment");
+  await page.getByRole("radio",{name:/Quiz 1 option 2:/}).click();
+  await page.getByRole("radio",{name:/Quiz 2 option 1:/}).click();
+  await page.getByRole("radio",{name:/Quiz 3 option 3:/}).click();
+  await page.getByRole("button",{name:"Grade this lesson quiz"}).click();
+  await page.getByText(/Passed — next lesson unlocked/).first().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Next lesson"}).click();
   await page.getByText(/LESSON 2 OF 6/).waitFor({state:"visible"});
-  await page.getByRole("button",{name:"Read this lesson source excerpt"}).click();
   await page.getByText(/Public review:/).first().waitFor({state:"visible"});
   await page.getByRole("textbox",{name:"Your private lesson reflection"}).fill("This is a lesson about cognitive theories and their use in artificial intelligence.");
   await page.getByRole("button",{name:"Reveal lesson self-check checklist"}).click();
