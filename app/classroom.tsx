@@ -10,6 +10,7 @@ import {academyCourseExists,academyCourseReview,listAcademyClassroomUnits} from 
 import type {AcademyCourseId} from "../lib/academyDashboard";
 import {speakText,stopSpeech} from "../lib/speech";
 import {useNarrationStore} from "../stores/narrationStore";
+import {setStudioDraft} from "../lib/studioDraft";
 import {getLessonCheck,gradeCheck,getCourseAssessment} from "../lib/guidedLearning";
 import {lessonPassed,recordGuidedQuiz,unlockedLesson} from "../lib/guidedCourseProgress";
 import {useGuidedAssessmentStore} from "../stores/guidedAssessmentStore";
@@ -223,8 +224,22 @@ export default function ClassroomScreen(){
     className="bg-slate-700 rounded-xl p-3 mt-3">
     <Text className="text-white font-bold">{showSource?"Hide source excerpt ↑":"Read lesson source excerpt ↓"}</Text>
    </TouchableOpacity>
-   {showSource&&<View><Text selectable className="text-slate-200 leading-6 mt-3">{review.source.content}</Text>
-    <Text className="text-slate-400 text-xs mt-3">{review.attribution}</Text></View>}
+   {showSource&&<View>
+    <Text selectable className="text-slate-200 leading-6 mt-3">{review.source.content}</Text>
+    <Text className="text-slate-400 text-xs mt-3">{review.attribution}</Text>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Listen to this lesson"
+      onPress={()=>{try{setSpeechError("");speakText(review.source.content,narratorRate,narratorVoice);}
+       catch(e){setSpeechError(e instanceof Error?e.message:"Speech is unavailable.");}}}
+      className="bg-emerald-700 rounded-xl p-3 mt-4">
+      <Text className="text-white text-center font-bold">▶ Listen to this lesson</Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Choose voice in text reader"
+      onPress={()=>{stopSpeech();setStudioDraft(review.unitTitle,review.source.content);router.push("/reader");}}
+      className="bg-slate-700 rounded-xl p-3 mt-3">
+      <Text className="text-white text-center font-bold">Change narrator voice →</Text>
+    </TouchableOpacity>
+    {!!speechError&&<Text className="text-amber-200 mt-3">{speechError}</Text>}
+   </View>}
    {!includeAcademyReview&&chosenNotes.length>=3&&<Text className="text-amber-200 mt-3">
     Deselect one personal note before adding this Academy review. At most three sources are used.
    </Text>}
