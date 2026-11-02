@@ -31,6 +31,7 @@ export default function FreeClassroomAI(){
  const [answer,setAnswer]=useState<ResponseContent|null>(null);
  const [error,setError]=useState("");
  const [busy,setBusy]=useState(false);
+ const [previewOpen,setPreviewOpen]=useState(false);
  const course=academy.courses.find(c=>c.id===courseId)??academy.courses[0];
  const review=academyCourseReview(course,unitId??undefined);
  const units=listAcademyClassroomUnits(course.id);
@@ -71,16 +72,39 @@ export default function FreeClassroomAI(){
  };
  return <ScrollView className="flex-1 bg-slate-900"
   contentContainerStyle={{padding:18,paddingBottom:90}} keyboardShouldPersistTaps="handled">
-  <Text className="text-green-400 text-xs font-bold">OPENFORGE AFRICA • ACCOUNT-BASED TRIAL</Text>
-  <Text className="text-white text-3xl font-extrabold mt-2">Authenticated AI Classroom</Text>
-  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
-   <Text className="text-amber-100 leading-6">
-    This is an optional future server-metered generative AI preview, separate from the
-    free offline classroom. It is DISABLED until the owner deploys an authenticated
-    Cloudflare Access app, a durable quota ledger and an approved capped provider account.
-    No model request occurs unless you explicitly approve the source transfer.
+  <Text className="text-emerald-300 text-xs font-bold">OPENFORGE AFRICA · LEARNING OPTIONS</Text>
+  <Text className="text-white text-3xl font-extrabold mt-2">Your classroom is ready</Text>
+  <Text className="text-slate-300 mt-3 leading-6">
+   You do not need an account or an AI subscription to study. The free classroom uses selected Academy reviews and runs on this device.
+  </Text>
+  <View className="bg-emerald-950 border border-emerald-600 rounded-2xl p-5 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">AVAILABLE NOW · NO LOGIN</Text>
+   <Text className="text-white text-xl font-bold mt-2">Start a guided lesson with the classroom roles</Text>
+   <Text className="text-slate-200 mt-2 leading-5">
+    Open a real course review, ask the teacher, and hear different viewpoints from the 15 local learning roles. This is source-guided offline learning, not generative model inference.
    </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Start working free classroom now"
+    onPress={()=>router.replace({pathname:"/classroom",params:{course:course.id}})}
+    className="bg-emerald-500 rounded-xl p-4 mt-4">
+    <Text className="text-slate-950 text-center font-extrabold">START FREE CLASSROOM →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Browse ten available courses"
+    onPress={()=>router.push("/academy")} className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white text-center font-bold">Browse the course catalogue</Text>
+   </TouchableOpacity>
   </View>
+  <View className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-5">
+   <Text className="text-white text-lg font-bold">Optional live AI</Text>
+   <Text className="text-slate-300 mt-2 leading-5">
+    Online model replies need identity verification, a durable quota service and a funded provider. Availability is not confirmed; free lessons work independently.
+   </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:previewOpen}}
+    accessibilityLabel={previewOpen?"Hide optional AI trial settings":"Show optional AI trial settings"}
+    onPress={()=>setPreviewOpen(x=>!x)} className="bg-indigo-700 rounded-xl p-4 mt-4">
+    <Text className="text-white text-center font-bold">{previewOpen?"Hide live AI trial settings ↑":"Check optional live AI access ↓"}</Text>
+   </TouchableOpacity>
+  </View>
+  {previewOpen&&<View>
   <View className="bg-slate-800 rounded-xl p-4 mt-4">
    <Text className="text-white font-bold">Account verification and quota</Text>
    <Text className="text-slate-300 mt-2">
@@ -173,6 +197,7 @@ export default function FreeClassroomAI(){
     <Text selectable className="text-white mt-3">{answer.answer}</Text>
     <Text className="text-amber-200 text-xs mt-3">{answer.warning||"Model content is not verified. Recheck sources."}</Text>
    </View>}
+  </View>}
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Back to free offline classroom"
    onPress={()=>router.push("/classroom")} className="bg-indigo-800 p-4 rounded-xl mt-6">
     <Text className="text-white text-center font-bold">Return to free offline classroom →</Text>

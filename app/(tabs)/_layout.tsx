@@ -29,7 +29,7 @@ export default function TabLayout(){
     <MaterialCommunityIcons name="school-outline" color={color} size={size}/>,
   }}/>
   <Tabs.Screen name="agent-classroom" options={{
-   title:"15 Agents",headerTitle:"AI Classroom",
+   title:"Classroom",headerTitle:"Guided Classroom",
    tabBarIcon:({color,size})=>
     <MaterialCommunityIcons name="account-group-outline" color={color} size={size}/>,
   }}/>

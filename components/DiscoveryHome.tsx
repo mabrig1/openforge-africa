@@ -72,7 +72,7 @@ function HeroArt({wide}:{wide:boolean}){
    paddingHorizontal:14,paddingVertical:12,borderRadius:15,
    backgroundColor:"#FFFFFF",maxWidth:220}}>
    <Text style={{color:"#0D8D76",fontSize:10,fontWeight:"900",letterSpacing:1}}>TEACH • QUESTION • DISCUSS</Text>
-   <Text style={{color:colors.ink,fontWeight:"900",marginTop:4,fontSize:13}}>Your classroom, your pace.</Text>
+   <Text style={{color:colors.ink,fontWeight:"900",marginTop:4,fontSize:13}}>Learn at your own pace.</Text>
   </View>
  </View>;
 }
@@ -195,7 +195,7 @@ export default function DiscoveryHome(){
      <View style={{flexDirection:wide?"row":"column",marginTop:24,gap:10}}>
       <Go label="Explore courses" route="/academy" accessibilityLabel="Explore all ten Academy courses"
        tone="primary" icon="book-open-variant"/>
-      <Go label="Meet the 15 agents" route="/classroom"
+      <Go label="Try a guided lesson" route="/classroom"
        accessibilityLabel="Launch free fifteen agent classroom from home" tone="nav" icon="account-group-outline"/>
      </View>
      <Text style={{color:"#9FB4D4",fontSize:11,marginTop:14,lineHeight:17}}>
@@ -308,7 +308,7 @@ export default function DiscoveryHome(){
      </Text>
     </View>
     <View style={{marginTop:wide?0:16,flex:wide?1:undefined}}>
-     <Go label="Enter classroom" route="/classroom" accessibilityLabel="Open interactive 15-agent classroom"
+     <Go label="Start guided classroom" route="/classroom" accessibilityLabel="Open interactive 15-agent classroom"
       tone="ghost" icon="forum-outline"/>
     </View>
    </View>

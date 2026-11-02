@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect,useState} from "react";
 import {useLocalSearchParams} from "expo-router";
 import {Platform,ScrollView,Text,TextInput,TouchableOpacity,View} from "react-native";
 import {router} from "expo-router";
@@ -8,6 +8,7 @@ import {getFreeAccess,localDayKey} from "../lib/classroomAccess";
 import {useClassroomAcademyDashboard} from "../hooks/useClassroomAcademyDashboard";
 import {academyCourseExists,academyCourseReview,listAcademyClassroomUnits} from "../lib/classroomAcademyBridge";
 import type {AcademyCourseId} from "../lib/academyDashboard";
+import {speakText,stopSpeech} from "../lib/speech";
 import {CLASSROOM_AGENTS,runClassroom,validateClassroomRoster,
  type ClassroomAgentId,type ClassroomMode,type ClassroomRun} from "../lib/openMaicClassroom";
 
@@ -17,7 +18,7 @@ export default function ClassroomScreen(){
  const [courseId,setCourseId]=useState<AcademyCourseId>(
    academyCourseExists(params.course??"")?params.course as AcademyCourseId:"logic");
  const [unitId,setUnitId]=useState<number|null>(null);
- const [includeAcademyReview,setIncludeAcademyReview]=useState(false);
+ const [includeAcademyReview,setIncludeAcademyReview]=useState(true);
  const [today]=useState(localDayKey());
  const trialStartedOn=useClassroomStore(s=>s.trialStartedOn);
  const dailyUsage=useClassroomStore(s=>s.dailyUsage);
@@ -28,6 +29,14 @@ export default function ClassroomScreen(){
  const [mode,setMode]=useState<ClassroomMode>("qa");
  const [topic,setTopic]=useState("");
  const [initiator,setInitiator]=useState<ClassroomAgentId>("of-physics-questioner");
+ const [showRolePicker,setShowRolePicker]=useState(false);
+ const [showCoursePicker,setShowCoursePicker]=useState(false);
+ const [showSource,setShowSource]=useState(false);
+ const [showTrace,setShowTrace]=useState(false);
+ const [showDetails,setShowDetails]=useState(false);
+ const [reflection,setReflection]=useState("");
+ const [showSelfCheck,setShowSelfCheck]=useState(false);
+ const [speechError,setSpeechError]=useState("");
  const [chosenNotes,setChosenNotes]=useState<string[]>([]);
  const [result,setResult]=useState<ClassroomRun|null>(null);
  const [error,setError]=useState("");
@@ -42,6 +51,21 @@ export default function ClassroomScreen(){
  const course=academy.courses.find(c=>c.id===courseId)??academy.courses[0];
  const review=academyCourseReview(course,unitId??undefined);
  const reviewUnits=listAcademyClassroomUnits(course.id);
+ const unitIndex=reviewUnits.findIndex(u=>u.id===review.unitId);
+ useEffect(()=>()=>{stopSpeech();},[]);
+ const resetLesson=()=>{setResult(null);setError("");setShowTrace(false);setShowSource(false);
+   setReflection("");setShowSelfCheck(false);stopSpeech();};
+ const changeUnit=(offset:number)=>{
+   const target=reviewUnits[unitIndex+offset];
+   if(!target)return;
+   setUnitId(target.id);setIncludeAcademyReview(true);resetLesson();
+   setOwnerConsent(false);setOwnerAnswer(null);
+ };
+ const playTranscript=()=>{
+   if(!result)return;
+   try{setSpeechError("");speakText(result.turns.map(t=>t.name+". "+t.message).join("\n\n"),0.9);}
+   catch(e){setSpeechError(e instanceof Error?e.message:"Speech is not available on this device.");}
+ };
  const roster=validateClassroomRoster();
  const selection=notes.filter(n=>chosenNotes.includes(n.id)).slice(0,3);
  const setSubject=(next:ClassroomMode)=>{setMode(next);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);};
@@ -72,15 +96,17 @@ export default function ClassroomScreen(){
    prev.length<(includeAcademyReview?2:3)?[...prev,id]:prev);
   setResult(null);
  };
- const run=()=>{
-  setError("");
-  if(!topic.trim()){setError("Enter a question or discussion topic.");return;}
+ const run=(suggested?:string,suggestedMode?:ClassroomMode)=>{
+  setError("");setShowTrace(false);stopSpeech();
+  const prompt=typeof suggested==="string"&&suggested.trim()?suggested.trim():topic.trim();
+  if(!prompt){setError("Enter a question or discussion topic.");return;}
+  if(suggested){setTopic(prompt);setMode(suggestedMode??"qa");}
   if(!access.remaining){setError("Today's local preview allowance is exhausted. Basic access renews tomorrow.");return;}
   try{
    const approvedSources=[...(includeAcademyReview?[review.source]:[]),...selection]
      .slice(0,3);
    const transcript=runClassroom({
-    mode,topic,selectedAgentId:initiator,maxSpeakers:access.maxSpeakers,
+    mode:suggestedMode??mode,topic:prompt,selectedAgentId:initiator,maxSpeakers:access.maxSpeakers,
     // Last 50 metadata-only traces, oldest first for least-recent rotation.
     recentAgentIds:logs.slice().reverse().flatMap(l=>l.agents).slice(-60),
    },approvedSources);
@@ -95,10 +121,137 @@ export default function ClassroomScreen(){
   <Text className="text-green-400 text-xs font-bold">OPENFORGE AFRICA • OPENMAIC-INSPIRED PREVIEW</Text>
   <Text className="text-white text-3xl font-extrabold mt-2">15-agent classroom</Text>
   <Text className="text-slate-300 leading-6 mt-3">
-   The Director routes real on-device learning prompts to 15 distinct educational roles.
-   Teacher-first question answering and rotating roundtables are testable without any provider charges.
+   Choose a course, practise with a source-based teacher response and hear distinct perspectives from selectable educational roles. No subscription is needed.
   </Text>
-  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
+  <View className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">YOUR COURSE · LESSON {review.unitId} OF {reviewUnits.length}</Text>
+   <Text className="text-white text-lg font-bold mt-2">{course.title}</Text>
+   <Text className="text-slate-300 mt-1">{review.unitTitle}</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open corresponding Academy course"
+    onPress={()=>router.push(course.route)} className="mt-3">
+    <Text className="text-emerald-300 font-bold">Read the complete available course track →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showCoursePicker}}
+    accessibilityLabel="Choose a different course or lesson"
+    onPress={()=>setShowCoursePicker(value=>!value)} className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white text-center font-bold">{showCoursePicker?"Close course selector ↑":"Change course or lesson ↓"}</Text>
+   </TouchableOpacity>
+   <View className="flex-row justify-between mt-3">
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous lesson"
+     accessibilityState={{disabled:unitIndex<=0}} disabled={unitIndex<=0}
+     onPress={()=>changeUnit(-1)} className="bg-slate-700 rounded-xl p-3"
+     style={{opacity:unitIndex<=0?0.4:1,width:"48%",minHeight:47}}>
+     <Text className="text-white text-center font-bold">← Previous</Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Next lesson"
+     accessibilityState={{disabled:unitIndex>=reviewUnits.length-1}}
+     disabled={unitIndex>=reviewUnits.length-1}
+     onPress={()=>changeUnit(1)} className="bg-slate-700 rounded-xl p-3"
+     style={{opacity:unitIndex>=reviewUnits.length-1?0.4:1,width:"48%",minHeight:47}}>
+     <Text className="text-white text-center font-bold">Next →</Text>
+    </TouchableOpacity>
+   </View>
+   {showCoursePicker&&<View className="mt-4">
+    <Text className="text-white font-bold mb-2">Choose a subject</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+     {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
+      accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
+      onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(true);
+       resetLesson();setOwnerConsent(false);setOwnerAnswer(null);}}
+      className={course.id===c.id?"bg-emerald-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}
+      style={{minWidth:125,minHeight:48}}>
+      <Text className="text-white font-bold">{c.code}</Text>
+      <Text className="text-slate-200 text-xs" numberOfLines={2} style={{maxWidth:170}}>{c.title}</Text>
+     </TouchableOpacity>)}
+    </ScrollView>
+    <Text className="text-white font-bold mt-4 mb-2">Choose a lesson</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+     {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
+      accessibilityLabel={"Choose classroom unit "+u.id}
+      accessibilityState={{selected:review.unitId===u.id}}
+      onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(true);resetLesson();setOwnerConsent(false);setOwnerAnswer(null);}}
+      className={review.unitId===u.id?"bg-emerald-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"} style={{minHeight:46}}>
+      <Text className="text-white">Lesson {u.id}</Text>
+     </TouchableOpacity>)}
+    </ScrollView>
+   </View>}
+  </View>
+  <View className="bg-emerald-950 border border-emerald-700 rounded-2xl p-5 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">START HERE · GUIDED STUDY</Text>
+   <Text className="text-white text-xl font-bold mt-2">{review.unitTitle}</Text>
+   <Text className="text-slate-200 mt-2 leading-5">
+    {course.code}: a public lesson review is already selected. Try a source-grounded explanation or a classroom discussion; you can change the lesson below.
+   </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Explain this course lesson now"
+    disabled={!access.remaining}
+    onPress={()=>run("Explain "+review.unitTitle+" using the selected lesson review","qa")}
+    className="bg-emerald-500 rounded-xl p-4 mt-4">
+    <Text className="text-slate-950 text-center font-extrabold">TEACH ME THIS LESSON →</Text>
+   </TouchableOpacity>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run a guided class discussion now"
+    disabled={!access.remaining}
+    onPress={()=>run("Discuss "+review.unitTitle+" and test its main assumptions","discussion")}
+    className="bg-indigo-700 rounded-xl p-4 mt-3">
+    <Text className="text-white text-center font-bold">START A CLASS DISCUSSION →</Text>
+   </TouchableOpacity>
+   {!access.remaining&&<Text className="text-amber-200 mt-3">Today's free run allowance is used. You can still read Academy lessons and practise in the offline labs.</Text>}
+  </View>
+  {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
+  {result&&<View className="bg-slate-800 border border-emerald-600 rounded-2xl p-4 mt-5"
+    accessibilityLabel="Local classroom discussion results">
+   <Text className="text-emerald-300 text-xs font-bold">YOUR LEARNING CONVERSATION</Text>
+   <Text className="text-white text-xl font-bold mt-2">{result.turns.length} roles contributed</Text>
+   {result.questionUnanswered&&<View className="bg-amber-950 p-3 rounded-xl mt-3">
+    <Text className="text-amber-100">No matching source was found for this question. Check the lesson selection or provide a relevant note.</Text>
+    {!includeAcademyReview&&<TouchableOpacity accessibilityRole="button"
+     accessibilityLabel="Use the selected public lesson as evidence"
+     onPress={()=>{setIncludeAcademyReview(true);setResult(null);}} className="bg-emerald-700 rounded-lg p-3 mt-2">
+     <Text className="text-white font-bold">Use selected lesson source →</Text>
+    </TouchableOpacity>}
+   </View>}
+   {result.turns.map((turn,i)=><View key={turn.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
+    <Text className="text-emerald-300 font-bold">{i+1}. {turn.name}</Text>
+    <Text selectable className="text-slate-100 leading-6 mt-2">{turn.message}</Text>
+    {!!turn.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
+     Based on: {turn.evidence.map(e=>e.title).join("; ")}
+    </Text>}
+   </View>)}
+   <View className="flex-row flex-wrap mt-3" style={{gap:9}}>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Read classroom conversation aloud"
+     onPress={playTranscript} className="bg-indigo-700 rounded-xl p-3" style={{flexGrow:1,minHeight:48}}>
+     <Text className="text-white text-center font-bold">▶ Listen to conversation</Text>
+    </TouchableOpacity>
+    <TouchableOpacity accessibilityRole="button" accessibilityLabel="Stop reading conversation"
+     onPress={()=>stopSpeech()} className="bg-slate-700 rounded-xl p-3" style={{minHeight:48}}>
+     <Text className="text-white font-bold">■ Stop</Text>
+    </TouchableOpacity>
+   </View>
+   {!!speechError&&<Text className="text-amber-200 mt-2">{speechError}</Text>}
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Show agent dispatch details"
+    accessibilityState={{expanded:showTrace}} onPress={()=>setShowTrace(v=>!v)}
+    className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white text-center font-bold">{showTrace?"Hide agent details ↑":"Show agent details ↓"}</Text>
+   </TouchableOpacity>
+   {showTrace&&<View className="bg-slate-950 p-3 rounded-xl mt-3">
+    <Text className="text-emerald-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
+    {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 text-xs mt-2">
+     Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
+    </Text>)}
+   </View>}
+   <Text className="text-slate-400 text-xs mt-4">
+    These are source-aware offline role workflows, not a live AI-model conversation. No transcript is uploaded.
+   </Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open full course after discussion"
+    onPress={()=>router.push(course.route)} className="bg-emerald-700 rounded-xl p-4 mt-4">
+    <Text className="text-white text-center font-bold">Continue into the course →</Text>
+   </TouchableOpacity>
+  </View>}
+  <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showDetails}}
+   accessibilityLabel="Show offline classroom limits and trial options"
+   onPress={()=>setShowDetails(value=>!value)} className="bg-slate-800 rounded-xl p-4 mt-5">
+   <Text className="text-slate-200 font-bold">Free classroom · {access.remaining} of {access.maxRuns} runs available · {showDetails?"Hide details ↑":"Details & trial ↓"}</Text>
+  </TouchableOpacity>
+  {showDetails&&<View>  <View className="bg-amber-950 border border-amber-700 rounded-xl p-4 mt-4">
    <Text className="text-amber-100 leading-5">
     This free version is a deterministic offline classroom, NOT 15 cloud-powered generative agents,
     an OpenMAIC deployment or an accredited university. Only selected local notes are inspected.
@@ -118,44 +271,16 @@ export default function ClassroomScreen(){
      <Text className="text-white text-center font-bold">Activate free 7-day Explorer preview (8 runs/day) →</Text>
     </TouchableOpacity>:<Text className="text-slate-300 mt-2">Explorer preview has ended. Free Basic remains available each day.</Text>}
   </View>
-  <Text className="text-white text-lg font-bold mt-7">1. Choose an Academy course</Text>
-  <Text className="text-slate-300 mt-2 mb-3">
-   The classroom reads the same ten course progress stores as Academy. Choose a short original public review to study.
-   Private full-length textbooks are never loaded here.
-  </Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-   {academy.courses.map(c=><TouchableOpacity key={c.id} accessibilityRole="button"
-    accessibilityState={{selected:course.id===c.id}} accessibilityLabel={"Classroom course "+c.code}
-    onPress={()=>{setCourseId(c.id);setUnitId(null);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
-    className={course.id===c.id?"bg-green-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
-    <Text className="text-white font-bold">{c.code}</Text>
-   </TouchableOpacity>)}
-  </ScrollView>
-  <View className="bg-slate-800 border border-slate-700 p-4 rounded-xl mt-3">
-   <Text className="text-white font-bold">{course.title}</Text>
-   <Text className="text-slate-300 mt-2">
-    {course.percent}% self-reported milestones · Next: {course.next.action}
-   </Text>
-   <Text className="text-slate-300 mt-2">{course.next.title}</Text>
-   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Open corresponding Academy course"
-    onPress={()=>router.push(course.route)} className="bg-indigo-800 p-3 rounded-xl mt-3">
-    <Text className="text-white text-center font-bold">Open full Academy course →</Text>
-   </TouchableOpacity>
-  </View>
-  <Text className="text-white font-bold mt-5 mb-3">Select a short public unit review</Text>
-  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-   {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
-    accessibilityLabel={"Choose classroom unit "+u.id}
-    accessibilityState={{selected:review.unitId===u.id}}
-    onPress={()=>{setUnitId(u.id);setIncludeAcademyReview(false);setResult(null);setOwnerConsent(false);setOwnerAnswer(null);}}
-    className={review.unitId===u.id?"bg-green-800 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"}>
-    <Text className="text-white">Unit {u.id}</Text>
-   </TouchableOpacity>)}
-  </ScrollView>
+</View>}
   <View className="bg-slate-800 p-4 rounded-xl mt-3">
    <Text className="text-white font-bold">{review.unitTitle}</Text>
-   <Text selectable className="text-slate-300 mt-2">{review.source.content}</Text>
-   <Text className="text-slate-400 text-xs mt-2">{review.attribution}</Text>
+   <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showSource}}
+    accessibilityLabel="Read this lesson source excerpt" onPress={()=>setShowSource(v=>!v)}
+    className="bg-slate-700 rounded-xl p-3 mt-3">
+    <Text className="text-white font-bold">{showSource?"Hide source excerpt ↑":"Read lesson source excerpt ↓"}</Text>
+   </TouchableOpacity>
+   {showSource&&<View><Text selectable className="text-slate-200 leading-6 mt-3">{review.source.content}</Text>
+    <Text className="text-slate-400 text-xs mt-3">{review.attribution}</Text></View>}
    {!includeAcademyReview&&chosenNotes.length>=3&&<Text className="text-amber-200 mt-3">
     Deselect one personal note before adding this Academy review. At most three sources are used.
    </Text>}
@@ -169,6 +294,29 @@ export default function ClassroomScreen(){
      {includeAcademyReview?"☑":"☐"} Include this public review as a local classroom source
     </Text>
    </TouchableOpacity>
+  </View>
+  <View className="bg-slate-800 border border-slate-700 rounded-2xl p-4 mt-5">
+   <Text className="text-emerald-300 text-xs font-bold">PRACTISE WHAT YOU LEARNED</Text>
+   <Text className="text-white font-bold mt-2">In your own words, what is the main idea of {review.unitTitle}?</Text>
+   <TextInput accessibilityLabel="Your private lesson reflection" multiline value={reflection}
+    maxLength={1000} onChangeText={value=>{setReflection(value);setShowSelfCheck(false);}}
+    placeholder="Write a summary, a real-world example, or a question..."
+    placeholderTextColor="#94a3b8" className="bg-slate-900 border border-slate-600 text-white rounded-xl p-4 mt-3"
+    style={{minHeight:85,textAlignVertical:"top"}}/>
+   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Reveal lesson self-check checklist"
+    disabled={!reflection.trim()} accessibilityState={{disabled:!reflection.trim()}}
+    onPress={()=>setShowSelfCheck(v=>!v)} className="bg-indigo-700 rounded-xl p-4 mt-3"
+    style={{opacity:reflection.trim()?1:0.5}}>
+    <Text className="text-white text-center font-bold">{showSelfCheck?"Hide self-check ↑":"Review my understanding →"}</Text>
+   </TouchableOpacity>
+   {showSelfCheck&&<View className="bg-slate-900 rounded-xl p-3 mt-3">
+    <Text className="text-white font-bold">Check your reflection against the lesson:</Text>
+    <Text className="text-slate-200 mt-2">1. Did you describe the central concept in your own words?</Text>
+    <Text className="text-slate-200 mt-2">2. Did you give an example consistent with the source?</Text>
+    <Text className="text-slate-200 mt-2">3. Did you identify one limitation or question?</Text>
+    <Text selectable className="text-slate-300 text-xs mt-3">Source for comparison: {review.source.content.slice(0,550)}</Text>
+    <Text className="text-slate-400 text-xs mt-3">Self-check only, not automated grading. Your reflection is not submitted.</Text>
+   </View>}
   </View>
   <Text className="text-white text-lg font-bold mt-7">2. Classroom mode</Text>
   <View className="flex-row mt-3">
@@ -188,24 +336,28 @@ export default function ClassroomScreen(){
    style={{minHeight:90,textAlignVertical:"top"}}/>
   <Text className="text-white text-lg font-bold mt-7">4. Choose a classmate</Text>
   <Text className="text-slate-300 mt-2 leading-5">
-   In discussions the chosen classmate can initiate when there is no unanswered direct question.
-   A question always goes to the Teacher first. All 13 classmates are selectable.
+   The selected classmate contributes to your next discussion. Teacher-first responses are preserved for direct questions. All 13 classmates can be selected.
   </Text>
-  <View className="flex-row flex-wrap justify-between mt-3">
+  <TouchableOpacity accessibilityRole="button" accessibilityState={{expanded:showRolePicker}}
+   accessibilityLabel="Choose a different classroom role"
+   onPress={()=>setShowRolePicker(value=>!value)} className="bg-slate-700 p-4 rounded-xl mt-3">
+   <Text className="text-white font-bold">Selected: {CLASSROOM_AGENTS.find(a=>a.id===initiator)?.name} · {showRolePicker?"Hide roles ↑":"Change role ↓"}</Text>
+  </TouchableOpacity>
+  {showRolePicker&&<View className="flex-row flex-wrap justify-between mt-3">
    {CLASSROOM_AGENTS.filter(a=>a.role==="student").map(a=><TouchableOpacity key={a.id}
     accessibilityRole="button" accessibilityState={{selected:initiator===a.id}}
     accessibilityLabel={"Choose "+a.name} onPress={()=>{setInitiator(a.id);setResult(null);}}
     style={{width:"48%"}}
     className={initiator===a.id?"bg-green-900 border border-green-500 p-3 rounded-xl mb-3":"bg-slate-800 border border-slate-700 p-3 rounded-xl mb-3"}>
     <Text className="text-white font-bold">{a.name}</Text>
-    <Text className="text-slate-400 text-xs">Priority {a.priority}</Text>
+    <Text className="text-slate-400 text-xs">{a.persona}</Text>
    </TouchableOpacity>)}
-  </View>
+  </View>}
   <Text className="text-white text-lg font-bold mt-6">5. Additional personal notes (optional)</Text>
   <Text className="text-slate-300 mt-2 mb-3">
    You may select up to three sources in total, including the public review above. Personal saved notes are used only after you explicitly select them; no network requests occur.
   </Text>
-  {!notes.length&&<Text className="text-amber-200 mb-3">No saved study-circle notes yet. You can still test the speaking schedule.</Text>}
+  {!notes.length&&<Text className="text-amber-200 mb-3">No saved personal notes yet. The selected public Academy review is sufficient to start learning.</Text>}
   {notes.map(n=><TouchableOpacity key={n.id} accessibilityRole="checkbox"
    accessibilityState={{checked:chosenNotes.includes(n.id)}} accessibilityLabel={"Choose saved note "+n.title}
    onPress={()=>toggleNote(n.id)} className={chosenNotes.includes(n.id)?"bg-green-900 rounded-xl p-3 mb-2":"bg-slate-800 rounded-xl p-3 mb-2"}>
@@ -213,34 +365,12 @@ export default function ClassroomScreen(){
    {chosenNotes.includes(n.id)&&<Text selectable className="text-slate-300 text-xs mt-2">{n.content.slice(0,350)}{n.content.length>350?"…":""}</Text>}
   </TouchableOpacity>)}
   <TouchableOpacity accessibilityRole="button" accessibilityLabel="Run free local classroom"
-   disabled={!topic.trim()||!access.remaining} onPress={run}
+   disabled={!topic.trim()||!access.remaining} onPress={()=>run()}
    className="bg-green-700 rounded-xl p-4 mt-5">
    <Text className="text-white text-center font-bold">
     {!access.remaining?"Today's free limit reached":"Run free local classroom →"}
    </Text>
   </TouchableOpacity>
-  {!!error&&<Text className="text-amber-300 mt-3">{error}</Text>}
-  {result&&<View className="bg-slate-800 border border-green-700 rounded-2xl p-5 mt-6">
-   <Text className="text-green-300 font-bold">VERIFIABLE DIRECTOR DISPATCH TRACE</Text>
-   {result.dispatched.map(d=><Text key={d.agentId} selectable className="text-slate-200 mt-2">
-    Round {d.index}: {d.name} ({d.agentId}, priority {d.priority}) — {d.reason}
-   </Text>)}
-   {result.questionUnanswered&&<Text className="text-amber-200 mt-3">
-    Source gap: a learner question remains unverified. The classroom was not automatically closed.
-   </Text>}
-   <Text className="text-white text-xl font-bold mt-5">Classroom transcript</Text>
-   {result.turns.map(t=><View key={t.agentId} className="bg-slate-900 border border-slate-700 rounded-xl p-4 mt-3">
-    <Text className="text-green-300 font-bold">{t.name.toUpperCase()}</Text>
-    <Text selectable className="text-slate-100 leading-6 mt-2">{t.message}</Text>
-    {!!t.evidence.length&&<Text className="text-indigo-200 text-xs mt-3">
-     Local source: {t.evidence.map(e=>e.title).join("; ")}
-    </Text>}
-   </View>)}
-   <Text className="text-slate-400 text-xs mt-4">
-    These turns are role-specific offline learning scaffolds, not generative responses.
-    No transcript was uploaded or published.
-   </Text>
-  </View>}
   <View className="bg-slate-800 p-4 rounded-xl mt-6">
    <Text className="text-white font-bold">Recent local dispatch history ({logs.length})</Text>
    {logs.slice(0,3).map(l=><Text key={l.id} selectable className="text-slate-300 text-xs mt-2">

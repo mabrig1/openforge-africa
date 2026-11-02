@@ -117,10 +117,11 @@ export function scheduleClassroom(settings:ClassroomSettings):Dispatch[]{
  else add(teacher,"roundtable-framing");
  if(settings.mode==="qa"){
   add(assistant,"short-source-clarification");
-  if(selected&&selected.role==="student"&&(selected.priority>=40||allowLow))
-   add(selected.id,allowLow?"user-selected-after-stagnation":"subject-specific-question");
+  if(selected?.role==="student")
+   add(selected.id,"explicit-learner-selected-specialist");
  }else{
   add(teacher,"teacher-framing-or-response");
+  if(selected?.role==="student")add(selected.id,"selected-classmate-after-teacher");
   if(selected?.role==="assistant")add(assistant,"explicit-assistant-choice");
   const students=CLASSROOM_AGENTS.filter(a=>a.role==="student")
    .filter(a=>a.priority>=40||allowLow);

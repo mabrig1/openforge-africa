@@ -21,10 +21,18 @@ test("direct human question always dispatches Teacher first",()=>{
   assert.equal(new Set(route.map(d=>d.agentId)).size,route.length);
  }
 });
-test("ordinary QA rejects low-priority participation, even when selected",()=>{
+test("QA actually runs the explicitly chosen learner role after teacher and assistant",()=>{
  const route=scheduleClassroom({topic:"What is logic?",mode:"qa",
   selectedAgentId:"of-quiet-observer",maxSpeakers:3});
- assert.deepEqual(route.map(d=>d.agentId),["of-teacher","of-assistant"]);
+ assert.deepEqual(route.map(d=>d.agentId),["of-teacher","of-assistant","of-quiet-observer"]);
+});
+test("direct questions preserve teacher first while running selected student",()=>{
+ const route=scheduleClassroom({topic:"Why does this work?",mode:"discussion",
+  selectedAgentId:"of-quiet-observer",maxSpeakers:3});
+ assert.equal(route[0].agentId,"of-teacher");
+ assert.equal(route[1].agentId,"of-quiet-observer");
+ assert.equal(route.length,3);
+ assert.equal(new Set(route.map(d=>d.agentId)).size,3);
 });
 test("discussion starts with chosen classmate and frames with teacher",()=>{
  const route=scheduleClassroom({topic:"Logic and thinking",mode:"discussion",
