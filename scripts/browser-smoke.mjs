@@ -612,14 +612,21 @@ try {
   await page.getByText("YOUR LEARNING CONVERSATION",{exact:true}).waitFor({state:"visible"});
   await page.getByText(/Based on: PSY 210/).first().waitFor({state:"visible"});
   await page.getByRole("button",{name:"Read classroom conversation aloud"}).waitFor({state:"visible"});
-  // New release gate: next lesson must remain locked until the authentic quiz passes.
-  if(await page.getByRole("button",{name:"Next lesson"}).isEnabled())
-    throw Error("Student advanced without passing the lesson's formative assessment");
-  await page.getByRole("radio",{name:/Quiz 1 option 2:/}).click();
-  await page.getByRole("radio",{name:/Quiz 2 option 1:/}).click();
-  await page.getByRole("radio",{name:/Quiz 3 option 3:/}).click();
-  await page.getByRole("button",{name:"Grade this lesson quiz"}).click();
-  await page.getByText(/Passed — next lesson unlocked/).first().waitFor({state:"visible"});
+  // The earlier PSY210 course smoke may have already passed unit one in the
+  // SAME persisted browser context. Respect legitimate mastery; otherwise test
+  // locked progression and the authentic three-question review.
+  const alreadyMastered=await page.getByText(/Lesson mastered/).first().isVisible();
+  if(!alreadyMastered){
+    if(await page.getByRole("button",{name:"Next lesson"}).isEnabled())
+      throw Error("Student advanced without passing the lesson's formative assessment");
+    await page.getByRole("radio",{name:/Quiz 1 option 2:/}).click();
+    await page.getByRole("radio",{name:/Quiz 2 option 1:/}).click();
+    await page.getByRole("radio",{name:/Quiz 3 option 3:/}).click();
+    await page.getByRole("button",{name:"Grade this lesson quiz"}).click();
+    await page.getByText(/Passed — next lesson unlocked/).first().waitFor({state:"visible"});
+  }else if(!(await page.getByRole("button",{name:"Next lesson"}).isEnabled())){
+    throw Error("Already-passed lesson incorrectly locked");
+  }
   await page.getByRole("button",{name:"Next lesson"}).click();
   await page.getByText(/LESSON 2 OF 6/).waitFor({state:"visible"});
   await page.getByText(/Public review:/).first().waitFor({state:"visible"});
