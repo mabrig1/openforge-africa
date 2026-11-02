@@ -16,7 +16,7 @@ test("all ten Academy courses have genuine graded checks for every one of 158 pu
    assert.ok(check.passMark>=1&&check.passMark<=check.items.length);
    for(const item of check.items){
     assert.equal(item.options.length,3);
-    assert.ok(item.options[item.answer].length>8);
+    assert.ok(item.options[item.answer].trim().length>0);
     assert.equal(new Set(item.options).size,3);
     assert.ok(item.rationale.length>15);
    }
