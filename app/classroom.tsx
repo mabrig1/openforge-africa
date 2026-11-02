@@ -206,8 +206,8 @@ export default function ClassroomScreen(){
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
      {reviewUnits.map(u=><TouchableOpacity key={u.id} accessibilityRole="button"
       accessibilityLabel={"Choose classroom unit "+u.id}
-      accessibilityState={{selected:review.unitId===u.id}}
-      disabled={u.id>unlocked} accessibilityState={{disabled:u.id>unlocked}}
+      accessibilityState={{selected:review.unitId===u.id,disabled:u.id>unlocked}}
+      disabled={u.id>unlocked}
       onPress={()=>{if(u.id<=unlocked){setUnitId(u.id);setIncludeAcademyReview(true);resetLesson();setOwnerConsent(false);setOwnerAnswer(null);}}}
       className={review.unitId===u.id?"bg-emerald-700 p-3 rounded-xl mr-2":"bg-slate-700 p-3 rounded-xl mr-2"} style={{minHeight:46}}>
       <Text className="text-white">Lesson {u.id}{u.id>unlocked?" 🔒":""}</Text>
